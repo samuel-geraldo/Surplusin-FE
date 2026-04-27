@@ -7,4 +7,8 @@ export const STORAGE_KEYS = {
 
 export const ROUTES = {
   HOME: '/',
+  RECIPIENT_DASHBOARD: '/recipient/dashboard',
+  RECIPIENT_HANDOVER: '/recipient/handover',
+  RECIPIENT_HISTORY: '/recipient/history',
+  RECIPIENT_PROFILE: '/recipient/profile',
 };
