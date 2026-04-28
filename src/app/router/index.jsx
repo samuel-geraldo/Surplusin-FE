@@ -4,10 +4,10 @@ import { RootLayout } from '@/components/layout/RootLayout';
 import { PublicLayout } from '@/components/layout/PublicLayout';
 import { RecipientLayout } from '@/components/layout/recipient/RecipientLayout';
 import HomePage from '@/pages/HomePage';
-import RecipientDashboardPage from '@/pages/RecipientDashboardPage';
-import RecipientHandoverPage from '@/pages/RecipientHandoverPage';
-import RecipientHistoryPage from '@/pages/RecipientHistoryPage';
-import RecipientProfilePage from '@/pages/RecipientProfilePage';
+import RecipientDashboardPage from '@/pages/recipient-dashboard/RecipientDashboardPage';
+import RecipientHandoverPage from '@/pages/recipient-dashboard/RecipientHandoverPage';
+import RecipientHistoryPage from '@/pages/recipient-dashboard/RecipientHistoryPage';
+import RecipientProfilePage from '@/pages/recipient-dashboard/RecipientProfilePage';
 
 export const router = createBrowserRouter([
   {

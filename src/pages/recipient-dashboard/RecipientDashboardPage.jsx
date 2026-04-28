@@ -1,57 +1,13 @@
-import { useMemo, useState } from 'react';
-import {
-  AvailableDonationList,
-  DonationFilters,
-  RecipientPageLayout,
-  SummaryCard,
-} from '@/features/recipient-dashboard/components';
-import {
-  availableDonations,
-  donationFoodTypeOptions,
-  recipientSummaryCards,
-} from '@/features/recipient-dashboard/data/mockRecipientDashboardData';
-
 export default function RecipientDashboardPage() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedFoodType, setSelectedFoodType] = useState('all');
-
-  const filteredDonations = useMemo(() => {
-    return availableDonations.filter((donation) => {
-      const keyword = searchQuery.trim().toLowerCase();
-      const matchKeyword =
-        !keyword ||
-        donation.storeName.toLowerCase().includes(keyword) ||
-        donation.menuDescription.toLowerCase().includes(keyword) ||
-        donation.category.toLowerCase().includes(keyword);
-
-      const matchType =
-        selectedFoodType === 'all' || donation.categoryKey === selectedFoodType;
-
-      return matchKeyword && matchType;
-    });
-  }, [searchQuery, selectedFoodType]);
-
   return (
-    <RecipientPageLayout title="Recipients Dashboard">
-      <section className="mx-auto max-w-6xl space-y-5">
-        <div className="grid gap-3 sm:grid-cols-2">
-          {recipientSummaryCards.map((card) => (
-            <SummaryCard key={card.id} {...card} />
-          ))}
-        </div>
-
-        <section className="space-y-3">
-          <h2 className="text-h4 font-semibold text-text">Daftar Donasi yang Tersedia</h2>
-          <DonationFilters
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            selectedType={selectedFoodType}
-            onTypeChange={setSelectedFoodType}
-            typeOptions={donationFoodTypeOptions}
-          />
-          <AvailableDonationList donations={filteredDonations} />
-        </section>
-      </section>
-    </RecipientPageLayout>
+    <section className="rounded-[28px] border border-dashed border-border bg-surface px-6 py-10 shadow-[0_12px_36px_rgba(15,23,42,0.04)]">
+      <div className="space-y-1">
+        <h2 className="text-h4 text-text">Dashboard Penerima</h2>
+        <p className="text-body2 text-text-muted">
+          Layout dasar siap. Detail konten dashboard akan diimplementasikan pada
+          tahap berikutnya.
+        </p>
+      </div>
+    </section>
   );
 }
