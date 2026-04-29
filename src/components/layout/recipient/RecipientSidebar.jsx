@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Flame, LogOut } from 'lucide-react';
+import { LogOut } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import { recipientNavigationItems } from './recipientNavigation';
 import { cn } from '@/lib/utils';
@@ -20,14 +20,14 @@ export function RecipientSidebar() {
         type="button"
         onClick={() => setIsExpanded((prev) => !prev)}
         className={cn(
-          "flex h-[73px] shrink-0 items-center border-b border-border/80 transition-all duration-300 cursor-pointer",
+          "flex h-[57px] shrink-0 items-center border-b border-border/80 transition-all duration-300 cursor-pointer",
           isExpanded ? "justify-center px-6 -translate-x-3" : "justify-center"
         )}
         aria-label={isExpanded ? 'Collapse sidebar' : 'Expand sidebar'}
       >
         <div className="flex shrink-0 items-center justify-center">
           <div className="flex size-10 shrink-0 items-center justify-center text-primary transition-transform duration-200 active:scale-95 cursor-pointer">
-            <Flame className="size-6" strokeWidth={2.2} />
+            <img src="/MainLogo.svg" alt="SurplusIn Logo" className="size-7" />
           </div>
           <span
             className={cn(
@@ -57,9 +57,9 @@ export function RecipientSidebar() {
                 to={item.to}
                 className={({ isActive }) =>
                   cn(
-                    'group flex items-center rounded-xl text-text-muted transition-all duration-200 hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+                    'group flex items-center rounded-xl text-text-muted transition-all duration-200 hover:text-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
                     isExpanded
-                      ? 'h-12 w-full justify-start gap-4 px-4 translate-x-8'
+                      ? 'h-12 w-full justify-start gap-4 px-4 translate-x-8 hover:text-primary-active'
                       : 'mx-auto h-12 w-15 justify-center',
                     isActive && 'text-primary',
                   )
@@ -68,9 +68,19 @@ export function RecipientSidebar() {
                 title={!isExpanded ? item.shortLabel : undefined}
               >
                 <div className="flex w-6 shrink-0 items-center justify-center">
-                  <Icon
-                    className="size-5 shrink-0 sm:size-[22px]"
-                    strokeWidth={2.1}
+                  <div
+                    className="size-5 shrink-0 sm:size-[22px] bg-current transition-colors duration-200"
+                    style={{
+                      WebkitMaskImage: `url(${Icon})`,
+                      WebkitMaskSize: 'contain',
+                      WebkitMaskRepeat: 'no-repeat',
+                      WebkitMaskPosition: 'center',
+                      maskImage: `url(${Icon})`,
+                      maskSize: 'contain',
+                      maskRepeat: 'no-repeat',
+                      maskPosition: 'center',
+                    }}
+                    aria-hidden="true"
                   />
                 </div>
                 <span
@@ -94,7 +104,7 @@ export function RecipientSidebar() {
         <button
           type="button"
           className={cn(
-            'flex items-center rounded-xl text-red-normal transition-all duration-200 hover:-translate-y-0.5 hover:text-red-dark active:translate-y-0',
+            'flex items-center rounded-xl text-red-normal transition-all duration-200 hover:text-red-dark active:translate-y-0 cursor-pointer',
             isExpanded ? 'h-12 w-full justify-start gap-4 px-4 translate-x-4' : 'mx-auto h-12 w-12 justify-center',
           )}
           aria-label="Keluar"

@@ -16,9 +16,9 @@ export function RecipientTopNavbar() {
 
   return (
     <header className="sticky top-0 z-30 border-b border-border/80 bg-surface/95 backdrop-blur-md">
-      <div className="flex h-16 items-center justify-between gap-4 px-5 pr-7 sm:h-[72px] sm:px-8 sm:pr-10">
+      <div className="flex h-12 items-center justify-between gap-4 px-5 pr-7 sm:h-[72px] sm:px-8 sm:pr-10 md:h-14">
         <div className="min-w-0">
-          <h1 className="truncate text-[22px] font-bold tracking-[-0.02em] text-text sm:text-[26px]">
+          <h1 className="truncate text-[18px] font-bold tracking-[-0.02em] text-text translate-x-4 sm:text-[26px] md:text-[20px]">
             {pageTitle}
           </h1>
         </div>
