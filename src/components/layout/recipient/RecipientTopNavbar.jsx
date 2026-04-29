@@ -25,7 +25,7 @@ export function RecipientTopNavbar() {
 
         <Link
           to={ROUTES.RECIPIENT.PROFILE}
-          className="flex size-10 shrink-0 items-center justify-center rounded-full border border-border bg-background text-text-muted shadow-sm transition-colors duration-200 hover:border-primary/20 hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          className="flex size-10 shrink-0 items-center justify-center rounded-full border border-border bg-background text-text-muted shadow-sm transition-colors duration-200 hover:border-primary/20 hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary -translate-x-6"
           aria-label="Recipient profile"
         >
           <UserRound className="size-5" strokeWidth={2.1} />

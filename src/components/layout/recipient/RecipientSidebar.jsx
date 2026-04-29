@@ -12,7 +12,7 @@ export function RecipientSidebar() {
     <aside
       className={cn(
         'sticky top-0 z-40 flex h-screen shrink-0 flex-col border-r border-border bg-surface font-[Manrope] shadow-[8px_0_24px_rgba(15,23,42,0.04)] transition-[width] duration-300 ease-in-out',
-        isExpanded ? 'w-[210px]' : 'w-[60px] sm:w-[60px]',
+        isExpanded ? 'w-[190px]' : 'w-[60px] sm:w-[60px]',
       )}
     >
       {/* ── Logo / Toggle ── */}
@@ -20,13 +20,13 @@ export function RecipientSidebar() {
         type="button"
         onClick={() => setIsExpanded((prev) => !prev)}
         className={cn(
-          "flex h-[73px] shrink-0 items-center border-b border-border/80 transition-all duration-300",
-          isExpanded ? "justify-center px-6" : "justify-center"
+          "flex h-[73px] shrink-0 items-center border-b border-border/80 transition-all duration-300 cursor-pointer",
+          isExpanded ? "justify-center px-6 -translate-x-3" : "justify-center"
         )}
         aria-label={isExpanded ? 'Collapse sidebar' : 'Expand sidebar'}
       >
         <div className="flex shrink-0 items-center justify-center">
-          <div className="flex size-10 shrink-0 items-center justify-center text-primary transition-transform duration-200 hover:scale-105 active:scale-95">
+          <div className="flex size-10 shrink-0 items-center justify-center text-primary transition-transform duration-200 active:scale-95 cursor-pointer">
             <Flame className="size-6" strokeWidth={2.2} />
           </div>
           <span
@@ -59,7 +59,7 @@ export function RecipientSidebar() {
                   cn(
                     'group flex items-center rounded-xl text-text-muted transition-all duration-200 hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
                     isExpanded
-                      ? 'h-12 w-full justify-start gap-4 px-4 translate-x-12'
+                      ? 'h-12 w-full justify-start gap-4 px-4 translate-x-8'
                       : 'mx-auto h-12 w-15 justify-center',
                     isActive && 'text-primary',
                   )
@@ -95,7 +95,7 @@ export function RecipientSidebar() {
           type="button"
           className={cn(
             'flex items-center rounded-xl text-red-normal transition-all duration-200 hover:-translate-y-0.5 hover:text-red-dark active:translate-y-0',
-            isExpanded ? 'h-12 w-full justify-start gap-4 px-4' : 'mx-auto h-12 w-12 justify-center',
+            isExpanded ? 'h-12 w-full justify-start gap-4 px-4 translate-x-4' : 'mx-auto h-12 w-12 justify-center',
           )}
           aria-label="Keluar"
           title={!isExpanded ? 'Keluar' : undefined}
