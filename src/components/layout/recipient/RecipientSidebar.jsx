@@ -49,46 +49,43 @@ export function RecipientSidebar() {
       >
         <div className="flex w-full flex-col gap-2">
           {recipientNavigationItems.map((item) => {
-            const Icon = item.icon;
-
             return (
               <NavLink
                 key={item.to}
                 to={item.to}
                 className={({ isActive }) =>
                   cn(
-                    'group flex items-center rounded-xl text-text-muted transition-all duration-200 hover:text-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+                    'group flex items-center rounded-xl transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
                     isExpanded
-                      ? 'h-12 w-full justify-start gap-4 px-4 translate-x-8 hover:text-primary-active'
-                      : 'mx-auto h-12 w-15 justify-center',
-                    isActive && 'text-primary',
+                      ? 'h-12 w-full justify-start gap-3 px-3 translate-x-7'
+                      : 'mx-auto h-12 w-12 justify-center translate-x-1',
+                    isActive ? 'is-active' : '',
                   )
                 }
                 aria-label={item.label}
                 title={!isExpanded ? item.shortLabel : undefined}
               >
                 <div className="flex w-6 shrink-0 items-center justify-center">
-                  <div
-                    className="size-5 shrink-0 sm:size-[22px] bg-current transition-colors duration-200"
-                    style={{
-                      WebkitMaskImage: `url(${Icon})`,
-                      WebkitMaskSize: 'contain',
-                      WebkitMaskRepeat: 'no-repeat',
-                      WebkitMaskPosition: 'center',
-                      maskImage: `url(${Icon})`,
-                      maskSize: 'contain',
-                      maskRepeat: 'no-repeat',
-                      maskPosition: 'center',
-                    }}
+                  <img
+                    src={item.icon}
+                    alt=""
                     aria-hidden="true"
+                    className={cn(
+                      'h-5 w-5 shrink-0 transition-all duration-200',
+                      // default: gray, hover: green, active: green
+                      'opacity-50 group-hover:opacity-100 group-[.is-active]:opacity-100',
+                      'group-hover:[filter:invert(48%)_sepia(62%)_saturate(450%)_hue-rotate(95deg)_brightness(90%)]',
+                      'group-[.is-active]:[filter:invert(48%)_sepia(62%)_saturate(450%)_hue-rotate(95deg)_brightness(90%)]',
+                    )}
                   />
                 </div>
                 <span
                   className={cn(
                     'whitespace-nowrap font-[Manrope] text-[15px] font-semibold transition-all duration-300',
+                    'text-text-muted group-hover:text-primary group-[.is-active]:text-primary',
                     isExpanded
-                      ? 'w-auto -translate-x-1 opacity-100'
-                      : 'pointer-events-none w-0 -translate-x-2 overflow-hidden opacity-0',
+                      ? 'w-auto opacity-100'
+                      : 'pointer-events-none w-0 overflow-hidden opacity-0',
                   )}
                 >
                   {item.shortLabel}
