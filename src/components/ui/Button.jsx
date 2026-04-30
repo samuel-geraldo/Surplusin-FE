@@ -7,13 +7,13 @@ const buttonVariants = cva(
     variants: {
       variant: {
         primary:
-          'rounded-2xl bg-gradient-to-r from-[#27623b] to-green-normal text-white hover:bg-[#307848] hover:bg-none hover:shadow-[0_0_8px_0_rgba(255,255,255,0.9)] active:bg-[#23ad51] active:bg-none focus-visible:outline-green-normal',
+          'rounded-2xl bg-gradient-to-r from-[#27623b] to-green-normal !text-white hover:bg-[#307848] hover:bg-none hover:shadow-[0_0_8px_0_rgba(255,255,255,0.9)] active:bg-[#23ad51] active:bg-none focus-visible:outline-green-normal',
         secondary:
-          'rounded-[20px] bg-orange-normal text-white hover:bg-[#ff8839] hover:shadow-[0_0_12px_0_rgba(255,255,255,0.3)] active:bg-orange-normal-active focus-visible:outline-orange-normal',
+          'rounded-[20px] bg-orange-normal !text-white hover:bg-[#ff8839] hover:shadow-[0_0_12px_0_rgba(255,255,255,0.3)] active:bg-orange-normal-active focus-visible:outline-orange-normal',
         outline:
-          'rounded-[20px] border border-slate-900 bg-white text-[#0f172a] hover:bg-green-light-hover active:bg-green-light-active focus-visible:outline-green-normal',
+          'rounded-[20px] border border-slate-900 bg-white !text-[#0f172a] hover:bg-green-light-hover active:bg-green-light-active focus-visible:outline-green-normal',
         ghost:
-          'rounded-[20px] bg-white text-[#0f172a] hover:bg-green-light-hover hover:shadow-[0_0_12px_0_rgba(255,255,255,0.3)] active:bg-green-light-active focus-visible:outline-green-normal',
+          'rounded-[20px] bg-white !text-[#0f172a] hover:bg-green-light-hover hover:shadow-[0_0_12px_0_rgba(255,255,255,0.3)] active:bg-green-light-active focus-visible:outline-green-normal',
       },
       size: {
         sm: 'min-h-[45px] px-5 py-2.5 text-label',
