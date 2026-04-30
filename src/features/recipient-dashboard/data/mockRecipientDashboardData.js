@@ -17,3 +17,43 @@ export const mockDonationSummary = {
   available: 15,
   claimed: 2,
 };
+
+export const MOCK_CATEGORIES = [
+  { value: 'semua', label: 'Semua' },
+  { value: 'makanan-siap-saji', label: 'Makanan Siap Saji' },
+  { value: 'roti-pastry', label: 'Roti & Pastry' },
+  { value: 'jajanan-kue', label: 'Jajanan & Kue' },
+];
+
+export const mockDonations = [
+  {
+    id: '1',
+    storeName: 'Bakery Enak',
+    foodType: 'roti-pastry',
+    categoryLabel: 'Roti & Pastry',
+    foodName: 'Roti Sisa Hari Ini',
+    distance: '1.2 km',
+    portion: '15 Porsi',
+    expiry: '2 jam',
+  },
+  {
+    id: '2',
+    storeName: 'Warteg Berkah',
+    foodType: 'makanan-siap-saji',
+    categoryLabel: 'Makanan Siap Saji',
+    foodName: 'Nasi Rames',
+    distance: '0.8 km',
+    portion: '8 Porsi',
+    expiry: '45 mnt',
+  },
+  {
+    id: '3',
+    storeName: 'Kue Basah Ibu Tini',
+    foodType: 'jajanan-kue',
+    categoryLabel: 'Jajanan & Kue',
+    foodName: 'Kue Lapis Legit',
+    distance: '2.5 km',
+    portion: '12 Pcs',
+    expiry: '4 jam',
+  },
+];

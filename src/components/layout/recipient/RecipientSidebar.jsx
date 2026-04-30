@@ -10,20 +10,19 @@ export function RecipientSidebar() {
 
   return (
     <aside
+      onMouseEnter={() => setIsExpanded(true)}
+      onMouseLeave={() => setIsExpanded(false)}
       className={cn(
-        'sticky top-0 z-40 flex h-screen shrink-0 flex-col border-r border-border bg-surface font-[Manrope] shadow-[8px_0_24px_rgba(15,23,42,0.04)] transition-[width] duration-300 ease-in-out',
+        'sticky top-0 z-40 flex h-screen shrink-0 flex-col border-r border-border bg-surface font-[Manrope] shadow-[8px_0_24px_rgba(15,23,42,0.04)] transition-[width] duration-700 ease-in-out',
         isExpanded ? 'w-[190px]' : 'w-[60px] sm:w-[60px]',
       )}
     >
       {/* ── Logo / Toggle ── */}
-      <button
-        type="button"
-        onClick={() => setIsExpanded((prev) => !prev)}
+      <div
         className={cn(
-          "flex h-[57px] shrink-0 items-center border-b border-border/80 transition-all duration-300 cursor-pointer",
+          "flex h-[57px] shrink-0 items-center border-b border-border/80 transition-all duration-500",
           isExpanded ? "justify-center px-6 -translate-x-3" : "justify-center"
         )}
-        aria-label={isExpanded ? 'Collapse sidebar' : 'Expand sidebar'}
       >
         <div className="flex shrink-0 items-center justify-center">
           <div className="flex size-10 shrink-0 items-center justify-center text-primary transition-transform duration-200 active:scale-95 cursor-pointer">
@@ -31,7 +30,7 @@ export function RecipientSidebar() {
           </div>
           <span
             className={cn(
-              'whitespace-nowrap font-[Manrope] text-[22px] font-extrabold tracking-tight text-green-dark transition-all duration-300',
+              'whitespace-nowrap font-[Manrope] text-[22px] font-extrabold tracking-tight text-green-dark transition-all duration-700',
               isExpanded
                 ? 'ml-3 w-auto translate-x-0 opacity-100'
                 : 'pointer-events-none ml-0 w-0 -translate-x-2 overflow-hidden opacity-0',
@@ -40,7 +39,7 @@ export function RecipientSidebar() {
             {APP_NAME}
           </span>
         </div>
-      </button>
+      </div>
 
       {/* ── Navigation ── */}
       <nav
@@ -55,7 +54,7 @@ export function RecipientSidebar() {
                 to={item.to}
                 className={({ isActive }) =>
                   cn(
-                    'group flex items-center rounded-xl transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+                    'group flex items-center rounded-xl transition-all duration-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
                     isExpanded
                       ? 'h-12 w-full justify-start gap-3 px-3 translate-x-7'
                       : 'mx-auto h-12 w-12 justify-center translate-x-1',
@@ -81,7 +80,7 @@ export function RecipientSidebar() {
                 </div>
                 <span
                   className={cn(
-                    'whitespace-nowrap font-[Manrope] text-[15px] font-semibold transition-all duration-300',
+                    'whitespace-nowrap font-[Manrope] text-[15px] font-semibold transition-all duration-700',
                     'text-text-muted group-hover:text-primary group-[.is-active]:text-primary',
                     isExpanded
                       ? 'w-auto opacity-100'
@@ -101,7 +100,7 @@ export function RecipientSidebar() {
         <button
           type="button"
           className={cn(
-            'flex items-center rounded-xl text-red-normal transition-all duration-200 hover:text-red-dark active:translate-y-0 cursor-pointer',
+            'flex items-center rounded-xl text-red-normal transition-all duration-700 hover:text-red-dark active:translate-y-0 cursor-pointer',
             isExpanded ? 'h-12 w-full justify-start gap-4 px-4 translate-x-4' : 'mx-auto h-12 w-12 justify-center',
           )}
           aria-label="Keluar"
@@ -112,7 +111,7 @@ export function RecipientSidebar() {
           </div>
           <span
             className={cn(
-              'whitespace-nowrap font-[Manrope] text-[15px] font-semibold transition-all duration-300',
+              'whitespace-nowrap font-[Manrope] text-[15px] font-semibold transition-all duration-700',
               isExpanded
                 ? 'w-auto translate-x-0 opacity-100'
                 : 'pointer-events-none w-0 -translate-x-2 overflow-hidden opacity-0',

@@ -14,7 +14,7 @@
  *   }
  */
 
-import { mockDonationSummary } from '@/features/recipient-dashboard/data/mockRecipientDashboardData';
+import { mockDonationSummary, mockDonations, MOCK_CATEGORIES } from '@/features/recipient-dashboard/data/mockRecipientDashboardData';
 
 /**
  * Mengambil ringkasan donasi untuk penerima yang sedang login.
@@ -29,4 +29,28 @@ export async function getDonationSummary() {
   // Simulasi network delay supaya loading state bisa diuji
   await new Promise((resolve) => setTimeout(resolve, 400));
   return mockDonationSummary;
+}
+
+export async function getDonations(search = '', category = 'semua') {
+  await new Promise((resolve) => setTimeout(resolve, 400));
+  let filtered = [...mockDonations];
+  
+  if (category && category !== 'semua') {
+    filtered = filtered.filter(item => item.foodType === category);
+  }
+  
+  if (search && search.trim() !== '') {
+    const q = search.toLowerCase();
+    filtered = filtered.filter(item => 
+      item.storeName.toLowerCase().includes(q) || 
+      item.foodName.toLowerCase().includes(q)
+    );
+  }
+  
+  return filtered;
+}
+
+export async function getFoodCategories() {
+  await new Promise((resolve) => setTimeout(resolve, 200));
+  return MOCK_CATEGORIES;
 }
