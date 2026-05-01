@@ -1,6 +1,8 @@
 import { createElement } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui';
+import { ROUTES } from '@/lib/constants';
 import { createLandingVariants, viewportOnce } from '@/lib/animations/landingMotion';
 import aboutImage from '@/assets/about.png';
 import heroImage from '@/assets/hero.png';
@@ -58,12 +60,12 @@ export function LandingNavbarActions() {
       >
         Tentang Kami
       </a>
-      <a
-        href="#daftar"
+      <Link
+        to={ROUTES.AUTH}
         className="inline-flex min-h-[40px] items-center justify-center whitespace-nowrap rounded-[16px] bg-[#ff6600] px-4 font-['Manrope',sans-serif] text-base font-extrabold text-white transition-[background-color,box-shadow,transform] hover:bg-[#ff7a1f] hover:shadow-[0_10px_24px_rgba(255,102,0,0.22)] active:translate-y-px focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ff6600] sm:min-h-[46px] sm:px-6 sm:text-lg"
       >
         Daftar Sekarang
-      </a>
+      </Link>
     </div>
   );
 }
@@ -258,7 +260,14 @@ function HeroSection({ variants, reducedMotion }) {
               transition={{ delay: 1.25, duration: 0.55, ease: 'easeOut' }}
               className="rounded-2xl"
             >
-              <Button type="button" size="md" className="rounded-2xl px-8 text-lg sm:px-10">
+              <Button
+                type="button"
+                size="md"
+                className="rounded-2xl px-8 text-lg sm:px-10"
+                onClick={() => {
+                  window.location.href = ROUTES.AUTH;
+                }}
+              >
                 Mulai Sekarang
               </Button>
             </Motion.div>
@@ -445,7 +454,15 @@ function FinalCTASection({ variants, reducedMotion }) {
           transition={{ type: 'spring', stiffness: 420, damping: 28 }}
           className="mt-10 inline-flex"
         >
-          <Button type="button" variant="secondary" size="lg" className="rounded-2xl text-xl hover:shadow-[0_14px_34px_rgba(255,102,0,0.28)]">
+          <Button
+            type="button"
+            variant="secondary"
+            size="lg"
+            className="rounded-2xl text-xl hover:shadow-[0_14px_34px_rgba(255,102,0,0.28)]"
+            onClick={() => {
+              window.location.href = ROUTES.AUTH;
+            }}
+          >
             Daftar Sebagai Mitra
           </Button>
         </Motion.div>

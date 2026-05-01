@@ -7,6 +7,7 @@ export function Select({
   onChange,
   disabled = false,
   className,
+  triggerClassName,
   placeholder = 'Pilih opsi',
 }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -29,6 +30,7 @@ export function Select({
           'flex h-[45px] w-full items-center justify-between gap-2 rounded-xl border border-black bg-white px-3 text-left text-body1 font-normal text-[#0f172a]',
           'transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-normal/30',
           disabled && 'cursor-not-allowed opacity-50',
+          triggerClassName,
         )}
         onClick={() => !disabled && setIsOpen((current) => !current)}
         disabled={disabled}
