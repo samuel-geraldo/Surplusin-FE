@@ -1,57 +1,61 @@
 import { Link } from 'react-router-dom';
-import { Copyright, Mail } from 'lucide-react';
+import { Copyright, createLucideIcon, Mail } from 'lucide-react';
 
-const Linkedin = ({ size = 20 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
-    <rect width="4" height="12" x="2" y="9" />
-    <circle cx="4" cy="4" r="2" />
-  </svg>
-);
+const Linkedin = createLucideIcon('linkedin', [
+  ['path', { d: 'M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z', key: 'c2jq9f' }],
+  ['rect', { width: '4', height: '12', x: '2', y: '9', key: 'mk3on5' }],
+  ['circle', { cx: '4', cy: '4', r: '2', key: 'bt5ra8' }],
+]);
 
-const Instagram = ({ size = 20 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
-    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
-  </svg>
-);
+const Instagram = createLucideIcon('instagram', [
+  ['rect', { width: '20', height: '20', x: '2', y: '2', rx: '5', ry: '5', key: '2e1cvw' }],
+  ['path', { d: 'M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z', key: '9exkf1' }],
+  ['line', { x1: '17.5', x2: '17.51', y1: '6.5', y2: '6.5', key: 'r4j83e' }],
+]);
+
+const footerLinkClass =
+  "w-fit max-w-full whitespace-nowrap transition-colors hover:text-[#50c878] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#50c878]";
+const socialLinkClass =
+  "flex min-h-[24px] w-fit max-w-full min-w-0 items-center gap-[6px] overflow-hidden font-['Manrope',sans-serif] text-sm font-normal text-[#0f172a] transition-colors hover:text-[#50c878] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#50c878] sm:text-base";
 
 export function PublicFooter() {
   return (
-    <footer className="bg-white flex items-center justify-between w-[1372px] mx-auto py-[40px]">
-      <div className="flex flex-col items-start justify-center gap-[20px] font-['Manrope',sans-serif] text-[16px] font-normal text-[#0f172a]">
-        <Link to="#" className="whitespace-nowrap hover:text-[#50c878] transition-colors">
-          Kebijakan Privasi
-        </Link>
-        <Link to="#" className="whitespace-nowrap hover:text-[#50c878] transition-colors">
-          Syarat & Ketentuan
-        </Link>
-        <Link to="#" className="whitespace-nowrap hover:text-[#50c878] transition-colors">
-          Pusat bantuan
-        </Link>
-      </div>
+    <footer className="w-full bg-background">
+      <div className="grid w-full grid-cols-1 gap-7 px-4 py-4 sm:px-6 sm:py-6 md:min-h-[155px] md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] md:items-start md:gap-10 lg:px-7 lg:py-7">
+        <nav
+          aria-label="Footer navigation"
+          className="flex min-w-0 flex-col items-start justify-center gap-4 font-['Manrope',sans-serif] text-sm font-normal text-[#0f172a] sm:text-base md:gap-5"
+        >
+          <Link to="#" className={footerLinkClass}>
+            Kebijakan Privasi
+          </Link>
+          <Link to="#" className={footerLinkClass}>
+            Syarat & Ketentuan
+          </Link>
+          <Link to="#" className={footerLinkClass}>
+            Pusat bantuan
+          </Link>
+        </nav>
 
-      <div className="flex items-end justify-center self-stretch">
-        <div className="flex h-full items-end justify-center gap-[4px] font-['Manrope',sans-serif] text-[16px] font-normal text-[#0f172a] whitespace-nowrap">
-          <Copyright size={20} />
-          <span>2026. Surplusin.</span>
+        <div className="order-3 flex min-w-0 items-center gap-[4px] font-['Manrope',sans-serif] text-sm font-normal text-[#0f172a] sm:text-base md:order-none md:self-end md:justify-self-center">
+          <Copyright className="size-4 shrink-0" aria-hidden="true" />
+          <span className="whitespace-nowrap">2026. Surplusin.</span>
         </div>
-      </div>
 
-      <div className="flex flex-col items-start justify-center gap-[20px] w-[190.2px]">
-        <a href="#" className="flex w-fit items-center gap-[4px] overflow-hidden rounded-[10px] bg-[#f3f3f6] px-[10px] py-[4px] font-['Manrope',sans-serif] text-[16px] font-normal text-[#0f172a] whitespace-nowrap hover:bg-[#e2e2e5] transition-colors">
-          <Linkedin size={20} />
-          <span>SurplusIn</span>
-        </a>
-        <a href="#" className="flex w-fit items-center gap-[4px] overflow-hidden rounded-[10px] bg-[#f3f3f6] px-[10px] py-[4px] font-['Manrope',sans-serif] text-[16px] font-normal text-[#0f172a] whitespace-nowrap hover:bg-[#e2e2e5] transition-colors">
-          <Instagram size={20} />
-          <span>SurplusIn</span>
-        </a>
-        <a href="mailto:info@surplusin.com" className="flex w-full items-center gap-[4px] overflow-hidden rounded-[10px] bg-[#f3f3f6] px-[10px] py-[4px] font-['Manrope',sans-serif] text-[16px] font-normal text-[#0f172a] whitespace-nowrap hover:bg-[#e2e2e5] transition-colors">
-          <Mail size={19.2} />
-          <span>info@surplusin.com</span>
-        </a>
+        <address className="flex min-w-0 flex-col items-start justify-center gap-4 not-italic md:items-start md:justify-self-end">
+          <a href="#" className={socialLinkClass} aria-label="LinkedIn SurplusIn">
+            <Linkedin className="size-4 shrink-0 sm:size-5" aria-hidden="true" />
+            <span className="min-w-0 truncate">SurplusIn</span>
+          </a>
+          <a href="#" className={socialLinkClass} aria-label="Instagram SurplusIn">
+            <Instagram className="size-4 shrink-0 sm:size-5" aria-hidden="true" />
+            <span className="min-w-0 truncate">SurplusIn</span>
+          </a>
+          <a href="mailto:info@surplusin.com" className={socialLinkClass} aria-label="Email info@surplusin.com">
+            <Mail className="size-4 shrink-0 sm:size-5" aria-hidden="true" />
+            <span className="min-w-0 break-words">info@surplusin.com</span>
+          </a>
+        </address>
       </div>
     </footer>
   );
