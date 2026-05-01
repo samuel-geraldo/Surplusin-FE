@@ -7,4 +7,5 @@ export const STORAGE_KEYS = {
 
 export const ROUTES = {
   HOME: '/',
+  AUTH: '/auth',
 };

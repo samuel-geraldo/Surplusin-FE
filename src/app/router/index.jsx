@@ -3,6 +3,7 @@ import { ROUTES } from '@/lib/constants';
 import { RootLayout } from '@/components/layout/RootLayout';
 import { PublicLayout } from '@/components/layout/PublicLayout';
 import LandingPage, { LandingNavbarActions } from '@/pages/LandingPage';
+import AuthPage from '@/pages/AuthPage';
 
 export const router = createBrowserRouter([
   {
@@ -19,6 +20,10 @@ export const router = createBrowserRouter([
             },
           },
         ],
+      },
+      {
+        path: ROUTES.AUTH,
+        element: <AuthPage />,
       },
     ],
   },
