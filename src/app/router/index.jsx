@@ -2,7 +2,7 @@ import { createBrowserRouter } from 'react-router-dom';
 import { ROUTES } from '@/lib/constants';
 import { RootLayout } from '@/components/layout/RootLayout';
 import { PublicLayout } from '@/components/layout/PublicLayout';
-import HomePage from '@/pages/HomePage';
+import LandingPage, { LandingNavbarActions } from '@/pages/LandingPage';
 
 export const router = createBrowserRouter([
   {
@@ -13,7 +13,10 @@ export const router = createBrowserRouter([
         children: [
           {
             path: ROUTES.HOME,
-            element: <HomePage />,
+            element: <LandingPage />,
+            handle: {
+              publicNavbarActions: <LandingNavbarActions />,
+            },
           },
         ],
       },

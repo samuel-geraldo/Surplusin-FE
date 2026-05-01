@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { ROUTES } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 
-export function PublicNavbar() {
+export function PublicNavbar({ actions = null }) {
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
@@ -28,13 +28,14 @@ export function PublicNavbar() {
           : 'border-transparent bg-background',
       )}
     >
-      <div className="flex w-full items-center justify-between px-4 py-3 sm:px-6 sm:py-4 lg:px-7">
+      <div className="flex w-full items-center justify-between gap-4 px-4 py-3 sm:px-6 sm:py-4 lg:px-7">
         <Link
           to={ROUTES.HOME}
-          className="whitespace-nowrap font-['Manrope',sans-serif] text-xl font-extrabold tracking-[-0.64px] text-[#50c878] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#50c878] sm:text-2xl"
+          className="whitespace-nowrap font-['Manrope',sans-serif] text-2xl font-extrabold tracking-[-0.64px] text-[#50c878] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#50c878]"
         >
           SurplusIn
         </Link>
+        {actions}
       </div>
     </nav>
   );
