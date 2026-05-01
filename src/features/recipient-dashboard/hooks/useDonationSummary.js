@@ -34,5 +34,16 @@ export function useDonationSummary() {
     return () => { cancelled = true; };
   }, []);
 
-  return { data, isLoading, error };
+  // Update summary lokal saat donasi diklaim
+  const claimDonation = () => {
+    setData((prev) => {
+      if (!prev) return prev;
+      return {
+        available: Math.max(0, prev.available - 1),
+        claimed: prev.claimed + 1,
+      };
+    });
+  };
+
+  return { data, isLoading, error, claimDonation };
 }

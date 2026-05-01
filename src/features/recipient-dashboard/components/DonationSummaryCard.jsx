@@ -17,10 +17,11 @@ export function DonationSummaryCard({ icon, count, label, accentColor, isLoading
   return (
     <article
       className={cn(
-        'relative h-28 flex items-center gap-4 overflow-hidden rounded-2xl bg-white px-6 py-4 shadow-sm',
+        'relative h-36 flex items-center gap-4 overflow-hidden rounded-2xl bg-white px-6 py-4',
         'border-l-4',
         isBlue ? 'border-l-[#1F66F4]' : 'border-l-[#FF6600]',
       )}
+      style={{ boxShadow: '0 12px 30px rgba(0,0,0,0.08)' }}
     >
       {/* Decorative background glow */}
       <div
@@ -36,6 +37,7 @@ export function DonationSummaryCard({ icon, count, label, accentColor, isLoading
         alt=""
         aria-hidden="true"
         className="h-12 w-12 shrink-0"
+        style={{ marginLeft: '1rem' }}
       />
 
       {/* Text */}
@@ -49,13 +51,18 @@ export function DonationSummaryCard({ icon, count, label, accentColor, isLoading
           <>
             <p
               className={cn(
-                'font-[Manrope] text-[22px] font-extrabold leading-tight',
+                'font-[Manrope] text-[30px] font-extrabold leading-tight',
                 isBlue ? 'text-[#1F66F4]' : 'text-[#FF6600]',
               )}
             >
               {count} Donasi
             </p>
-            <p className="font-[Manrope] text-[13px] font-medium text-text-muted">
+            <p 
+              className={cn(
+                "font-[Manrope] text-[16px] font-medium",
+                isBlue ? "text-[#1F66F4]" : "text-[#FF6600]"
+              )}
+            >
               {label}
             </p>
           </>

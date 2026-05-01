@@ -54,10 +54,16 @@ export function useDonations() {
     };
   }, [search, category]);
 
+  // Hapus donasi dari list setelah diklaim
+  const removeDonation = (id) => {
+    setData((prev) => prev.filter((item) => item.id !== id));
+  };
+
   return { 
     data, isLoading, error, 
     search, setSearch, 
     category, setCategory, 
-    categories 
+    categories,
+    removeDonation,
   };
 }

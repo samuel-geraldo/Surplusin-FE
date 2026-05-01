@@ -9,15 +9,22 @@ const BOX_ICON = '/recipient_retailer icon/basic-icon/box.svg';
 const TRUCK_ICON = '/recipient_retailer icon/basic-icon/truck.svg';
 
 export default function RecipientDashboardPage() {
-  const { data, isLoading, error } = useDonationSummary();
+  const { data, isLoading, error, claimDonation } = useDonationSummary();
   const { 
     data: donations, 
     search, 
     setSearch, 
     category, 
     setCategory, 
-    categories 
+    categories,
+    removeDonation,
   } = useDonations();
+
+  // Dipanggil setelah user tekan Oke di popup sukses
+  const handleClaimed = (donationId) => {
+    removeDonation(donationId);  // hapus card dari list
+    claimDonation();             // update angka summary
+  };
 
   return (
     <div className="flex flex-col gap-6 px-6 pt-6 sm:px-8 sm:pt-8 lg:px-12 lg:pt-10" style={{ marginTop: '2rem' }}>
@@ -47,7 +54,7 @@ export default function RecipientDashboardPage() {
 
       {/* ── Daftar Donasi Section ── */}
       <section className="mt-6 flex flex-col gap-6" style={{ marginLeft: '2rem', marginRight: '2rem' }}>
-        <h2 className="font-[Manrope] text-[22px] font-bold text-text">
+        <h2 className="font-[Manrope] text-[26px] font-semibold text-text">
           Daftar Donasi yang Tersedia
         </h2>
 
@@ -91,7 +98,11 @@ export default function RecipientDashboardPage() {
         <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
           {donations.length > 0 ? (
             donations.map((item) => (
-              <DonationListCard key={item.id} data={item} />
+              <DonationListCard
+                key={item.id}
+                data={item}
+                onClaimed={() => handleClaimed(item.id)}
+              />
             ))
           ) : (
             <p className="col-span-full py-10 text-center font-[Manrope] text-text-muted">
