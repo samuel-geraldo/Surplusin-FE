@@ -43,11 +43,23 @@ export function PublicFooter() {
         </div>
 
         <address className="flex min-w-0 flex-col items-start justify-center gap-4 not-italic md:items-start md:justify-self-end">
-          <a href="#" className={socialLinkClass} aria-label="LinkedIn SurplusIn">
+          <a
+            href="https://www.linkedin.com/in/surplusin"
+            className={socialLinkClass}
+            target="_blank"
+            rel="noreferrer"
+            aria-label="LinkedIn SurplusIn"
+          >
             <Linkedin className="size-4 shrink-0 sm:size-5" aria-hidden="true" />
             <span className="min-w-0 truncate">SurplusIn</span>
           </a>
-          <a href="#" className={socialLinkClass} aria-label="Instagram SurplusIn">
+          <a
+            href="https://www.instagram.com/surplusin"
+            className={socialLinkClass}
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Instagram SurplusIn"
+          >
             <Instagram className="size-4 shrink-0 sm:size-5" aria-hidden="true" />
             <span className="min-w-0 truncate">SurplusIn</span>
           </a>
