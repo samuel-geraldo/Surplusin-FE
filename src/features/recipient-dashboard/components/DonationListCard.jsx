@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ROUTES } from '@/lib/constants';
 import { MOCK_CATEGORIES } from '@/features/recipient-dashboard/data/mockRecipientDashboardData';
 import { ClaimDonationModal } from './ClaimDonationModal';
 import { ClaimSuccessPopup } from './ClaimSuccessPopup';
@@ -16,9 +18,26 @@ export function DonationListCard({ data, onClaimed }) {
   // Integrasi label kategori dengan data yang dipakai di dropdown
   const categoryLabel = data.categoryLabel || MOCK_CATEGORIES.find(c => c.value === foodType)?.label || foodType;
 
+  const navigate = useNavigate();
+
   // State untuk dua popup terpisah
   const [showConfirm, setShowConfirm] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+
+  // Simpan donasi yang diklaim ke localStorage
+  const saveClaimed = () => {
+    try {
+      const stored = localStorage.getItem('surplusin_claimed_donations');
+      const existing = stored ? JSON.parse(stored) : [];
+      // Hindari duplikat
+      if (!existing.find((d) => d.id === data.id)) {
+        existing.push(data);
+      }
+      localStorage.setItem('surplusin_claimed_donations', JSON.stringify(existing));
+    } catch (e) {
+      console.error('Gagal menyimpan klaim:', e);
+    }
+  };
 
   // Konfigurasi warna & ikon berdasarkan tipe makanan
   const getConfig = (type) => {
@@ -146,7 +165,7 @@ export function DonationListCard({ data, onClaimed }) {
         {/* Ambil Button */}
         <button
           onClick={() => setShowConfirm(true)}
-          className="mt-4 h-10 w-full rounded-xl bg-[#ff7a00] py-[10px] font-[Manrope] text-[15px] font-bold text-white transition-colors hover:bg-[#e66e00] focus:outline-none focus:ring-4 focus:ring-[#ff7a00]/30"
+          className="mt-4 h-10 w-full rounded-xl bg-[#ff7a00] py-[10px] font-[Manrope] text-[15px] font-bold text-white transition-colors hover:bg-[#e66e00] focus:outline-none focus:ring-4 focus:ring-[#ff7a00]/30 cursor-pointer"
         >
           Ambil
         </button>
@@ -157,6 +176,7 @@ export function DonationListCard({ data, onClaimed }) {
     <ClaimDonationModal
       donation={showConfirm ? data : null}
       onConfirm={() => {
+        saveClaimed();
         setShowConfirm(false);
         setShowSuccess(true);
       }}
@@ -168,7 +188,8 @@ export function DonationListCard({ data, onClaimed }) {
       <ClaimSuccessPopup
         onClose={() => {
           setShowSuccess(false);
-          onClaimed?.();  // hapus card + update summary di parent
+          onClaimed?.();
+          navigate(ROUTES.RECIPIENT.HANDOVER);
         }}
       />
     )}

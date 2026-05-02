@@ -25,10 +25,11 @@ export function Select({
     <div className={cn('relative w-full', className)}>
       <button
         type="button"
+        style={{ paddingLeft: '0.5rem' }}
         className={cn(
-          'flex h-[45px] w-full items-center justify-between gap-2 rounded-xl border border-black bg-white px-3 text-left text-body1 font-normal text-[#0f172a]',
+          'flex h-[45px] w-full items-center justify-between gap-2 rounded-xl border border-black bg-transparent pr-3 text-left text-body1 font-normal text-[#0f172a]',
           'transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-normal/30',
-          disabled && 'cursor-not-allowed opacity-50',
+          disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer',
         )}
         onClick={() => !disabled && setIsOpen((current) => !current)}
         disabled={disabled}
@@ -67,7 +68,7 @@ export function Select({
               key={option.value}
               type="button"
               className={cn(
-                'flex min-h-[45px] w-full items-center px-3 text-left text-body1 font-normal text-[#0f172a] transition-colors duration-150 hover:bg-green-light-hover',
+                'flex min-h-[45px] w-full items-center px-3 text-left text-body1 font-normal text-[#0f172a] transition-colors duration-150 hover:bg-green-light-hover cursor-pointer',
                 option.value === value && 'border-l-4 border-green-normal',
               )}
               onClick={() => handleSelect(option.value)}

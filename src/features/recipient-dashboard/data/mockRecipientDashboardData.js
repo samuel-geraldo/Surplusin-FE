@@ -35,6 +35,11 @@ export const mockDonations = [
     distance: '1.2 km',
     portion: '15 Porsi',
     expiry: '2 jam',
+    patokan: 'Samping Alfamart, masuk ke pintu warna hijau',
+    lat: -6.2088,
+    lng: 106.8456,
+    items: ['Roti Tawar Gandum', 'Roti Sobek Cokelat', 'Roti Sisir Mentega'],
+    estimasi: '30 menit',
   },
   {
     id: '2',
@@ -45,6 +50,11 @@ export const mockDonations = [
     distance: '0.8 km',
     portion: '8 Porsi',
     expiry: '45 mnt',
+    patokan: 'Di depan gang kecil sebelah apotek K-24',
+    lat: -6.2150,
+    lng: 106.8500,
+    items: ['Nasi Putih', 'Ayam Goreng', 'Tempe Orek', 'Sayur Lodeh'],
+    estimasi: '15 menit',
   },
   {
     id: '3',
@@ -55,6 +65,11 @@ export const mockDonations = [
     distance: '2.5 km',
     portion: '12 Pcs',
     expiry: '4 jam',
+    patokan: 'Pasar Tradisional lantai 2, kios nomor 15',
+    lat: -6.1950,
+    lng: 106.8200,
+    items: ['Kue Lapis Legit', 'Bolu Pandan', 'Kue Talam'],
+    estimasi: '45 menit',
   },
   {
     id: '4',
@@ -65,6 +80,11 @@ export const mockDonations = [
     distance: '1.5 km',
     portion: '10 Porsi',
     expiry: '1 jam',
+    patokan: 'Persis di sebelah Bank BRI cabang Mampang',
+    lat: -6.2480,
+    lng: 106.8310,
+    items: ['Nasi Putih', 'Rendang Sapi', 'Gulai Nangka', 'Sambal Ijo'],
+    estimasi: '25 menit',
   },
   {
     id: '5',
@@ -75,6 +95,11 @@ export const mockDonations = [
     distance: '3.1 km',
     portion: '20 Pcs',
     expiry: '3 jam',
+    patokan: 'Mall Kecil lantai dasar, dekat eskalator utama',
+    lat: -6.1750,
+    lng: 106.8280,
+    items: ['Croissant Almond', 'Pain au Chocolat', 'Cinnamon Roll'],
+    estimasi: '50 menit',
   },
   {
     id: '6',
@@ -85,6 +110,11 @@ export const mockDonations = [
     distance: '1.8 km',
     portion: '30 Pcs',
     expiry: '2 jam',
+    patokan: 'Sebelah warnet, depan masjid Al-Hikmah',
+    lat: -6.2300,
+    lng: 106.8650,
+    items: ['Onde-onde Kacang Hijau', 'Klepon Pandan', 'Dadar Gulung', 'Serabi'],
+    estimasi: '35 menit',
   },
   {
     id: '7',
@@ -95,6 +125,11 @@ export const mockDonations = [
     distance: '0.5 km',
     portion: '20 Porsi',
     expiry: '30 mnt',
+    patokan: 'Gerbang belakang pabrik, lapor satpam',
+    lat: -6.2100,
+    lng: 106.8420,
+    items: ['Mie Goreng Spesial', 'Telur Dadar', 'Kerupuk Udang'],
+    estimasi: '10 menit',
   },
   {
     id: '8',
@@ -105,6 +140,11 @@ export const mockDonations = [
     distance: '4.2 km',
     portion: '25 Pcs',
     expiry: '5 jam',
+    patokan: 'Ruko deretan ke-3 dari perempatan lampu merah',
+    lat: -6.1850,
+    lng: 106.7950,
+    items: ['Roti Gandum Multigrain', 'Roti Oat', 'Roti Flaxseed'],
+    estimasi: '60 menit',
   },
   {
     id: '9',
@@ -115,6 +155,11 @@ export const mockDonations = [
     distance: '2.0 km',
     portion: '18 Pcs',
     expiry: '3 jam',
+    patokan: 'Pojok timur pasar pagi, dekat parkiran motor',
+    lat: -6.2200,
+    lng: 106.8550,
+    items: ['Bika Ambon', 'Lemper Ayam', 'Risoles Mayo', 'Pastel Goreng'],
+    estimasi: '40 menit',
   },
   {
     id: '10',
@@ -125,6 +170,11 @@ export const mockDonations = [
     distance: '2.3 km',
     portion: '15 Kotak',
     expiry: '1.5 jam',
+    patokan: 'Belakang Indomaret, masuk gang pertama',
+    lat: -6.2400,
+    lng: 106.8380,
+    items: ['Nasi Putih', 'Ayam Bakar', 'Lalapan', 'Sambal Terasi'],
+    estimasi: '35 menit',
   },
   {
     id: '11',
@@ -135,6 +185,11 @@ export const mockDonations = [
     distance: '3.8 km',
     portion: '14 Pcs',
     expiry: '4 jam',
+    patokan: 'Ground floor gedung perkantoran, lobi utama',
+    lat: -6.1680,
+    lng: 106.8150,
+    items: ['Danish Pastry', 'Éclair Cokelat', 'Puff Cream'],
+    estimasi: '55 menit',
   },
   {
     id: '12',
@@ -145,6 +200,11 @@ export const mockDonations = [
     distance: '1.1 km',
     portion: '24 Pcs',
     expiry: '2.5 jam',
+    patokan: 'Rumah cat hijau muda, pagar besi hitam',
+    lat: -6.2130,
+    lng: 106.8480,
+    items: ['Getuk Lindri', 'Cenil', 'Lupis', 'Kue Cucur'],
+    estimasi: '20 menit',
   },
   {
     id: '13',
@@ -155,6 +215,11 @@ export const mockDonations = [
     distance: '1.6 km',
     portion: '12 Porsi',
     expiry: '1 jam',
+    patokan: 'Di pertigaan, seberang SPBU Pertamina',
+    lat: -6.2350,
+    lng: 106.8700,
+    items: ['Soto Ayam', 'Lontong', 'Kerupuk Udang', 'Sambal Kecap'],
+    estimasi: '30 menit',
   },
   {
     id: '14',
@@ -165,6 +230,11 @@ export const mockDonations = [
     distance: '0.9 km',
     portion: '30 Pcs',
     expiry: '6 jam',
+    patokan: 'Lantai 1 mall, sebelah toko buku',
+    lat: -6.2050,
+    lng: 106.8530,
+    items: ['Roti Kasur Keju', 'Roti Abon', 'Roti Cokelat Lava'],
+    estimasi: '15 menit',
   },
   {
     id: '15',
@@ -175,5 +245,61 @@ export const mockDonations = [
     distance: '3.5 km',
     portion: '16 Pcs',
     expiry: '2 jam',
+    patokan: 'Samping SD Negeri 05, gerobak warna merah',
+    lat: -6.1900,
+    lng: 106.8100,
+    items: ['Putu Ayu', 'Nagasari', 'Wajik', 'Kue Putu'],
+    estimasi: '50 menit',
+  },
+];
+
+// ═══════════════════════════════════════════
+// History Page Data
+// ═══════════════════════════════════════════
+
+/** Ringkasan statistik halaman riwayat */
+export const mockHistorySummary = {
+  orangTerbantu: 70,
+  donasiDiterima: 30,
+  jumlahToko: 6,
+};
+
+/** Riwayat donasi yang sudah selesai dipenjemput */
+export const mockHistoryDonations = [
+  {
+    id: 'h1',
+    storeName: 'Toko Pak Haji Andra',
+    location: 'Tebet',
+    foodName: 'Nasi Box',
+    portion: '60 Porsi',
+    date: '23 April 2026',
+    donationCount: 8,
+  },
+  {
+    id: 'h2',
+    storeName: 'Warung Bu Neni',
+    location: 'Pasar Minggu',
+    foodName: 'Nasi Ayam & Sayur',
+    portion: '30 Porsi',
+    date: '21 April 2026',
+    donationCount: 10,
+  },
+  {
+    id: 'h3',
+    storeName: 'Restoran Manado',
+    location: 'Tebet',
+    foodName: 'Paket Nasi Ikan Manado',
+    portion: '65 Porsi',
+    date: '15 April 2026',
+    donationCount: 8,
+  },
+  {
+    id: 'h4',
+    storeName: 'Kedai Arsik',
+    location: 'Setiabudi',
+    foodName: 'Roti',
+    portion: '10 Porsi',
+    date: '30 Maret 2026',
+    donationCount: 2,
   },
 ];

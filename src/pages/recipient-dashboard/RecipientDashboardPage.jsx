@@ -10,12 +10,12 @@ const TRUCK_ICON = '/recipient_retailer icon/basic-icon/truck.svg';
 
 export default function RecipientDashboardPage() {
   const { data, isLoading, error, claimDonation } = useDonationSummary();
-  const { 
-    data: donations, 
-    search, 
-    setSearch, 
-    category, 
-    setCategory, 
+  const {
+    data: donations,
+    search,
+    setSearch,
+    category,
+    setCategory,
     categories,
     removeDonation,
   } = useDonations();
@@ -27,14 +27,17 @@ export default function RecipientDashboardPage() {
   };
 
   return (
-    <div className="flex flex-col gap-6 px-6 pt-6 sm:px-8 sm:pt-8 lg:px-12 lg:pt-10" style={{ marginTop: '2rem' }}>
+    <div
+      className="mt-6 flex flex-col gap-6 px-6 pt-4 sm:mt-8 sm:px-8 sm:pt-6 lg:mt-10 lg:px-12 lg:pt-8"
+      style={{ paddingLeft: '2.5rem', paddingRight: '2.5rem', paddingTop: '2.5rem' }}
+    >
       {/* ── Summary Cards ── */}
       {error ? (
         <p className="rounded-xl border border-red-200 bg-red-50 px-5 py-4 font-[Manrope] text-sm text-red-600">
           {error}
         </p>
       ) : (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-8 lg:gap-10" style={{ marginRight: '5rem', marginLeft: '5rem' }}>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:gap-10">
           <DonationSummaryCard
             icon={BOX_ICON}
             count={data?.available ?? null}
@@ -53,16 +56,18 @@ export default function RecipientDashboardPage() {
       )}
 
       {/* ── Daftar Donasi Section ── */}
-      <section className="mt-6 flex flex-col gap-6" style={{ marginLeft: '2rem', marginRight: '2rem' }}>
-        <h2 className="font-[Manrope] text-[26px] font-semibold text-text">
+      <section
+        className="mt-6 flex flex-col gap-5 sm:gap-6"
+      >
+        <h2 className="font-[Manrope] text-[22px] font-semibold text-text sm:text-[26px]">
           Daftar Donasi yang Tersedia
         </h2>
 
         {/* ── Filter Controls ── */}
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-8">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-start md:gap-10">
           {/* Search Input */}
-          <div className="relative w-full max-w-md">
-            <div 
+          <div className="relative w-full md:max-w-md">
+            <div
               className="pointer-events-none absolute inset-y-0 flex items-center"
               style={{ left: '1rem' }}
             >
@@ -79,11 +84,11 @@ export default function RecipientDashboardPage() {
           </div>
 
           {/* Category Dropdown */}
-          <div className="flex items-center gap-3">
+          <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center sm:gap-3 md:w-auto">
             <span className="shrink-0 font-[Manrope] text-[15px] font-bold text-[#0f172a]">
               Jenis Makanan:
             </span>
-            <div className="w-[200px]">
+            <div className="w-full sm:w-[220px]">
               <Select
                 options={categories}
                 value={category}
