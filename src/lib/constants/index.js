@@ -14,4 +14,8 @@ export const ROUTES = {
     HISTORY: '/recipient/history',
     PROFILE: '/recipient/profile',
   },
+  AUTH: '/auth',
+  FAQ: '/faq',
+  PRIVACY: '/privacy-policy',
+  TERMS: '/terms',
 };
