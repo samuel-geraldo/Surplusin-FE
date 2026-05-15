@@ -20,6 +20,10 @@ export function AppProviders({ children }) {
         closeButton
         toastOptions={{
           duration: 4000,
+          classNames: {
+            title: 'text-sm font-semibold leading-snug',
+            description: 'text-sm leading-snug',
+          },
         }}
       />
     </QueryClientProvider>

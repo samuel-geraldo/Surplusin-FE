@@ -17,7 +17,12 @@ export function FaqSupportCard() {
           </div>
         </div>
         <a href="mailto:info@surplusin.com" className="shrink-0">
-          <Button type="button" variant="secondary" size="sm" className="rounded-2xl">
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            className="min-h-[48px] rounded-2xl px-6 text-sm"
+          >
             Hubungi Kami
           </Button>
         </a>
