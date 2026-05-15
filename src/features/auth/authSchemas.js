@@ -31,5 +31,7 @@ export const profileSchema = z.object({
       message: 'Nomor WhatsApp tidak valid',
     }),
   address: z.string().optional(),
+  latitude: z.number().optional(),
+  longitude: z.number().optional(),
   locationConfirmed: z.boolean().optional(),
 });

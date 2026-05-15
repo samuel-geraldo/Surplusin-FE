@@ -38,7 +38,7 @@ export function RegisterAccountStep({
           </h1>
         </div>
 
-        <GoogleAuthButton className="h-[56px] rounded-lg text-body2">
+        <GoogleAuthButton role={role} className="h-[56px] rounded-lg text-body2">
           Daftar dengan Google
         </GoogleAuthButton>
         <AuthDivider />
@@ -61,12 +61,12 @@ export function RegisterAccountStep({
           {...register('password')}
         />
 
-        <div className="grid grid-cols-[1fr_1.4fr] items-center gap-4 pt-5">
+        <div className="grid grid-cols-2 items-center gap-4 pt-5">
           <Button
             type="button"
             variant="ghost"
             size="sm"
-            className="h-[38px] rounded-xl bg-transparent px-0 text-label font-medium shadow-none hover:bg-transparent"
+            className="h-[56px] rounded-xl bg-white px-5 text-body2 font-medium shadow-none hover:bg-white active:bg-green-light-active"
             onClick={onBack}
           >
             Kembali
