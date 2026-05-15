@@ -7,7 +7,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         primary:
-          'rounded-2xl bg-gradient-to-r from-[#27623b] to-green-normal !text-white shadow-[0_10px_24px_rgba(39,98,59,0.18)] hover:bg-[#307848] hover:bg-none hover:shadow-[0_12px_26px_rgba(39,98,59,0.24)] active:translate-y-px active:bg-[#245a36] active:bg-none active:shadow-[0_6px_16px_rgba(39,98,59,0.18)] focus-visible:outline-green-normal',
+          'rounded-2xl bg-[#27623b] !text-white shadow-[0_10px_24px_rgba(39,98,59,0.18)] hover:bg-[#307848] hover:shadow-[0_12px_26px_rgba(39,98,59,0.24)] active:translate-y-px active:bg-[#245a36] active:shadow-[0_6px_16px_rgba(39,98,59,0.18)] focus-visible:outline-green-normal',
         secondary:
           'rounded-[20px] bg-orange-normal !text-white hover:bg-[#ff8839] hover:shadow-[0_0_12px_0_rgba(255,255,255,0.3)] active:bg-orange-normal-active focus-visible:outline-orange-normal',
         outline:

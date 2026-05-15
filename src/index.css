@@ -181,6 +181,29 @@
   line-height: 1.5;
 }
 
+.slot-digit-track {
+  animation-name: slot-roll;
+  animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+  animation-fill-mode: forwards;
+}
+
+@keyframes slot-roll {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(-10em);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slot-digit-track {
+    animation: none;
+    transform: translateY(-10em);
+  }
+}
+
 /* =========================================
    Responsive Typography Overrides
    ========================================= */
