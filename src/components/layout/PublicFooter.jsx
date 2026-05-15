@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Copyright, createLucideIcon, Mail } from 'lucide-react';
+import { ROUTES } from '@/lib/constants';
 
 const Linkedin = createLucideIcon('linkedin', [
   ['path', { d: 'M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z', key: 'c2jq9f' }],
@@ -26,13 +27,13 @@ export function PublicFooter() {
           aria-label="Footer navigation"
           className="flex min-w-0 flex-col items-start justify-center gap-4 font-['Manrope',sans-serif] text-sm font-normal text-[#0f172a] sm:text-base md:gap-5"
         >
-          <Link to="#" className={footerLinkClass}>
+          <Link to={ROUTES.PRIVACY} className={footerLinkClass}>
             Kebijakan Privasi
           </Link>
-          <Link to="#" className={footerLinkClass}>
+          <Link to={ROUTES.TERMS} className={footerLinkClass}>
             Syarat & Ketentuan
           </Link>
-          <Link to="#" className={footerLinkClass}>
+          <Link to={ROUTES.FAQ} className={footerLinkClass}>
             Pusat bantuan
           </Link>
         </nav>
@@ -43,11 +44,23 @@ export function PublicFooter() {
         </div>
 
         <address className="flex min-w-0 flex-col items-start justify-center gap-4 not-italic md:items-start md:justify-self-end">
-          <a href="#" className={socialLinkClass} aria-label="LinkedIn SurplusIn">
+          <a
+            href="https://www.linkedin.com/in/surplusin"
+            className={socialLinkClass}
+            target="_blank"
+            rel="noreferrer"
+            aria-label="LinkedIn SurplusIn"
+          >
             <Linkedin className="size-4 shrink-0 sm:size-5" aria-hidden="true" />
             <span className="min-w-0 truncate">SurplusIn</span>
           </a>
-          <a href="#" className={socialLinkClass} aria-label="Instagram SurplusIn">
+          <a
+            href="https://www.instagram.com/surplusin"
+            className={socialLinkClass}
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Instagram SurplusIn"
+          >
             <Instagram className="size-4 shrink-0 sm:size-5" aria-hidden="true" />
             <span className="min-w-0 truncate">SurplusIn</span>
           </a>
