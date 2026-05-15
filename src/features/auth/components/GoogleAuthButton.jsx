@@ -2,7 +2,7 @@ import { Button } from '@/components/ui';
 import { cn } from '@/lib/utils';
 import { getGoogleAuthUrl } from '../authApi';
 
-export function GoogleAuthButton({ children, disabled = false, className }) {
+export function GoogleAuthButton({ children, disabled = false, className, role }) {
   return (
     <Button
       type="button"
@@ -15,7 +15,7 @@ export function GoogleAuthButton({ children, disabled = false, className }) {
       )}
       onClick={() => {
         if (!disabled) {
-          window.location.assign(getGoogleAuthUrl());
+          window.location.assign(getGoogleAuthUrl(role));
         }
       }}
     >

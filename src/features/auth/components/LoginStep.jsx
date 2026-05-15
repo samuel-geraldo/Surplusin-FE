@@ -7,6 +7,7 @@ import { AuthDivider } from './AuthDivider';
 import { GoogleAuthButton } from './GoogleAuthButton';
 
 export function LoginStep({
+  role,
   onSubmit,
   onForgotPassword,
   onRegister,
@@ -78,7 +79,9 @@ export function LoginStep({
         </Button>
 
         <AuthDivider />
-        <GoogleAuthButton className="h-[56px]">Masuk dengan Google</GoogleAuthButton>
+        <GoogleAuthButton role={role} className="h-[56px]">
+          Masuk dengan Google
+        </GoogleAuthButton>
 
         <p className="text-center text-body2 text-[#64748b]">
           Belum punya akun?{' '}

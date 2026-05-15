@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
+    "test": "node --test src/features/auth/authLogic.test.mjs src/features/auth/components/locationSearch.test.mjs src/components/ui/mapConfig.test.mjs",
     "preview": "vite preview"
   },
   "dependencies": {

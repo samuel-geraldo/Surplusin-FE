@@ -28,6 +28,8 @@ export function ProfileCompletionStep({
       category: initialValues?.category ?? '',
       whatsapp: initialValues?.whatsapp ?? '',
       address: initialValues?.address ?? '',
+      latitude: initialValues?.latitude,
+      longitude: initialValues?.longitude,
       locationConfirmed: initialValues?.locationConfirmed ?? false,
     },
   });
@@ -96,7 +98,7 @@ export function ProfileCompletionStep({
             <Button
               type="button"
               variant="ghost"
-              className="h-[56px] rounded-xl bg-transparent px-0 text-body2 font-medium shadow-none hover:bg-transparent"
+              className="h-[56px] rounded-xl bg-white px-5 text-body2 font-medium shadow-none hover:bg-white active:bg-green-light-active"
               onClick={onBack}
             >
               Kembali
