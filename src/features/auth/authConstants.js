@@ -54,12 +54,16 @@ export function getRoleDestination(role) {
 }
 
 export function buildRegisterPayload(accountData, profileData) {
+  const selectedRole =
+    accountData.role === AUTH_ROLES.RETAILER ? 'penyalur' : 'penerima';
+
   return {
     name: profileData.name.trim(),
     age: Number(accountData.age),
     email: accountData.email.trim(),
     password: accountData.password,
     role: accountData.role,
+    selectedRole,
   };
 }
 
@@ -92,4 +96,3 @@ export function decodeJwtPayload(token) {
     return null;
   }
 }
-

@@ -141,7 +141,7 @@ export const Map = forwardRef(
           className,
         )}
       >
-        <div ref={containerRef} className="absolute inset-0" />
+        <div ref={containerRef} className="absolute inset-0" style={{ position: 'absolute', inset: 0 }} />
         {(loading || isLoading) && !error ? <DefaultLoader /> : null}
         {error ? <MapError message={error} /> : null}
         {children}
