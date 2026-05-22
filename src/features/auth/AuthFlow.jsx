@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/store/auth/useAuthStore';
@@ -9,7 +10,12 @@ import {
   decodeJwtPayload,
   getRoleDestination,
 } from './authConstants';
-import { getAuthErrorMessage, loginUser, registerUser } from './authApi';
+import {
+  createRoleProfile,
+  getAuthErrorMessage,
+  loginUser,
+  registerUser,
+} from './authApi';
 import { AuthShell } from './components/AuthShell';
 import { ForgotPasswordStep } from './components/ForgotPasswordStep';
 import { LoginStep } from './components/LoginStep';
@@ -24,15 +30,62 @@ const initialProfileData = {
   category: '',
   whatsapp: '',
   address: '',
+  latitude: undefined,
+  longitude: undefined,
   locationConfirmed: false,
 };
 
+function getGoogleCallbackData(searchParams) {
+  const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+  const getParam = (key) => searchParams.get(key) ?? hashParams.get(key);
+  const token = getParam('token');
+
+  if (!token) {
+    return null;
+  }
+
+  const decodedUser = decodeJwtPayload(token);
+  const backendRole = getParam('role') ?? decodedUser?.role;
+  const role =
+    backendRole === 'penerima' ? AUTH_ROLES.RECIPIENT : AUTH_ROLES.RETAILER;
+  const user = {
+    ...decodedUser,
+    email: getParam('email') ?? decodedUser?.email,
+    role: backendRole,
+  };
+
+  return {
+    token,
+    user,
+    accountData: {
+      email: user.email ?? '',
+      role,
+      backendRole,
+      userId: decodedUser?.id,
+      isGoogleProfile: true,
+    },
+  };
+}
+
 export function AuthFlow() {
+  const [searchParams] = useSearchParams();
   const reducedMotion = useReducedMotion();
   const setSession = useAuthStore((state) => state.setSession);
-  const [step, setStep] = useState(AUTH_STEPS.ROLE_SELECTION);
-  const [selectedRole, setSelectedRole] = useState(null);
-  const [accountData, setAccountData] = useState(null);
+  const googleCallbackData = useMemo(
+    () => getGoogleCallbackData(searchParams),
+    [searchParams],
+  );
+  const [step, setStep] = useState(() =>
+    googleCallbackData
+      ? AUTH_STEPS.PROFILE_COMPLETION
+      : AUTH_STEPS.ROLE_SELECTION,
+  );
+  const [selectedRole, setSelectedRole] = useState(
+    () => googleCallbackData?.accountData.role ?? null,
+  );
+  const [accountData, setAccountData] = useState(
+    () => googleCallbackData?.accountData ?? null,
+  );
   const [profileData, setProfileData] = useState(initialProfileData);
   const [registeredUser, setRegisteredUser] = useState(null);
   const [authResult, setAuthResult] = useState(null);
@@ -48,6 +101,18 @@ export function AuthFlow() {
     () => selectedRole ?? AUTH_ROLES.RETAILER,
     [selectedRole],
   );
+
+  useEffect(() => {
+    if (!googleCallbackData) {
+      return;
+    }
+
+    setSession({
+      user: googleCallbackData.user,
+      accessToken: googleCallbackData.token,
+    });
+    window.history.replaceState(null, '', window.location.pathname);
+  }, [googleCallbackData, setSession]);
 
   function resetError() {
     setSubmitState({ type: 'idle', message: '' });
@@ -95,9 +160,15 @@ export function AuthFlow() {
 
     try {
       const payload = buildRegisterPayload(accountData, values);
-      const response = await registerUser(payload);
+      const response = accountData?.isGoogleProfile
+        ? await createRoleProfile({
+            role: accountData.backendRole,
+            userId: accountData.userId,
+            profileData: values,
+          })
+        : await registerUser(payload);
 
-      setRegisteredUser(response.user);
+      setRegisteredUser(response.user ?? response);
       setStep(AUTH_STEPS.REGISTERED);
       setSubmitState({ type: 'idle', message: '' });
       toast.success(response.message ?? 'Registrasi berhasil');
@@ -113,6 +184,7 @@ export function AuthFlow() {
     if (step === AUTH_STEPS.LOGIN) {
       return (
         <LoginStep
+          role={currentRole}
           onSubmit={handleLogin}
           onForgotPassword={() => {
             resetError();
@@ -204,10 +276,10 @@ export function AuthFlow() {
       <AnimatePresence mode="wait" initial={false}>
         <Motion.div
           key={step}
-          initial={reducedMotion ? false : { opacity: 0, y: 12 }}
-          animate={reducedMotion ? undefined : { opacity: 1, y: 0 }}
-          exit={reducedMotion ? undefined : { opacity: 0, y: -10 }}
-          transition={{ duration: 0.22, ease: 'easeOut' }}
+          initial={reducedMotion ? false : { opacity: 0 }}
+          animate={reducedMotion ? undefined : { opacity: 1 }}
+          exit={reducedMotion ? undefined : { opacity: 0 }}
+          transition={{ duration: 0.14, ease: 'easeOut' }}
         >
           {renderStep()}
         </Motion.div>
@@ -220,9 +292,9 @@ function StatusCard({ title, message, actionLabel, onAction }) {
   return (
     <Motion.div
       className="mx-auto w-full max-w-[460px] rounded-[20px] bg-white p-8 text-center shadow-[0_0_2px_rgba(0,0,0,0.25)]"
-      initial={{ opacity: 0, y: 18, scale: 0.985 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.34, ease: [0.22, 1, 0.36, 1] }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.16, ease: 'easeOut' }}
     >
       <h1 className="text-h1 font-extrabold text-[#0f172a]">{title}</h1>
       <p className="mt-3 text-body2 text-[#64748b]">{message}</p>

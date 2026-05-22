@@ -30,15 +30,9 @@ export default function RecipientHistoryPage() {
 
 
   return (
-    <div
-      className="flex flex-col gap-8"
-      style={{ padding: '2rem 2rem 4rem', marginTop: '1rem' }}
-    >
+    <div className="flex flex-col gap-8 pb-16">
       {/* ════════════ SUMMARY CARDS ════════════ */}
-      <div
-        className="grid grid-cols-1 gap-5 sm:grid-cols-3"
-        style={{ marginLeft: '1rem', marginRight: '1rem' }}
-      >
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-3 mx-4 sm:mx-0">
         {/* Card 1: Orang Terbantu */}
         <div
           className="relative flex items-center gap-5 overflow-hidden rounded-2xl bg-white"
@@ -125,15 +119,7 @@ export default function RecipientHistoryPage() {
       </div>
 
       {/* ════════════ RIWAYAT PENERIMA DONASI ════════════ */}
-      <section
-        className="rounded-2xl"
-        style={{
-          marginLeft: '1rem',
-          marginRight: '1rem',
-          padding: '1.75rem 2rem',
-          backgroundColor: '#f8fafc',
-        }}
-      >
+      <section className="rounded-2xl mx-4 sm:mx-0 px-6 py-7 sm:px-8 bg-slate-50">
         <h2
           className="mb-5 font-[Manrope] font-bold text-[#0f172a]"
           style={{ fontSize: '20px' }}
@@ -145,11 +131,7 @@ export default function RecipientHistoryPage() {
           {historyDonations.map((item, idx) => (
             <div
               key={item.id}
-              className="flex items-center gap-4 rounded-2xl bg-white transition-shadow hover:shadow-md"
-              style={{
-                padding: '1.1rem 1.5rem',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-              }}
+              className="flex items-center gap-4 rounded-2xl bg-white px-5 py-4 shadow-sm transition-shadow hover:shadow-md"
             >
               {/* Numbered badge */}
               <div

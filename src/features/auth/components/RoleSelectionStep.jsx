@@ -19,9 +19,9 @@ export function RoleSelectionStep({ onSelectRole, onLogin }) {
     <div>
       <Motion.div
         className="text-center"
-        initial={reducedMotion ? false : { opacity: 0, y: 16 }}
-        animate={reducedMotion ? undefined : { opacity: 1, y: 0 }}
-        transition={{ duration: 0.32, ease: 'easeOut' }}
+        initial={reducedMotion ? false : { opacity: 0 }}
+        animate={reducedMotion ? undefined : { opacity: 1 }}
+        transition={{ duration: 0.16, ease: 'easeOut' }}
       >
         <h1 className="text-[40px] font-extrabold leading-tight tracking-normal text-black">
           Pilih Peran Anda
@@ -36,19 +36,18 @@ export function RoleSelectionStep({ onSelectRole, onLogin }) {
         {ROLE_OPTIONS.map((role, index) => (
           <Motion.div
             key={role.value}
-            initial={reducedMotion ? false : { opacity: 0, y: 24 }}
-            animate={reducedMotion ? undefined : { opacity: 1, y: 0 }}
+            initial={reducedMotion ? false : { opacity: 0 }}
+            animate={reducedMotion ? undefined : { opacity: 1 }}
             transition={{
-              delay: reducedMotion ? 0 : 0.08 + index * 0.08,
-              duration: 0.36,
-              ease: [0.22, 1, 0.36, 1],
+              delay: reducedMotion ? 0 : index * 0.04,
+              duration: 0.16,
+              ease: 'easeOut',
             }}
             whileHover={
               reducedMotion
                 ? undefined
                 : {
-                    y: -6,
-                    boxShadow: '0 18px 38px rgba(15,23,42,0.12)',
+                    boxShadow: '0 12px 28px rgba(15,23,42,0.10)',
                   }
             }
             className="h-full rounded-xl"
@@ -60,8 +59,6 @@ export function RoleSelectionStep({ onSelectRole, onLogin }) {
                 alt=""
                 className="h-full w-full object-cover"
                 aria-hidden="true"
-                whileHover={reducedMotion ? undefined : { scale: 1.035 }}
-                transition={{ duration: 0.35, ease: 'easeOut' }}
               />
             </div>
             <div className="flex flex-1 flex-col gap-3 px-2.5 py-3">
@@ -95,9 +92,9 @@ export function RoleSelectionStep({ onSelectRole, onLogin }) {
 
       <Motion.p
         className="mt-8 text-center text-body2 text-black"
-        initial={reducedMotion ? false : { opacity: 0, y: 8 }}
-        animate={reducedMotion ? undefined : { opacity: 1, y: 0 }}
-        transition={{ delay: 0.38, duration: 0.25 }}
+        initial={reducedMotion ? false : { opacity: 0 }}
+        animate={reducedMotion ? undefined : { opacity: 1 }}
+        transition={{ delay: 0.12, duration: 0.16 }}
       >
         Sudah punya akun?{' '}
         <button

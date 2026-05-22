@@ -49,7 +49,7 @@ describe('auth schemas', () => {
 });
 
 describe('auth helpers', () => {
-  it('builds register payload with only backend-supported fields', () => {
+  it('builds register payload with backend role fields', () => {
     const payload = buildRegisterPayload(
       {
         email: 'recipient@example.com',
@@ -72,6 +72,7 @@ describe('auth helpers', () => {
       email: 'recipient@example.com',
       password: 'secret1',
       role: 'recipients',
+      selectedRole: 'penerima',
     });
   });
 

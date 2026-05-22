@@ -27,17 +27,14 @@ export default function RecipientDashboardPage() {
   };
 
   return (
-    <div
-      className="mt-6 flex flex-col gap-6 px-6 pt-4 sm:mt-8 sm:px-8 sm:pt-6 lg:mt-10 lg:px-12 lg:pt-8"
-      style={{ paddingLeft: '2.5rem', paddingRight: '2.5rem', paddingTop: '2.5rem' }}
-    >
+    <div className="flex flex-col gap-3 pb-10">
       {/* ── Summary Cards ── */}
       {error ? (
         <p className="rounded-xl border border-red-200 bg-red-50 px-5 py-4 font-[Manrope] text-sm text-red-600">
           {error}
         </p>
       ) : (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:gap-10">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-10 lg:gap-10 px-2 sm:px-6 lg:px-10">
           <DonationSummaryCard
             icon={BOX_ICON}
             count={data?.available ?? null}
@@ -67,10 +64,7 @@ export default function RecipientDashboardPage() {
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-start md:gap-10">
           {/* Search Input */}
           <div className="relative w-full md:max-w-md">
-            <div
-              className="pointer-events-none absolute inset-y-0 flex items-center"
-              style={{ left: '1rem' }}
-            >
+            <div className="pointer-events-none absolute inset-y-0 left-4 flex items-center">
               <Search className="size-5 text-[#64748b]" strokeWidth={2} />
             </div>
             <input
@@ -78,8 +72,7 @@ export default function RecipientDashboardPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Cari toko, jenis makanan, dll..."
-              style={{ paddingLeft: '2.75rem' }}
-              className="h-[46px] w-full rounded-xl border border-[#94a3b8] bg-transparent pr-4 font-[Manrope] text-[15px] font-medium text-text placeholder:text-[#64748b] focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-colors"
+              className="h-[46px] w-full rounded-xl border border-[#94a3b8] bg-transparent pl-11 pr-4 font-[Manrope] text-[15px] font-medium text-text placeholder:text-[#64748b] transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             />
           </div>
 

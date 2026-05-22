@@ -9,30 +9,46 @@ export function LocationPicker({ register, confirmed, setValue }) {
   const [addressQuery, setAddressQuery] = useState('');
   const [addressResults, setAddressResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [isLocating, setIsLocating] = useState(false);
   const [searchError, setSearchError] = useState('');
+  const [locationError, setLocationError] = useState('');
   const selectedAddressRef = useRef('');
   const addressField = register('address');
 
   const handlePick = useCallback(
     (nextCenter) => {
       setCenter(nextCenter);
-      setValue('locationConfirmed', true);
+      setLocationError('');
+      setValue('longitude', nextCenter[0], { shouldDirty: true });
+      setValue('latitude', nextCenter[1], { shouldDirty: true });
+      setValue('locationConfirmed', false, { shouldDirty: true });
     },
     [setValue],
   );
 
   function handleLocate() {
+    setLocationError('');
+
     if (!navigator.geolocation) {
-      setValue('locationConfirmed', true);
+      setValue('locationConfirmed', false);
+      setLocationError('Browser tidak mendukung lokasi perangkat.');
       return;
     }
 
+    setIsLocating(true);
     navigator.geolocation.getCurrentPosition(
       (position) => {
         handlePick([position.coords.longitude, position.coords.latitude]);
+        setIsLocating(false);
       },
-      () => {
-        setValue('locationConfirmed', true);
+      (error) => {
+        setValue('locationConfirmed', false);
+        setIsLocating(false);
+        setLocationError(
+          error.code === error.PERMISSION_DENIED
+            ? 'Izin lokasi ditolak browser/perangkat.'
+            : 'Lokasi perangkat tidak tersedia. Cek Location Services Windows.',
+        );
       },
       { enableHighAccuracy: true, timeout: 6000 },
     );
@@ -81,6 +97,8 @@ export function LocationPicker({ register, confirmed, setValue }) {
     addressField.onChange(event);
     selectedAddressRef.current = '';
     setAddressQuery(nextQuery);
+    setLocationError('');
+    setValue('locationConfirmed', false, { shouldDirty: true });
 
     if (!shouldSearchAddress(nextQuery)) {
       setAddressResults([]);
@@ -118,6 +136,7 @@ export function LocationPicker({ register, confirmed, setValue }) {
           type="button"
           className="absolute right-3 top-1/2 grid size-6 -translate-y-1/2 place-items-center text-[#3b9b5b] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-normal"
           aria-label="Gunakan lokasi saat ini"
+          disabled={isLocating}
           onClick={handleLocate}
         >
           <TargetIcon />
@@ -144,10 +163,18 @@ export function LocationPicker({ register, confirmed, setValue }) {
             ))}
           </div>
         )}
+        {locationError ? (
+          <p className="mt-2 text-label text-red-dark">{locationError}</p>
+        ) : null}
       </div>
 
       <div className="relative min-h-[190px] overflow-hidden rounded-2xl border border-[#d6dbe3] bg-[#edf2f7]">
-        <Map center={center} zoom={13} onPick={handlePick} className="absolute inset-0">
+        <Map
+          center={center}
+          zoom={13}
+          onPick={handlePick}
+          className="absolute inset-0"
+        >
           <div
             className="pointer-events-none absolute left-1/2 top-1/2 grid size-12 -translate-x-1/2 -translate-y-full place-items-center rounded-full bg-orange-normal text-white shadow-lg"
             aria-hidden="true"
@@ -156,13 +183,21 @@ export function LocationPicker({ register, confirmed, setValue }) {
             <span className="absolute top-[42px] h-4 w-1 rounded-full bg-orange-normal" />
           </div>
         </Map>
+        {confirmed ? (
+          <div
+            className="absolute inset-0 z-10 cursor-not-allowed"
+            aria-label="Lokasi sudah dikonfirmasi"
+          />
+        ) : null}
       </div>
 
       <div className="flex flex-col gap-3 rounded-2xl border border-[#d6dbe3] bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-body2 font-bold text-[#0f172a]">Konfirmasi Lokasi</p>
           <p className="text-label text-[#64748b]">
-            Pin sudah sesuai dengan titik lokasi?
+            {confirmed
+              ? 'Lokasi sudah dikonfirmasi.'
+              : 'Pin sudah sesuai dengan titik lokasi?'}
           </p>
         </div>
         <Button
@@ -170,9 +205,14 @@ export function LocationPicker({ register, confirmed, setValue }) {
           size="sm"
           variant={confirmed ? 'primary' : 'secondary'}
           className="min-h-11 rounded-xl px-6 text-body2"
-          onClick={() => setValue('locationConfirmed', true)}
+          onClick={() => {
+            setValue('locationConfirmed', !confirmed, {
+              shouldDirty: true,
+              shouldValidate: true,
+            });
+          }}
         >
-          OK
+          {confirmed ? 'Ubah' : 'OK'}
         </Button>
       </div>
     </div>

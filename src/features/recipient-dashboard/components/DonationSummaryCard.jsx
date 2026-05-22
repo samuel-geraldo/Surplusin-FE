@@ -17,7 +17,7 @@ export function DonationSummaryCard({ icon, count, label, accentColor, isLoading
   return (
     <article
       className={cn(
-        'relative h-36 flex items-center gap-4 overflow-hidden rounded-2xl bg-white px-6 py-4',
+        'relative flex h-32 items-center gap-4 overflow-hidden rounded-2xl bg-white px-2 py-4',
         'border-l-4',
         isBlue ? 'border-l-[#1F66F4]' : 'border-l-[#FF6600]',
       )}
@@ -51,7 +51,7 @@ export function DonationSummaryCard({ icon, count, label, accentColor, isLoading
           <>
             <p
               className={cn(
-                'font-[Manrope] text-[30px] font-extrabold leading-tight',
+                'font-[Manrope] text-[26px] font-extrabold leading-tight',
                 isBlue ? 'text-[#1F66F4]' : 'text-[#FF6600]',
               )}
             >
@@ -59,7 +59,7 @@ export function DonationSummaryCard({ icon, count, label, accentColor, isLoading
             </p>
             <p 
               className={cn(
-                "font-[Manrope] text-[16px] font-medium",
+                "font-[Manrope] text-[14px] font-medium",
                 isBlue ? "text-[#1F66F4]" : "text-[#FF6600]"
               )}
             >

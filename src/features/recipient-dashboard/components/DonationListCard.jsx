@@ -81,29 +81,29 @@ export function DonationListCard({ data, onClaimed }) {
       style={{ padding: '1rem', paddingLeft: '1rem' }}
     >
       {/* ── Left Column: Icon & Category ── */}
-      <div className="flex w-[200px] shrink-0 flex-col">
+      <div className="flex w-[200px] shrink min-w-[120px] flex-col">
         {/* Main Box */}
         <div className={`flex h-[140px] w-full items-center justify-center rounded-2xl ${config.bg}`}>
           <img
             src={config.icon}
             alt={categoryLabel}
-            className="h-20 w-20 object-contain opacity-90"
+            className="h-16 w-16 sm:h-20 sm:w-20 object-contain opacity-90"
           />
         </div>
 
         {/* Category Pill */}
         <div
-          className={`flex h-[36px] w-full items-center justify-center rounded-xl ${config.pillBg}`}
+          className={`flex min-h-[36px] w-full items-center justify-center rounded-xl px-2 py-1 text-center ${config.pillBg}`}
           style={{ marginTop: '1rem' }}
         >
-          <span className={`font-[Manrope] text-[14px] font-semibold uppercase tracking-wide ${config.pillText}`}>
+          <span className={`font-[Manrope] text-[11px] sm:text-[13px] font-semibold uppercase tracking-wide ${config.pillText}`}>
             {categoryLabel}
           </span>
         </div>
       </div>
 
       {/* ── Right Column: Details & Button ── */}
-      <div className="flex flex-1 flex-col justify-between">
+      <div className="flex flex-1 shrink-0 min-w-[280px] flex-col justify-between">
         {/* Header Texts */}
         <div>
           <h3 className="font-[Manrope] text-[18px] font-extrabold leading-tight text-[#0f172a]">

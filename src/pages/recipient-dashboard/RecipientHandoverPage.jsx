@@ -90,10 +90,7 @@ export default function RecipientHandoverPage() {
   // Jika belum ada donasi yang diklaim
   if (claimedDonations.length === 0) {
     return (
-      <div
-        className="flex flex-col items-center justify-center gap-4"
-        style={{ minHeight: '60vh', padding: '2rem' }}
-      >
+      <div className="flex flex-col items-center justify-center gap-4 min-h-[60vh] px-8">
         <img
           src="/recipient_retailer icon/basic-icon/box.svg"
           alt="empty"
@@ -122,10 +119,7 @@ export default function RecipientHandoverPage() {
   }
 
   return (
-    <div
-      className="flex flex-col gap-8"
-      style={{ padding: '2rem 2rem 4rem', marginTop: '1rem' }}
-    >
+    <div className="flex flex-col gap-8 pb-16">
       {claimedDonations.map((donation) => {
         const storeLat = donation.lat || RECIPIENT_LAT;
         const storeLng = donation.lng || RECIPIENT_LNG;
@@ -138,13 +132,7 @@ export default function RecipientHandoverPage() {
           <div key={donation.id} className="flex gap-6" style={{ alignItems: 'flex-start' }}>
             {/* ════════════ LEFT: Donation Card ════════════ */}
             <article
-              className="flex-1 rounded-3xl bg-white"
-              style={{
-                padding: '2rem',
-                boxShadow: '0 8px 30px rgba(0,0,0,0.06)',
-                border: '1px solid #f1f5f9',
-                minWidth: 0,
-              }}
+              className="flex-1 rounded-3xl bg-white p-6 sm:p-8 shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-slate-100 min-w-0"
             >
               {/* ── Header: Badge + Info + Estimasi ── */}
               <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">

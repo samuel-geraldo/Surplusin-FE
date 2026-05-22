@@ -230,17 +230,11 @@ export default function RecipientProfilePage() {
   );
 
   return (
-    <div
-      className="flex gap-6"
-      style={{ padding: '2rem 2rem 4rem', marginTop: '1rem' }}
-    >
+    <div className="flex flex-col xl:flex-row gap-6 pb-16">
       {/* ════════════ LEFT COLUMN: Profile ════════════ */}
       <div className="flex flex-1 flex-col gap-6" style={{ minWidth: 0 }}>
         {/* ── Informasi Dasar Card ── */}
-        <div
-          className="rounded-3xl bg-white"
-          style={{ padding: '1.75rem 2rem', boxShadow: '0 8px 30px rgba(0,0,0,0.06)', border: '1px solid #f1f5f9' }}
-        >
+        <div className="rounded-3xl bg-white p-6 sm:p-8 shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-slate-100">
           {/* Header — always visible, pencil only when not editing */}
           <div className="mb-5 flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -344,14 +338,7 @@ export default function RecipientProfilePage() {
 
       {/* ════════════ RIGHT COLUMN: Pinpoint Lokasi ════════════ */}
       <aside className="hidden shrink-0 flex-col gap-0 xl:flex" style={{ width: 380 }}>
-        <div
-          className="flex flex-col rounded-3xl bg-white"
-          style={{
-            padding: '1.75rem',
-            boxShadow: '0 8px 30px rgba(0,0,0,0.06)',
-            border: '1px solid #f1f5f9',
-          }}
-        >
+        <div className="flex flex-col rounded-3xl bg-white p-7 shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-slate-100">
           {/* ── Header ── */}
           <div className="mb-2 flex items-center gap-3">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#0f172a" style={{ width: 22, height: 22 }}>
