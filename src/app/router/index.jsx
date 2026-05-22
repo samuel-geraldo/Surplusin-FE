@@ -3,10 +3,15 @@ import { ROUTES } from '@/lib/constants';
 import { RootLayout } from '@/components/layout/RootLayout';
 import { PublicLayout } from '@/components/layout/PublicLayout';
 import { RecipientLayout } from '@/components/layout/recipient/RecipientLayout';
+import { RetailerLayout } from '@/components/layout/retailer/RetailerLayout';
 import RecipientDashboardPage from '@/pages/recipient-dashboard/RecipientDashboardPage';
 import RecipientHandoverPage from '@/pages/recipient-dashboard/RecipientHandoverPage';
 import RecipientHistoryPage from '@/pages/recipient-dashboard/RecipientHistoryPage';
 import RecipientProfilePage from '@/pages/recipient-dashboard/RecipientProfilePage';
+import RetailerDashboardPage from '@/pages/retailer-dashboard/RetailerDashboardPage';
+import RetailerHandoverPage from '@/pages/retailer-dashboard/RetailerHandoverPage';
+import RetailerHistoryPage from '@/pages/retailer-dashboard/RetailerHistoryPage';
+import RetailerProfilePage from '@/pages/retailer-dashboard/RetailerProfilePage';
 import LandingPage, { LandingNavbarActions } from '@/pages/LandingPage';
 import AuthPage from '@/pages/AuthPage';
 import FaqPage from '@/pages/FaqPage';
@@ -82,6 +87,44 @@ export const router = createBrowserRouter([
           {
             path: 'profile',
             element: <RecipientProfilePage />,
+            handle: {
+              pageTitle: 'Profil Instansi',
+            },
+          },
+        ],
+      },
+      {
+        path: ROUTES.RETAILER.ROOT,
+        element: <RetailerLayout />,
+        children: [
+          {
+            index: true,
+            element: <Navigate to={ROUTES.RETAILER.DASHBOARD} replace />,
+          },
+          {
+            path: 'dashboard',
+            element: <RetailerDashboardPage />,
+            handle: {
+              pageTitle: 'Retailer Dashboard',
+            },
+          },
+          {
+            path: 'handover',
+            element: <RetailerHandoverPage />,
+            handle: {
+              pageTitle: 'Detail Penyerahan',
+            },
+          },
+          {
+            path: 'history',
+            element: <RetailerHistoryPage />,
+            handle: {
+              pageTitle: 'Riwayat Penyerahan',
+            },
+          },
+          {
+            path: 'profile',
+            element: <RetailerProfilePage />,
             handle: {
               pageTitle: 'Profil Instansi',
             },

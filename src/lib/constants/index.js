@@ -14,6 +14,13 @@ export const ROUTES = {
     HISTORY: '/recipient/history',
     PROFILE: '/recipient/profile',
   },
+  RETAILER: {
+    ROOT: '/retailer',
+    DASHBOARD: '/retailer/dashboard',
+    HANDOVER: '/retailer/handover',
+    HISTORY: '/retailer/history',
+    PROFILE: '/retailer/profile',
+  },
   AUTH: '/auth',
   FAQ: '/faq',
   PRIVACY: '/privacy-policy',
