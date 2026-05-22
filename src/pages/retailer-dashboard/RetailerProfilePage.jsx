@@ -1,5 +1,12 @@
-import { useState } from 'react';
-import { Search, LocateFixed } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { LocateFixed, Search } from 'lucide-react';
+import { Map } from '@/components/ui';
+import {
+  searchAddresses,
+  shouldSearchAddress,
+} from '@/features/auth/components/locationSearch';
+
+const DEFAULT_CENTER = [106.8456, -6.2088];
 
 const initialProfile = {
   storeName: 'Catering Ibu Endang',
@@ -7,6 +14,8 @@ const initialProfile = {
   whatsapp: '081234567890',
   address: 'Jl. Kebahagian No.123, Kebayoran baru, Jakarta Selatan',
   landmark: 'Depan Alfamart',
+  latitude: -6.2088,
+  longitude: 106.8456,
 };
 
 const profileFields = [
@@ -37,6 +46,12 @@ const profileFields = [
     style: { width: 573, height: 60 },
   },
 ];
+
+function getProfileCenter(profile) {
+  return profile.longitude && profile.latitude
+    ? [Number(profile.longitude), Number(profile.latitude)]
+    : DEFAULT_CENTER;
+}
 
 function HomeProfileIcon() {
   return (
@@ -114,14 +129,211 @@ function FieldBox({ field, value, draftValue, error, isEditing, onChange }) {
   );
 }
 
-function MapPreview() {
+function RetailerLocationMap({ editable, profile, draft, onLocationChange }) {
+  const activeProfile = editable ? draft : profile;
+  const [center, setCenter] = useState(getProfileCenter(activeProfile));
+  const [addressQuery, setAddressQuery] = useState(activeProfile.address);
+  const [addressResults, setAddressResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [isLocating, setIsLocating] = useState(false);
+  const [searchError, setSearchError] = useState('');
+  const [locationError, setLocationError] = useState('');
+  const selectedAddressRef = useRef(activeProfile.address);
+
+  const handlePick = useCallback(
+    (nextCenter) => {
+      if (!editable) {
+        return;
+      }
+
+      setCenter(nextCenter);
+      setLocationError('');
+      onLocationChange({
+        longitude: nextCenter[0],
+        latitude: nextCenter[1],
+      });
+    },
+    [editable, onLocationChange],
+  );
+
+  useEffect(() => {
+    if (!editable || addressQuery === selectedAddressRef.current) {
+      return undefined;
+    }
+
+    if (!shouldSearchAddress(addressQuery)) {
+      return undefined;
+    }
+
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(() => {
+      setIsSearching(true);
+      setSearchError('');
+
+      searchAddresses(addressQuery, controller.signal)
+        .then((results) => {
+          setAddressResults(results);
+        })
+        .catch((error) => {
+          if (error.name !== 'AbortError') {
+            setAddressResults([]);
+            setSearchError('Alamat tidak bisa dimuat');
+          }
+        })
+        .finally(() => {
+          if (!controller.signal.aborted) {
+            setIsSearching(false);
+          }
+        });
+    }, 350);
+
+    return () => {
+      controller.abort();
+      window.clearTimeout(timeoutId);
+    };
+  }, [addressQuery, editable]);
+
+  function handleAddressChange(event) {
+    if (!editable) {
+      return;
+    }
+
+    const nextQuery = event.target.value;
+
+    selectedAddressRef.current = '';
+    setAddressQuery(nextQuery);
+    setLocationError('');
+    onLocationChange({ address: nextQuery });
+
+    if (!shouldSearchAddress(nextQuery)) {
+      setAddressResults([]);
+      setSearchError('');
+      setIsSearching(false);
+    }
+  }
+
+  function handleAddressSelect(result) {
+    if (!editable) {
+      return;
+    }
+
+    selectedAddressRef.current = result.label;
+    setAddressQuery(result.label);
+    setAddressResults([]);
+    setSearchError('');
+    onLocationChange({ address: result.label });
+    handlePick(result.center);
+  }
+
+  function handleLocate() {
+    if (!editable) {
+      return;
+    }
+
+    setLocationError('');
+
+    if (!navigator.geolocation) {
+      setLocationError('Browser tidak mendukung lokasi perangkat.');
+      return;
+    }
+
+    setIsLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        handlePick([position.coords.longitude, position.coords.latitude]);
+        setIsLocating(false);
+      },
+      (error) => {
+        setIsLocating(false);
+        setLocationError(
+          error.code === error.PERMISSION_DENIED
+            ? 'Izin lokasi ditolak browser/perangkat.'
+            : 'Lokasi perangkat tidak tersedia. Cek Location Services Windows.',
+        );
+      },
+      { enableHighAccuracy: true, timeout: 6000 },
+    );
+  }
+
   return (
-    <img
-      src="/retailer-profile-map.png"
-      alt=""
-      aria-hidden="true"
-      style={{ width: 538.5, height: 327, objectFit: 'cover' }}
-    />
+    <div className="mt-[33px] flex flex-col gap-[18px]">
+      <div className="relative">
+        <div className="flex items-center rounded-[10px] border border-[#64748b] bg-white px-3" style={{ width: 538.5, height: 60 }}>
+          <Search className="size-8 text-[#64748b]" strokeWidth={2.2} />
+          <input
+            type="text"
+            value={addressQuery}
+            onChange={handleAddressChange}
+            placeholder="Cari alamat..."
+            disabled={!editable}
+            className="ml-2 h-full min-w-0 flex-1 bg-transparent font-[Manrope] text-[20px] font-normal leading-[27px] tracking-[-0.4px] text-[#1e293b] outline-none placeholder:text-[#64748b] disabled:cursor-not-allowed"
+          />
+          <button
+            type="button"
+            aria-label="Gunakan lokasi saat ini"
+            disabled={!editable || isLocating}
+            className="ml-3 grid size-8 shrink-0 place-items-center rounded-full text-[#0f172a] transition-colors hover:bg-[#dcfce9] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3c965a] disabled:opacity-50"
+            onClick={handleLocate}
+          >
+            <LocateFixed className="size-7" strokeWidth={2.5} />
+          </button>
+        </div>
+
+        {editable && (addressResults.length > 0 || isSearching || searchError) && (
+          <div className="absolute left-0 right-0 top-[calc(100%+8px)] z-30 max-h-56 overflow-y-auto rounded-xl border border-[#d6dbe3] bg-white shadow-lg">
+            {isSearching && (
+              <p className="px-4 py-3 font-[Manrope] text-[14px] text-[#64748b]">
+                Mencari alamat...
+              </p>
+            )}
+            {searchError && (
+              <p className="px-4 py-3 font-[Manrope] text-[14px] text-red-dark">
+                {searchError}
+              </p>
+            )}
+            {addressResults.map((result) => (
+              <button
+                key={result.id}
+                type="button"
+                className="block w-full px-4 py-3 text-left font-[Manrope] text-[14px] leading-5 text-[#0f172a] hover:bg-[#dcfce9] focus-visible:bg-[#dcfce9] focus-visible:outline-none"
+                onClick={() => handleAddressSelect(result)}
+              >
+                {result.label}
+              </button>
+            ))}
+          </div>
+        )}
+        {editable && locationError ? (
+          <p className="mt-2 font-[Manrope] text-[14px] text-red-dark">
+            {locationError}
+          </p>
+        ) : null}
+      </div>
+
+      <div className="relative overflow-hidden rounded-2xl border border-[#d6dbe3] bg-[#edf2f7]" style={{ width: 538.5, height: 327 }}>
+        <Map
+          center={center}
+          zoom={14}
+          onPick={handlePick}
+          interactive={editable}
+          controls={editable}
+          className="absolute inset-0"
+        >
+          <div
+            className="pointer-events-none absolute left-1/2 top-1/2 grid size-12 -translate-x-1/2 -translate-y-full place-items-center rounded-full bg-[#ff6600] text-white shadow-lg"
+            aria-hidden="true"
+          >
+            <span className="size-3 rounded-full bg-white" />
+            <span className="absolute top-[42px] h-4 w-1 rounded-full bg-[#ff6600]" />
+          </div>
+        </Map>
+        {!editable ? (
+          <div className="pointer-events-none absolute inset-x-4 bottom-4 rounded-xl bg-white/90 px-4 py-3 font-[Manrope] text-[14px] font-semibold text-[#0f172a] shadow-[0_10px_24px_rgba(15,23,42,0.12)]">
+            Lokasi terkunci. Klik edit untuk mengubah titik toko.
+          </div>
+        ) : null}
+      </div>
+    </div>
   );
 }
 
@@ -147,6 +359,17 @@ export default function RetailerProfilePage() {
       return nextErrors;
     });
   };
+
+  const handleLocationChange = useCallback((nextLocation) => {
+    setDraft((currentDraft) => ({ ...currentDraft, ...nextLocation }));
+    setErrors((currentErrors) => {
+      if (!nextLocation.address || !currentErrors.address) return currentErrors;
+
+      const nextErrors = { ...currentErrors };
+      delete nextErrors.address;
+      return nextErrors;
+    });
+  }, []);
 
   const handleCancel = () => {
     setDraft(profile);
@@ -174,6 +397,8 @@ export default function RetailerProfilePage() {
       whatsapp: draft.whatsapp.trim(),
       address: draft.address.trim(),
       landmark: draft.landmark.trim(),
+      latitude: draft.latitude,
+      longitude: draft.longitude,
     });
     setIsEditing(false);
   };
@@ -193,7 +418,8 @@ export default function RetailerProfilePage() {
               type="button"
               aria-label="Edit profil"
               onClick={handleEditClick}
-              className="flex size-8 items-center justify-center text-black transition-opacity hover:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3c965a]"
+              disabled={isEditing}
+              className="flex size-8 items-center justify-center text-black transition-opacity hover:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3c965a] disabled:cursor-not-allowed disabled:opacity-50"
             >
               <EditProfileIcon />
             </button>
@@ -280,17 +506,13 @@ export default function RetailerProfilePage() {
               Geser pin pada peta untuk menentukan titik koordinat penjemputan donasi yang lebih akurat
             </p>
 
-            <div className="flex items-center rounded-[10px] border border-[#64748b] bg-white px-3" style={{ width: 538.5, height: 60, marginTop: 33 }}>
-              <Search className="size-8 text-[#64748b]" strokeWidth={2} />
-              <span className="ml-2 font-[Manrope] text-[20px] font-normal leading-[27px] tracking-[-0.4px] text-[#64748b]">
-                Cari alamat...
-              </span>
-              <LocateFixed className="ml-auto size-7 text-black" strokeWidth={2.1} />
-            </div>
-
-            <div style={{ marginTop: 18 }}>
-              <MapPreview />
-            </div>
+            <RetailerLocationMap
+              key={`${isEditing ? 'edit' : 'view'}-${profile.address}-${profile.latitude}-${profile.longitude}`}
+              editable={isEditing}
+              profile={profile}
+              draft={draft}
+              onLocationChange={handleLocationChange}
+            />
           </div>
         </section>
       </div>
