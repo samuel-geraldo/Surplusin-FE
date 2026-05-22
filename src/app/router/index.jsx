@@ -5,6 +5,7 @@ import { PublicLayout } from '@/components/layout/PublicLayout';
 import LandingPage, { LandingNavbarActions } from '@/pages/LandingPage';
 import AuthPage from '@/pages/AuthPage';
 import FaqPage from '@/pages/FaqPage';
+import NotFoundPage from '@/pages/NotFoundPage';
 import PrivacyPolicyPage from '@/pages/PrivacyPolicyPage';
 import TermsPage from '@/pages/TermsPage';
 
@@ -42,6 +43,10 @@ export const router = createBrowserRouter([
             handle: {
               publicNavbarTall: true,
             },
+          },
+          {
+            path: '*',
+            element: <NotFoundPage />,
           },
         ],
       },
