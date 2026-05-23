@@ -1,6 +1,6 @@
-import { createElement } from 'react';
-import { motion, useReducedMotion } from 'motion/react';
-import { Link } from 'react-router-dom';
+import { createElement, useRef } from 'react';
+import { motion, useInView, useReducedMotion } from 'motion/react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui';
 import { ROUTES } from '@/lib/constants';
 import { createLandingVariants, viewportOnce } from '@/lib/animations/landingMotion';
@@ -43,12 +43,68 @@ const metrics = [
   { value: '15 Menit', label: 'Rata-rata Respon Mitra' },
 ];
 
+const DIGITS = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+
 function LandingIcon({ icon, size = 'h-7 w-7', className = '' }) {
   return createElement(icon, {
     'aria-hidden': 'true',
     className: `${size} text-[#059669] ${className}`,
     strokeWidth: 2.5,
   });
+}
+
+function SlotMetricValue({ value, reducedMotion }) {
+  const ref = useRef(null);
+  const isInView = useInView(ref, viewportOnce);
+
+  if (reducedMotion) {
+    return (
+      <strong className="block text-[40px] font-extrabold leading-none sm:text-5xl">
+        {value}
+      </strong>
+    );
+  }
+
+  return (
+    <strong
+      ref={ref}
+      className="flex justify-center text-[40px] font-extrabold leading-none tabular-nums sm:text-5xl"
+      aria-label={value}
+    >
+      {value.split('').map((character, index) => {
+        if (!/\d/.test(character)) {
+          return (
+            <span key={`${character}-${index}`} className="inline-block">
+              {character === ' ' ? '\u00A0' : character}
+            </span>
+          );
+        }
+
+        return (
+          <span
+            key={`${character}-${index}`}
+            className="slot-digit inline-block h-[1em] overflow-hidden"
+            aria-hidden="true"
+          >
+            <span
+              className={`flex flex-col will-change-transform ${isInView ? 'slot-digit-track' : ''}`}
+              style={{
+                animationDelay: `${0.04 * index}s`,
+                animationDuration: `${0.62 + index * 0.035}s`,
+              }}
+            >
+              {DIGITS.map((digit) => (
+                <span key={digit} className="h-[1em] leading-none">
+                  {digit}
+                </span>
+              ))}
+              <span className="h-[1em] leading-none">{character}</span>
+            </span>
+          </span>
+        );
+      })}
+    </strong>
+  );
 }
 
 export function LandingNavbarActions() {
@@ -208,6 +264,7 @@ function HeroTitleLine({ children, variants }) {
 }
 
 function HeroSection({ variants, reducedMotion }) {
+  const navigate = useNavigate();
   return (
     <section className="overflow-hidden bg-[#f3f3f6] px-5 py-14 sm:px-8 lg:py-24">
       <div className="mx-auto grid max-w-[1320px] items-center gap-12 lg:grid-cols-[0.86fr_1.14fr]">
@@ -254,19 +311,16 @@ function HeroSection({ variants, reducedMotion }) {
             className="mt-10 inline-flex rounded-2xl"
           >
             <Motion.div
-              animate={reducedMotion ? undefined : { scale: [1, 1.025, 1], boxShadow: ['0 0 0 rgba(80,200,120,0)', '0 0 34px rgba(80,200,120,0.26)', '0 0 0 rgba(80,200,120,0)'] }}
               whileHover={reducedMotion ? undefined : { y: -3, scale: 1.015 }}
               whileTap={reducedMotion ? undefined : { y: 1, scale: 0.99 }}
-              transition={{ delay: 1.25, duration: 0.55, ease: 'easeOut' }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
               className="rounded-2xl"
             >
               <Button
                 type="button"
                 size="md"
                 className="rounded-2xl px-8 text-lg sm:px-10"
-                onClick={() => {
-                  window.location.href = ROUTES.AUTH;
-                }}
+                onClick={() => navigate(ROUTES.AUTH)}
               >
                 Mulai Sekarang
               </Button>
@@ -398,7 +452,7 @@ function AboutSection({ variants }) {
   );
 }
 
-function MetricsStrip({ variants }) {
+function MetricsStrip({ variants, reducedMotion }) {
   return (
     <Motion.section
       className="overflow-hidden bg-gradient-to-r from-green-dark to-[#27623b] px-5 py-14 text-white sm:px-8 lg:py-18"
@@ -416,9 +470,7 @@ function MetricsStrip({ variants }) {
       >
         {metrics.map((metric) => (
           <Motion.div key={metric.label} className="text-center" variants={variants.fadeUp}>
-            <strong className="block text-[40px] font-extrabold leading-none sm:text-5xl">
-              {metric.value}
-            </strong>
+            <SlotMetricValue value={metric.value} reducedMotion={reducedMotion} />
             <span className="mt-4 block text-sm font-extrabold uppercase tracking-wide text-white/90 sm:text-base">{metric.label}</span>
           </Motion.div>
         ))}
@@ -428,6 +480,7 @@ function MetricsStrip({ variants }) {
 }
 
 function FinalCTASection({ variants, reducedMotion }) {
+  const navigate = useNavigate();
   return (
     <section id="daftar" className="relative scroll-mt-24 overflow-hidden bg-[#f3f3f6] px-5 py-20 text-center sm:px-8 lg:py-24">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(255,102,0,0.10),transparent_42%)]" />
@@ -457,11 +510,9 @@ function FinalCTASection({ variants, reducedMotion }) {
           <Button
             type="button"
             variant="secondary"
-            size="lg"
-            className="rounded-2xl text-xl hover:shadow-[0_14px_34px_rgba(255,102,0,0.28)]"
-            onClick={() => {
-              window.location.href = ROUTES.AUTH;
-            }}
+            size="md"
+            className="min-h-[56px] rounded-2xl px-8 text-base hover:shadow-[0_14px_34px_rgba(255,102,0,0.28)] sm:px-10 sm:text-lg"
+            onClick={() => navigate(ROUTES.AUTH)}
           >
             Daftar Sebagai Mitra
           </Button>
@@ -480,7 +531,7 @@ export default function LandingPage() {
       <HeroSection variants={variants} reducedMotion={reducedMotion} />
       <PillarsSection variants={variants} reducedMotion={reducedMotion} />
       <AboutSection variants={variants} />
-      <MetricsStrip variants={variants} />
+      <MetricsStrip variants={variants} reducedMotion={reducedMotion} />
       <FinalCTASection variants={variants} reducedMotion={reducedMotion} />
     </div>
   );

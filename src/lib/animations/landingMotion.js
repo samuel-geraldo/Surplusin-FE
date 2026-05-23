@@ -11,8 +11,8 @@ export function createLandingVariants(reducedMotion) {
       visible: {
         transition: {
           when: 'beforeChildren',
-          staggerChildren: reducedMotion ? 0 : 0.1,
-          delayChildren: reducedMotion ? 0 : 0.08,
+          staggerChildren: reducedMotion ? 0 : 0.075,
+          delayChildren: reducedMotion ? 0 : 0.04,
         },
       },
     },
@@ -22,15 +22,15 @@ export function createLandingVariants(reducedMotion) {
         opacity: 1,
         y: 0,
         scale: 1,
-        transition: { duration: 0.48, ease: easeOut },
+        transition: { duration: 0.36, ease: easeOut },
       },
     },
     heroTitleMask: {
       hidden: {},
       visible: {
         transition: {
-          staggerChildren: reducedMotion ? 0 : 0.08,
-          delayChildren: reducedMotion ? 0 : 0.12,
+          staggerChildren: reducedMotion ? 0 : 0.055,
+          delayChildren: reducedMotion ? 0 : 0.08,
         },
       },
     },
@@ -42,7 +42,7 @@ export function createLandingVariants(reducedMotion) {
       visible: {
         opacity: 1,
         y: 0,
-        transition: { duration: 0.72, ease: easeOut },
+        transition: { duration: 0.56, ease: easeOut },
       },
     },
     heroHighlight: {
@@ -55,7 +55,7 @@ export function createLandingVariants(reducedMotion) {
         opacity: 1,
         scale: 1,
         textShadow: reducedMotion ? '0 0 0 rgba(80, 200, 120, 0)' : '0 10px 32px rgba(80, 200, 120, 0.24)',
-        transition: { delay: reducedMotion ? 0 : 0.22, duration: 0.48, ease: easeOut },
+        transition: { delay: reducedMotion ? 0 : 0.16, duration: 0.36, ease: easeOut },
       },
     },
     heroDescription: {
@@ -63,7 +63,7 @@ export function createLandingVariants(reducedMotion) {
       visible: {
         opacity: 1,
         y: 0,
-        transition: { duration: 0.58, ease: easeOut },
+        transition: { duration: 0.44, ease: easeOut },
       },
     },
     heroCta: {
@@ -72,7 +72,7 @@ export function createLandingVariants(reducedMotion) {
         opacity: 1,
         y: 0,
         scale: 1,
-        transition: { duration: 0.5, ease: easeOut },
+        transition: { duration: 0.36, ease: easeOut },
       },
     },
     heroGlow: {
@@ -80,7 +80,7 @@ export function createLandingVariants(reducedMotion) {
       visible: {
         opacity: 1,
         scale: 1,
-        transition: { delay: reducedMotion ? 0 : 0.02, duration: 0.75, ease: easeOut },
+        transition: { delay: reducedMotion ? 0 : 0.02, duration: 0.55, ease: easeOut },
       },
     },
     heroImageReveal: {
@@ -93,7 +93,7 @@ export function createLandingVariants(reducedMotion) {
         opacity: 1,
         scale: 1,
         clipPath: 'inset(0% 0% 0% 0% round 2.5rem)',
-        transition: { delay: reducedMotion ? 0 : 0.35, duration: 0.88, ease: easeOut },
+        transition: { delay: reducedMotion ? 0 : 0.24, duration: 0.62, ease: easeOut },
       },
     },
     reportCardEntrance: {
@@ -113,8 +113,8 @@ export function createLandingVariants(reducedMotion) {
         rotateX: 0,
         rotateY: 0,
         transition: {
-          delay: reducedMotion ? 0 : 0.72,
-          duration: reducedMotion ? 0 : 0.78,
+          delay: reducedMotion ? 0 : 0.46,
+          duration: reducedMotion ? 0 : 0.52,
           ease: easeOut,
         },
       },
@@ -122,22 +122,22 @@ export function createLandingVariants(reducedMotion) {
     reportCardFloat: reducedMotion
       ? {}
       : {
-          y: [0, -6, 0],
-          transition: { duration: 5.6, repeat: Infinity, ease: 'easeInOut' },
+          y: [0, -4, 0],
+          transition: { duration: 7.2, repeat: Infinity, ease: 'easeInOut' },
         },
     fadeUp: {
       hidden: { opacity: 0, y },
       visible: {
         opacity: 1,
         y: 0,
-        transition: { duration: 0.65, ease: easeOut },
+        transition: { duration: 0.46, ease: easeOut },
       },
     },
     fadeIn: {
       hidden: { opacity: 0 },
       visible: {
         opacity: 1,
-        transition: { duration: 0.55, ease: 'easeOut' },
+        transition: { duration: 0.38, ease: 'easeOut' },
       },
     },
     scaleIn: {
@@ -145,15 +145,15 @@ export function createLandingVariants(reducedMotion) {
       visible: {
         opacity: 1,
         scale: 1,
-        transition: { duration: 0.6, ease: easeOut },
+        transition: { duration: 0.4, ease: easeOut },
       },
     },
     staggerContainer: {
       hidden: {},
       visible: {
         transition: {
-          staggerChildren: reducedMotion ? 0 : 0.11,
-          delayChildren: reducedMotion ? 0 : 0.05,
+          staggerChildren: reducedMotion ? 0 : 0.07,
+          delayChildren: reducedMotion ? 0 : 0.03,
         },
       },
     },
@@ -167,7 +167,7 @@ export function createLandingVariants(reducedMotion) {
         opacity: 1,
         scale: 1,
         clipPath: 'inset(0% 0% 0% 0%)',
-        transition: { duration: 0.8, ease: easeOut },
+        transition: { duration: 0.52, ease: easeOut },
       },
     },
     cardReveal: {
@@ -176,13 +176,13 @@ export function createLandingVariants(reducedMotion) {
         opacity: 1,
         y: 0,
         scale: 1,
-        transition: { duration: 0.62, ease: easeOut },
+        transition: { duration: 0.42, ease: easeOut },
       },
     },
     cardHover: reducedMotion
       ? {}
       : {
-          y: -6,
+          y: -4,
           boxShadow: '0 22px 52px rgba(15, 23, 42, 0.12)',
           borderColor: 'rgba(80, 200, 120, 0.38)',
           transition: { duration: 0.24, ease: 'easeOut' },
@@ -192,7 +192,7 @@ export function createLandingVariants(reducedMotion) {
       visible: {
         opacity: 1,
         x: 0,
-        transition: { duration: 0.7, ease: easeOut },
+        transition: { duration: 0.48, ease: easeOut },
       },
     },
     fromRight: {
@@ -200,7 +200,7 @@ export function createLandingVariants(reducedMotion) {
       visible: {
         opacity: 1,
         x: 0,
-        transition: { duration: 0.7, ease: easeOut },
+        transition: { duration: 0.48, ease: easeOut },
       },
     },
   };
