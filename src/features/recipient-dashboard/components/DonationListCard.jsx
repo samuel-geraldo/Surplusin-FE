@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@/lib/constants';
 import { MOCK_CATEGORIES } from '@/features/recipient-dashboard/data/mockRecipientDashboardData';
 import { claimDonation } from '@/services/api/recipient';
+import { env } from '@/lib/env';
 import { ClaimDonationModal } from './ClaimDonationModal';
 import { ClaimSuccessPopup } from './ClaimSuccessPopup';
 
@@ -33,16 +34,17 @@ export function DonationListCard({ data, onClaimed }) {
       // Panggil API backend: POST /api/klaim/:donasi_id
       await claimDonation(data.id);
 
-      // Simpan ke localStorage juga (untuk mock flow & halaman Handover)
-      try {
-        const stored = localStorage.getItem('surplusin_claimed_donations');
-        const existing = stored ? JSON.parse(stored) : [];
-        if (!existing.find((d) => d.id === data.id)) {
-          existing.push(data);
+      if (env.USE_MOCK_API) {
+        try {
+          const stored = localStorage.getItem('surplusin_claimed_donations');
+          const existing = stored ? JSON.parse(stored) : [];
+          if (!existing.find((d) => d.id === data.id)) {
+            existing.push(data);
+          }
+          localStorage.setItem('surplusin_claimed_donations', JSON.stringify(existing));
+        } catch (e) {
+          console.error('Gagal menyimpan klaim ke localStorage:', e);
         }
-        localStorage.setItem('surplusin_claimed_donations', JSON.stringify(existing));
-      } catch (e) {
-        console.error('Gagal menyimpan klaim ke localStorage:', e);
       }
 
       setShowConfirm(false);

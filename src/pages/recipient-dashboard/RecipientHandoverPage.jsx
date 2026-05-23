@@ -160,9 +160,9 @@ export default function RecipientHandoverPage() {
         const storeLat = donation.lat || recipientLat;
         const storeLng = donation.lng || recipientLng;
 
-        // URL embed Google Maps
-        const mapsEmbedUrl = `https://maps.google.com/maps?q=${storeLat},${storeLng}&z=16&output=embed`;
-        const mapsOpenUrl = `https://www.google.com/maps/dir/${recipientLat},${recipientLng}/${storeLat},${storeLng}`;
+        const bbox = [storeLng - 0.01, storeLat - 0.01, storeLng + 0.01, storeLat + 0.01].join('%2C');
+        const mapsEmbedUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${storeLat}%2C${storeLng}`;
+        const mapsOpenUrl = `https://www.openstreetmap.org/?mlat=${storeLat}&mlon=${storeLng}#map=16/${storeLat}/${storeLng}`;
 
         return (
           <div key={donation.id} className="flex flex-col lg:flex-row gap-6" style={{ alignItems: 'flex-start' }}>
@@ -241,7 +241,7 @@ export default function RecipientHandoverPage() {
                 </div>
               </div>
 
-              {/* ── Google Maps Embed ── */}
+              {/* ── OpenStreetMap Embed ── */}
               <div
                 className="relative overflow-hidden rounded-2xl"
                 style={{ marginTop: '1.5rem', height: 280, border: '1px solid #e2e8f0' }}
@@ -255,7 +255,7 @@ export default function RecipientHandoverPage() {
                   referrerPolicy="no-referrer-when-downgrade"
                 />
 
-                {/* Buka di Google Maps */}
+                {/* Buka di OpenStreetMap */}
                 <a
                   href={mapsOpenUrl}
                   target="_blank"
@@ -275,7 +275,7 @@ export default function RecipientHandoverPage() {
                     alt="maps"
                     style={{ width: 16, height: 16 }}
                   />
-                  Buka di Google Maps
+                  Buka di OpenStreetMap
                 </a>
               </div>
 
