@@ -1,173 +1,278 @@
-import { MessageSquare } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { Hourglass, MessageSquare, PackageCheck, Radio, Trash2, Truck } from 'lucide-react';
+import { getRetailerActiveClaims, getRetailerErrorMessage } from '@/services/api/retailer';
 
-const preparationItems = ['Nasi', 'Ayam Goreng', 'Sayur Lodeh', 'Kerupuk', 'Item 5', 'Item 6', 'Item 7'];
+function splitItems(value) {
+  if (!value) return [];
 
-const notifications = Array.from({ length: 3 }, (_, index) => ({
-  id: index + 1,
-  title: 'Klaim Donasi!',
-  message: 'Panti Asuhan Kasih Bunda baru saja mengklaim 20 Porsi Nasi Box Anda. Mohon siapkan paket untuk penjemputan.',
-  time: 'Baru saja',
-}));
-
-function TruckIcon() {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 64 48" className="h-12 w-16 fill-[#ff6600]">
-      <path d="M2 6a4 4 0 0 1 4-4h36v34H2V6Zm40 10h8.6c1.3 0 2.5.6 3.3 1.6L62 28v8H42V16Zm7 6v8h8.2l-6-8H49Z" />
-      <circle cx="16" cy="38" r="7" />
-      <circle cx="49" cy="38" r="7" />
-      <circle cx="16" cy="38" r="3" className="fill-white" />
-      <circle cx="49" cy="38" r="3" className="fill-white" />
-    </svg>
-  );
+  return value
+    .split(/[\n,;]/)
+    .map((item) => item.trim())
+    .filter(Boolean);
 }
 
-function PackageIcon() {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 32 32" className="size-8 fill-black">
-      <path d="M3 7h10v10H3V7Zm12 0h9.5L29 12.2V25H15V7Zm9 2.6V14h3.8L24 9.6ZM3 19h10v6H3v-6Z" />
-    </svg>
-  );
+function formatClaimTime(value) {
+  if (!value) return 'Baru saja';
+
+  const date = new Date(value);
+  const diffMs = Date.now() - date.getTime();
+
+  if (Number.isNaN(date.getTime()) || diffMs < 60000) return 'Baru saja';
+
+  const minutes = Math.floor(diffMs / 60000);
+  if (minutes < 60) return `${minutes} menit lalu`;
+
+  const hours = Math.floor(minutes / 60);
+  return `${hours} jam lalu`;
 }
 
-function HomeIcon() {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 64 50" className="h-[50px] w-16 fill-[#2563eb]">
-      <path d="M31.9 1 2 25.5l5.2 6.4 5.6-4.6V50h14.5V35.4h9.4V50h14.5V27.3l5.6 4.6 5.2-6.4L49.5 15.2V4.5h-9.1V7.7L31.9 1Z" />
-    </svg>
-  );
+function getPickupStatus(claim) {
+  if (!claim) return 'waiting';
+
+  const rawStatus = String(claim.status_penjemputan ?? claim.pickup_status ?? claim.status ?? '').toLowerCase();
+
+  if (rawStatus.includes('tiba') || rawStatus.includes('arrived') || rawStatus.includes('diterima')) {
+    return 'arrived';
+  }
+
+  if (rawStatus.includes('menuju') || rawStatus.includes('jalan') || rawStatus.includes('pickup') || rawStatus.includes('diklaim')) {
+    return 'on_the_way';
+  }
+
+  return 'on_the_way';
 }
 
-function CheckItem({ children }) {
-  return (
-    <li className="flex h-[25px] items-center gap-2">
-      <span className="w-[26px] shrink-0 text-[20px] font-bold leading-none text-[#50c878]">✓</span>
-      <span className="font-[Manrope] text-[18px] font-normal leading-[25px] tracking-[-0.36px] text-[#1e293b]">
-        {children}
-      </span>
-    </li>
-  );
-}
+const PICKUP_STATUS = {
+  waiting: {
+    title: 'Menunggu klaim dari penerima',
+    subtitle: '',
+    Icon: Hourglass,
+    textClass: 'text-[#9a9a9a]',
+    borderClass: 'border-transparent',
+    shadowClass: '',
+  },
+  on_the_way: {
+    title: 'Penerima sedang menuju lokasi',
+    subtitlePrefix: 'dari',
+    Icon: Truck,
+    textClass: 'text-[#ff6600]',
+    borderClass: 'border-[#ff6600]',
+    shadowClass: 'shadow-[0_4px_16px_rgba(255,102,0,0.32)]',
+  },
+  arrived: {
+    title: 'Penerima tiba di lokasi',
+    subtitlePrefix: 'dari',
+    Icon: Radio,
+    textClass: 'text-[#059669]',
+    borderClass: 'border-[#059669]',
+    shadowClass: 'shadow-[0_4px_16px_rgba(5,150,105,0.28)]',
+  },
+};
 
-function NotificationCard({ item, active }) {
+function NotificationCard({ item, active, onDelete }) {
   return (
-    <article className="h-[162px] w-[370px] rounded-[14px] bg-white shadow-[0_4px_4px_rgba(0,0,0,0.25)]">
-      <div className="relative h-full w-full rounded-[14px]">
-        {active ? <div className="absolute left-0 top-0 h-full w-1 rounded-l-[14px] bg-[#1f66f4]" /> : null}
-        <div className="flex h-full w-full flex-col px-6 py-5">
-          <h3 className="font-[Manrope] text-[18px] font-bold leading-[25px] tracking-[-0.36px] text-[#0f172a]">
-            {item.title}
-          </h3>
-          <p className="mt-1.5 w-[322px] font-[Manrope] text-[16px] font-normal leading-[22px] tracking-[-0.32px] text-[#64748b]">
-            {item.message}
-          </p>
-          <p className="mt-1.5 font-[Manrope] text-[14px] font-normal leading-[19px] tracking-[-0.28px] text-[#64748b]">
-            {item.time}
-          </p>
-        </div>
-      </div>
+    <article
+      className="relative rounded-2xl bg-white p-4 pr-12 transition-colors hover:bg-slate-50"
+      style={{
+        border: '1px solid #e2e8f0',
+        borderLeft: active ? '4px solid #3b82f6' : '4px solid transparent',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
+      }}
+    >
+      <button
+        type="button"
+        aria-label="Hapus notifikasi"
+        onClick={() => onDelete(item.id)}
+        className="absolute right-4 top-4 grid size-8 place-items-center rounded-full text-[#64748b] transition-colors hover:bg-red-50 hover:text-red-normal focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-normal"
+      >
+        <Trash2 className="size-4" />
+      </button>
+      <h3 className="text-[15px] font-bold text-[#0f172a]">{item.title}</h3>
+      <p className="mt-2 text-[13px] leading-5 text-[#64748b]">{item.message}</p>
+      <p className="mt-2 text-[12px] text-[#64748b]">{item.time}</p>
     </article>
   );
 }
 
 export default function RetailerHandoverPage() {
-  const firstColumn = preparationItems.slice(0, 4);
-  const secondColumn = preparationItems.slice(4);
+  const [claims, setClaims] = useState([]);
+  const [dismissedIds, setDismissedIds] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('surplusin_retailer_dismissed_notifications') ?? '[]');
+    } catch {
+      return [];
+    }
+  });
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadClaims() {
+      setIsLoading(true);
+      setError('');
+
+      try {
+        const result = await getRetailerActiveClaims();
+        if (!cancelled) setClaims(Array.isArray(result) ? result : []);
+      } catch (err) {
+        if (!cancelled) {
+          setClaims([]);
+          setError(getRetailerErrorMessage(err, 'Gagal memuat klaim aktif'));
+        }
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    }
+
+    loadClaims();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const activeClaim = claims[0] ?? null;
+  const pickupStatus = PICKUP_STATUS[getPickupStatus(activeClaim)];
+  const PickupIcon = pickupStatus.Icon;
+  const preparationItems = splitItems(activeClaim?.item_detail);
+
+  const notifications = useMemo(
+    () =>
+      claims
+        .filter((claim) => !dismissedIds.includes(claim.id))
+        .map((claim) => ({
+          id: claim.id,
+          title: 'Klaim Donasi!',
+          message: `${claim.nama_instansi} baru saja mengklaim ${claim.jumlah} ${claim.satuan} ${claim.nama_donasi}.`,
+          time: formatClaimTime(claim.claimed_at),
+        })),
+    [claims, dismissedIds],
+  );
+
+  function deleteNotification(id) {
+    setDismissedIds((current) => {
+      const next = [...new Set([...current, id])];
+      localStorage.setItem('surplusin_retailer_dismissed_notifications', JSON.stringify(next));
+      return next;
+    });
+  }
 
   return (
-    <div className="min-h-[947px] w-full overflow-x-auto bg-[#f3f3f6] font-[Manrope]">
-      <div className="min-w-[1379px] px-[42px] pb-[55px] pt-12">
-        <section className="flex h-[117px] w-[1295px] items-center rounded-[14px] border border-[#ff6600] bg-white px-[39px] shadow-[0_4px_10px_rgba(255,102,0,0.6)]">
-          <TruckIcon />
-          <div className="ml-5 flex flex-col">
-            <h2 className="font-[Manrope] text-[32px] font-bold leading-[38px] tracking-[-0.64px] text-[#ff6600]">
-              Penerima sedang menuju lokasi
-            </h2>
-            <p className="font-[Manrope] text-[18px] font-normal leading-[25px] tracking-[-0.36px] text-[#ff6600]">
-              dari Panti Jenaka Sukarela
+    <div className="mt-6 flex w-full flex-col gap-6 px-6 pt-4 sm:mt-8 sm:px-8 sm:pt-6 lg:mt-10 lg:px-12 lg:pt-8">
+      {error ? (
+        <p className="rounded-xl border border-red-200 bg-red-50 px-5 py-4 text-sm font-semibold text-red-600">
+          {error}
+        </p>
+      ) : null}
+
+      <section className={`flex min-h-20 items-center gap-4 rounded-3xl border bg-white px-5 py-4 shadow-[0_8px_30px_rgba(0,0,0,0.06)] sm:px-7 ${pickupStatus.borderClass} ${pickupStatus.shadowClass}`}>
+        <PickupIcon className={`size-10 shrink-0 sm:size-12 ${pickupStatus.textClass}`} strokeWidth={2.2} />
+        <div className="min-w-0">
+          <h2 className={`text-[20px] font-extrabold leading-tight sm:text-[26px] ${pickupStatus.textClass}`}>
+            {pickupStatus.title}
+          </h2>
+          {activeClaim ? (
+            <p className={`mt-1 text-[14px] font-medium sm:text-[16px] ${pickupStatus.textClass}`}>
+              {pickupStatus.subtitlePrefix} {activeClaim.nama_instansi}
             </p>
-          </div>
-        </section>
-
-        <div className="mt-11 flex w-[1295px] gap-[38px]">
-          <div className="flex w-[823px] shrink-0 flex-col gap-[30px]">
-            <section className="h-[371px] w-[823px] rounded-[10px] bg-white px-9 py-[39px]">
-              <div className="flex h-[38px] items-center gap-1.5">
-                <PackageIcon />
-                <h2 className="font-[Manrope] text-[28px] font-bold leading-[38px] tracking-[-0.56px] text-[#0f172a]">
-                  Daftar Persiapan Item
-                </h2>
-              </div>
-
-              <div className="mt-[18px] flex h-[27px] w-[751px] items-center justify-between">
-                <h3 className="font-[Manrope] text-[20px] font-semibold leading-[27px] tracking-[-0.4px] text-[#0f172a]">
-                  Paket Nasi Box
-                </h3>
-                <div className="flex items-center gap-[10px] pr-0">
-                  <span className="font-[Manrope] text-[16px] font-normal leading-[22px] tracking-[-0.32px] text-[#1e293b]">
-                    Jumlah:
-                  </span>
-                  <span className="font-[Manrope] text-[16px] font-medium leading-[22px] tracking-[-0.32px] text-[#1e293b]">
-                    20 Porsi
-                  </span>
-                </div>
-              </div>
-
-              <div className="mt-[21px] h-[148px] w-[751px] rounded-[10px] bg-[#f0f0f3] px-2 py-3">
-                <div className="flex gap-2">
-                  <ul className="flex w-[293px] flex-col gap-2">
-                    {firstColumn.map((item) => (
-                      <CheckItem key={item}>{item}</CheckItem>
-                    ))}
-                  </ul>
-                  <ul className="flex w-[293px] flex-col gap-2 pl-2">
-                    {secondColumn.map((item) => (
-                      <CheckItem key={item}>{item}</CheckItem>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-
-              <div className="mt-5 flex h-7 w-[751px] items-center gap-2">
-                <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-[#1f66f4] font-[Manrope] text-[18px] font-extrabold leading-none text-white">
-                  !
-                </span>
-                <p className="font-[Manrope] text-[16px] font-normal leading-[22px] tracking-[-0.32px] text-[#0f172a]">
-                  Pastikan semua item sudah dikemas sesuai standar kebersihan sebelum kurir/penerima tiba.
-                </p>
-              </div>
-            </section>
-
-            <section className="h-[282px] w-[823px] rounded-[14px] bg-white px-[45px] py-7 text-center">
-              <h2 className="font-[Manrope] text-[28px] font-bold leading-[38px] tracking-[-0.56px] text-black">
-                Penerima Hari Ini
-              </h2>
-              <div className="mt-[26px] flex h-[87px] flex-col items-center">
-                <HomeIcon />
-                <p className="mt-2.5 font-[Manrope] text-[20px] font-medium leading-[27px] tracking-[-0.4px] text-black">
-                  Panti Jenaka Sukarela
-                </p>
-              </div>
-              <button
-                type="button"
-                className="mt-6 flex h-[53px] w-[733px] items-center justify-center gap-2 rounded-[14px] bg-[#50c878] font-[Manrope] text-[20px] font-bold leading-[27px] tracking-[-0.4px] text-white transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#50c878]"
-              >
-                <MessageSquare className="size-7 fill-white stroke-white" strokeWidth={1.8} />
-                Chat Penerima
-              </button>
-            </section>
-          </div>
-
-          <aside className="h-[683px] w-[434px] shrink-0 rounded-[14px] border border-[#64748b] px-8 py-[37px]">
-            <h2 className="text-center font-[Manrope] text-[28px] font-bold leading-[38px] tracking-[-0.56px] text-black">
-              Pusat Notifikasi
-            </h2>
-            <div className="mt-8 flex flex-col gap-8">
-              {notifications.map((notification, index) => (
-                <NotificationCard key={notification.id} item={notification} active={index === 0} />
-              ))}
-            </div>
-          </aside>
+          ) : null}
         </div>
+      </section>
+
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
+        <div className="flex w-full flex-col gap-6">
+          <section
+            className="rounded-3xl bg-white"
+            style={{ padding: '2rem', boxShadow: '0 8px 30px rgba(0,0,0,0.06)', border: '1px solid #f1f5f9' }}
+          >
+            <div className="flex items-center gap-3">
+              <PackageCheck className="size-[18px] text-[#0f172a]" />
+              <h2 className="font-[Manrope] text-[15px] font-bold text-[#0f172a]">
+                Daftar Persiapan Item
+              </h2>
+            </div>
+
+            <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <h3 className="font-[Manrope] text-[14px] font-semibold text-[#0f172a]">
+                {activeClaim?.nama_donasi ?? 'Belum ada klaim aktif'}
+              </h3>
+              {activeClaim ? (
+                <p className="text-[13px] text-[#1e293b]">
+                  Jumlah: <span className="font-semibold">{activeClaim.jumlah} {activeClaim.satuan}</span>
+                </p>
+              ) : null}
+            </div>
+
+            {isLoading ? (
+              <p className="mt-5 rounded-[10px] bg-[#f0f0f3] p-4 text-[#64748b]">
+                Memuat data penyerahan...
+              </p>
+            ) : preparationItems.length > 0 ? (
+              <ul className="mt-5 grid gap-2 rounded-[10px] bg-[#f0f0f3] p-4 sm:grid-cols-2">
+                {preparationItems.map((item) => (
+                  <li key={item} className="flex items-center gap-2 text-[13px] text-[#1e293b]">
+                    <span className="font-bold text-[#50c878]">✓</span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="mt-5 rounded-[10px] bg-[#f0f0f3] p-4 text-[#64748b]">
+                Belum ada detail item untuk klaim ini.
+              </p>
+            )}
+
+            <p className="mt-5 rounded-2xl bg-blue-50 px-4 py-3 font-[Manrope] text-[13px] text-[#0f172a]">
+              Pastikan semua item sudah dikemas sesuai standar kebersihan sebelum kurir/penerima tiba.
+            </p>
+          </section>
+
+          <section
+            className="rounded-3xl bg-white text-center"
+            style={{ padding: '2rem', boxShadow: '0 8px 30px rgba(0,0,0,0.06)', border: '1px solid #f1f5f9' }}
+          >
+            <h2 className="font-[Manrope] text-[18px] font-extrabold text-[#0f172a]">Penerima Hari Ini</h2>
+            <p className="mt-3 text-[14px] font-semibold text-black">
+              {activeClaim?.nama_instansi ?? '-'}
+            </p>
+            {activeClaim?.alamat ? (
+              <p className="mx-auto mt-2 max-w-[520px] text-[15px] text-[#64748b]">{activeClaim.alamat}</p>
+            ) : null}
+            <a
+              href={activeClaim?.nomor_whatsapp ? `https://wa.me/${activeClaim.nomor_whatsapp.replace(/\D/g, '')}` : undefined}
+              className="mt-5 flex min-h-11 w-full items-center justify-center gap-2 rounded-[12px] bg-[#50c878] px-5 text-[14px] font-bold text-white transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#50c878] aria-disabled:pointer-events-none aria-disabled:opacity-50"
+              aria-disabled={!activeClaim?.nomor_whatsapp}
+            >
+              <MessageSquare className="size-5" strokeWidth={2} />
+              Chat Penerima
+            </a>
+          </section>
+        </div>
+
+        <aside
+          className="rounded-3xl bg-white"
+          style={{ padding: '1.75rem', boxShadow: '0 8px 30px rgba(0,0,0,0.06)', border: '1px solid #f1f5f9' }}
+        >
+          <h2 className="mb-5 text-center font-[Manrope] text-[18px] font-extrabold text-[#0f172a]">Pusat Notifikasi</h2>
+          <div className="flex flex-col gap-3">
+            {notifications.length > 0 ? (
+              notifications.map((notification, index) => (
+                <NotificationCard
+                  key={notification.id}
+                  item={notification}
+                  active={index === 0}
+                  onDelete={deleteNotification}
+                />
+              ))
+            ) : (
+              <p className="rounded-2xl border border-[#e2e8f0] bg-white p-4 text-center font-[Manrope] text-[13px] text-[#64748b] shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
+                Tidak ada notifikasi aktif.
+              </p>
+            )}
+          </div>
+        </aside>
       </div>
     </div>
   );

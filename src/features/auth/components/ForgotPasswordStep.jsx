@@ -20,22 +20,31 @@ export function ForgotPasswordStep({ onBackToLogin }) {
     },
   });
 
+  function handleRecoveryRequest(values) {
+    const subject = encodeURIComponent('Permintaan Pemulihan Akun SurplusIn');
+    const body = encodeURIComponent(
+      `Halo Tim SurplusIn,\n\nSaya ingin mengajukan pemulihan akun.\n\nEmail akun: ${values.email}\n\nTerima kasih.`,
+    );
+
+    window.location.href = `mailto:support@surplusin.id?subject=${subject}&body=${body}`;
+  }
+
   return (
     <AuthCard>
-      <form className="space-y-5" onSubmit={handleSubmit(() => {})}>
+      <form className="space-y-5" onSubmit={handleSubmit(handleRecoveryRequest)}>
         <div className="text-center">
           <h1 className="text-h1 font-extrabold tracking-normal text-[#0f172a]">
             Pemulihan Akun
           </h1>
           <p className="mt-3 text-body2 text-[#64748b]">
-            Masukkan email Anda untuk menerima tautan pengaturan ulang kata
-            sandi.
+            Masukkan email Anda untuk mengirim permintaan pemulihan akun.
           </p>
         </div>
 
         {isSubmitSuccessful && (
-          <p className="rounded-xl bg-orange-light p-3 text-body2 text-orange-dark">
-            Reset password belum tersedia. Hubungi support@surplusin.id.
+          <p className="rounded-xl bg-[#eefaf2] p-3 text-body2 text-[#047857]">
+            Aplikasi email terbuka dengan format permintaan pemulihan. Kirim
+            email tersebut agar tim SurplusIn dapat memproses verifikasi akun.
           </p>
         )}
 
@@ -52,7 +61,7 @@ export function ForgotPasswordStep({ onBackToLogin }) {
           variant="secondary"
           className="h-[56px] w-full rounded-2xl text-body2"
         >
-          Atur Ulang Kata Sandi
+          Kirim Permintaan Pemulihan
         </Button>
 
         <button
