@@ -93,6 +93,11 @@ export function ProfileCompletionStep({
             confirmed={confirmed}
             setValue={setValue}
           />
+          {errors.locationConfirmed?.message ? (
+            <p className="-mt-3 text-label text-red-dark">
+              {errors.locationConfirmed.message}
+            </p>
+          ) : null}
 
           <div className="grid grid-cols-[1fr_1.8fr] items-center gap-4 pt-1">
             <Button
@@ -106,7 +111,7 @@ export function ProfileCompletionStep({
             <Button
               type="submit"
               variant="secondary"
-              disabled={isSubmitting}
+              disabled={isSubmitting || !confirmed}
               className="h-[56px] rounded-xl text-body2"
             >
               {isSubmitting ? 'Memproses...' : 'Selesaikan Pendaftaran'}

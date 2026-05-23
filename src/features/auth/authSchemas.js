@@ -33,5 +33,7 @@ export const profileSchema = z.object({
   address: z.string().optional(),
   latitude: z.number().optional(),
   longitude: z.number().optional(),
-  locationConfirmed: z.boolean().optional(),
+  locationConfirmed: z.literal(true, {
+    error: 'Pastikan lokasi terlebih dahulu',
+  }),
 });
