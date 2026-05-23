@@ -34,17 +34,15 @@ export function DonationListCard({ data, onClaimed }) {
       // Panggil API backend: POST /api/klaim/:donasi_id
       await claimDonation(data.id);
 
-      if (env.USE_MOCK_API) {
-        try {
-          const stored = localStorage.getItem('surplusin_claimed_donations');
-          const existing = stored ? JSON.parse(stored) : [];
-          if (!existing.find((d) => d.id === data.id)) {
-            existing.push(data);
-          }
-          localStorage.setItem('surplusin_claimed_donations', JSON.stringify(existing));
-        } catch (e) {
-          console.error('Gagal menyimpan klaim ke localStorage:', e);
+      try {
+        const stored = localStorage.getItem('surplusin_claimed_donations');
+        const existing = stored ? JSON.parse(stored) : [];
+        if (!existing.find((d) => d.id === data.id)) {
+          existing.push(data);
         }
+        localStorage.setItem('surplusin_claimed_donations', JSON.stringify(existing));
+      } catch (e) {
+        if (env.USE_MOCK_API) console.error('Gagal menyimpan klaim ke localStorage:', e);
       }
 
       setShowConfirm(false);

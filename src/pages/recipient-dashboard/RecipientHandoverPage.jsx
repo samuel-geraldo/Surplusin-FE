@@ -320,17 +320,23 @@ export default function RecipientHandoverPage() {
                       Daftar Item Donasi
                     </h4>
                   </div>
-                  <ul className="flex flex-col gap-2 pl-4">
-                    {(donation.items && donation.items.length > 0 ? donation.items : ['Nasi Box', 'Ayam Bakar', 'Kerupuk udang', 'Sayur Lodeh']).map((item, idx) => (
-                      <li
-                        key={idx}
-                        className="font-[Manrope] text-[#0f172a]"
-                        style={{ fontSize: '16px' }}
-                      >
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
+                  {donation.items && donation.items.length > 0 ? (
+                    <ul className="flex flex-col gap-2 pl-4">
+                      {donation.items.map((item) => (
+                        <li
+                          key={item}
+                          className="font-[Manrope] text-[#0f172a]"
+                          style={{ fontSize: '16px' }}
+                        >
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-center font-[Manrope] text-[15px] text-[#64748b]">
+                      Belum ada detail item untuk klaim ini.
+                    </p>
+                  )}
                 </div>
 
                 {/* Konfirmasi Penerimaan */}

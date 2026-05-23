@@ -218,7 +218,9 @@ export async function getActiveHandovers() {
     }
   }
 
-  return claims.map((klaim) => mapActiveHandoverToUI(klaim, retailers));
+  const snapshots = readClaimedDonationSnapshots();
+
+  return claims.map((klaim) => mapActiveHandoverToUI(klaim, retailers, snapshots));
 }
 
 // ────────────────────────────────────────────
@@ -431,8 +433,32 @@ function findRetailerForClaim(klaim, retailers) {
   ));
 }
 
-function mapActiveHandoverToUI(klaim, retailers = []) {
+function readClaimedDonationSnapshots() {
+  try {
+    const stored = localStorage.getItem('surplusin_claimed_donations');
+    const snapshots = stored ? JSON.parse(stored) : [];
+    return Array.isArray(snapshots) ? snapshots : [];
+  } catch {
+    return [];
+  }
+}
+
+function findClaimSnapshot(klaim, snapshots) {
+  const claimStore = String(klaim.penyalur ?? '').trim().toLowerCase();
+  const claimFood = String(klaim.nama_donasi ?? '').trim().toLowerCase();
+  const claimPortion = `${klaim.jumlah ?? ''} ${klaim.satuan ?? ''}`.trim().toLowerCase();
+
+  return snapshots.find((snapshot) => (
+    String(snapshot.storeName ?? '').trim().toLowerCase() === claimStore &&
+    String(snapshot.foodName ?? '').trim().toLowerCase() === claimFood &&
+    String(snapshot.portion ?? '').trim().toLowerCase() === claimPortion
+  ));
+}
+
+function mapActiveHandoverToUI(klaim, retailers = [], snapshots = []) {
   const matchedRetailer = findRetailerForClaim(klaim, retailers);
+  const snapshot = findClaimSnapshot(klaim, snapshots);
+  const claimItems = parseItemDetail(klaim.item_detail);
 
   return {
     id: klaim.klaim_id,
@@ -445,7 +471,7 @@ function mapActiveHandoverToUI(klaim, retailers = []) {
     lng: klaim.longitude_penyalur ? parseFloat(klaim.longitude_penyalur) : null,
     nomor_whatsapp: getRetailerWhatsappFromClaim(klaim) || matchedRetailer?.nomor_whatsapp || '',
     expiry: klaim.claimed_at ? new Date(klaim.claimed_at).toLocaleString('id-ID') : '-',
-    items: [], // BE doesn't return item_detail for active handovers
+    items: claimItems.length > 0 ? claimItems : snapshot?.items || [],
   };
 }
 
