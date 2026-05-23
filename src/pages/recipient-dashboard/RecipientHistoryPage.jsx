@@ -51,17 +51,17 @@ export default function RecipientHistoryPage() {
         <div
           className="relative flex items-center gap-5 overflow-hidden rounded-2xl bg-white shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-shadow duration-300 hover:shadow-[0_0px_30px_rgba(37,99,235,0.35)] cursor-default"
           style={{
-            padding: '2.5rem 3rem',
+            padding: '1.5rem 1.5rem',
             borderLeft: '4px solid #2563eb',
           }}
         >
           <div className="flex shrink-0 items-center justify-center">
-            <img src="/recipient_retailer icon/basic-icon/orang terbantu.svg" alt="Orang Terbantu" style={{ width: 48, height: 48 }} />
+            <img src="/recipient_retailer icon/basic-icon/orang terbantu.svg" alt="Orang Terbantu" className="w-10 h-10 sm:w-12 sm:h-12" />
           </div>
-          <div className="flex flex-col whitespace-nowrap">
+          <div className="flex flex-col">
             <p
-              className="font-[Manrope] font-extrabold text-[#2563eb]"
-              style={{ fontSize: '28px', lineHeight: 1.2 }}
+              className="font-[Manrope] font-extrabold text-[#2563eb] text-[22px] sm:text-[28px]"
+              style={{ lineHeight: 1.2 }}
             >
               {orangTerbantu} Orang
             </p>
@@ -78,17 +78,17 @@ export default function RecipientHistoryPage() {
         <div
           className="relative flex items-center gap-5 overflow-hidden rounded-2xl bg-white shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-shadow duration-300 hover:shadow-[0_0px_30px_rgba(16,185,129,0.35)] cursor-default"
           style={{
-            padding: '2.5rem 3rem',
+            padding: '1.5rem 1.5rem',
             borderLeft: '4px solid #10b981',
           }}
         >
           <div className="flex shrink-0 items-center justify-center">
-            <img src="/recipient_retailer icon/basic-icon/donasi diterima.svg" alt="Donasi Diterima" style={{ width: 48, height: 48 }} />
+            <img src="/recipient_retailer icon/basic-icon/donasi diterima.svg" alt="Donasi Diterima" className="w-10 h-10 sm:w-12 sm:h-12" />
           </div>
-          <div className="flex flex-col whitespace-nowrap">
+          <div className="flex flex-col">
             <p
-              className="font-[Manrope] font-extrabold text-[#10b981]"
-              style={{ fontSize: '28px', lineHeight: 1.2 }}
+              className="font-[Manrope] font-extrabold text-[#10b981] text-[22px] sm:text-[28px]"
+              style={{ lineHeight: 1.2 }}
             >
               {donasiDiterima} Donasi
             </p>
@@ -105,17 +105,17 @@ export default function RecipientHistoryPage() {
         <div
           className="relative flex items-center gap-5 overflow-hidden rounded-2xl bg-white shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-shadow duration-300 hover:shadow-[0_0px_30px_rgba(249,115,22,0.35)] cursor-default"
           style={{
-            padding: '2.5rem 3rem',
+            padding: '1.5rem 1.5rem',
             borderLeft: '4px solid #f97316',
           }}
         >
           <div className="flex shrink-0 items-center justify-center">
-            <img src="/recipient_retailer icon/basic-icon/toko mengirimkan donasi.svg" alt="Jumlah Toko" style={{ width: 48, height: 48 }} />
+            <img src="/recipient_retailer icon/basic-icon/toko mengirimkan donasi.svg" alt="Jumlah Toko" className="w-10 h-10 sm:w-12 sm:h-12" />
           </div>
-          <div className="flex flex-col whitespace-nowrap">
+          <div className="flex flex-col">
             <p
-              className="font-[Manrope] font-extrabold text-[#f97316]"
-              style={{ fontSize: '28px', lineHeight: 1.2 }}
+              className="font-[Manrope] font-extrabold text-[#f97316] text-[22px] sm:text-[28px]"
+              style={{ lineHeight: 1.2 }}
             >
               {jumlahToko} Toko
             </p>
@@ -142,7 +142,7 @@ export default function RecipientHistoryPage() {
           {historyDonations.map((item, idx) => (
             <div
               key={item.id}
-              className="flex items-center gap-4 rounded-2xl bg-white px-5 py-6 shadow-sm transition-shadow hover:shadow-md"
+              className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-4 rounded-2xl bg-white px-5 py-6 shadow-sm transition-shadow hover:shadow-md"
             >
               {/* Numbered badge */}
               <div

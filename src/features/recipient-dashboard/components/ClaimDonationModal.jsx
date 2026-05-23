@@ -13,7 +13,7 @@ export function ClaimDonationModal({ donation, isClaiming, onConfirm, onClose })
       onClick={onClose}
     >
       <div
-        className="relative w-[50%] max-w-[410px] rounded-2xl bg-white"
+        className="relative w-[90%] sm:w-[70%] md:w-[50%] max-w-[410px] rounded-2xl bg-white"
         style={{
           padding: '2rem 2.5rem 1.5rem',
           boxShadow: '0 32px 80px rgba(0,0,0,0.22)',

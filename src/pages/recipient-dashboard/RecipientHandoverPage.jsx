@@ -202,7 +202,7 @@ export default function RecipientHandoverPage() {
                 </div>
 
                 {/* Estimasi box */}
-                <div className="flex flex-col items-end gap-1">
+                <div className="flex flex-col items-start sm:items-end gap-1">
                   <span
                     className="font-[Manrope] font-bold uppercase tracking-widest text-text-muted"
                     style={{ fontSize: '10px' }}
