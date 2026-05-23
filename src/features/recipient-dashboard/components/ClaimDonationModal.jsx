@@ -3,7 +3,7 @@
  * Setelah klik "Klaim Donasi", panggil onConfirm() — caller yang akan
  * menutup modal ini dan membuka ClaimSuccessPopup secara terpisah.
  */
-export function ClaimDonationModal({ donation, onConfirm, onClose }) {
+export function ClaimDonationModal({ donation, isClaiming, onConfirm, onClose }) {
   if (!donation) return null;
 
   return (
@@ -99,15 +99,18 @@ export function ClaimDonationModal({ donation, onConfirm, onClose }) {
         {/* ── Klaim Donasi Button ── */}
         <button
           onClick={onConfirm}
+          disabled={isClaiming}
           className="mt-7 w-full font-[Manrope] font-semibold text-white transition-all hover:opacity-70 active:scale-[0.98] focus:outline-none cursor-pointer"
           style={{
             backgroundColor: '#ff6600',
             borderRadius: '18px',
             padding: '11px 0',
             fontSize: '18px',
+            opacity: isClaiming ? 0.7 : 1,
+            cursor: isClaiming ? 'wait' : 'pointer',
           }}
         >
-          Klaim Donasi
+          {isClaiming ? 'Mengklaim...' : 'Klaim Donasi'}
         </button>
 
         {/* ── Batal ── */}

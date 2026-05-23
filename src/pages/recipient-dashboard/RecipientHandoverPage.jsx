@@ -38,7 +38,6 @@ export default function RecipientHandoverPage() {
   const [claimedDonations, setClaimedDonations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeNotifs, setActiveNotifs] = useState({});
-  const [arrivedStates, setArrivedStates] = useState({});
 
   useEffect(() => {
     async function fetchHandovers() {
@@ -251,7 +250,7 @@ export default function RecipientHandoverPage() {
                 <div
                   className="rounded-2xl"
                   style={{
-                    padding: '1.25rem',
+                    padding: '0.8rem',
                     backgroundColor: '#F3F4F6',
                   }}
                 >
@@ -281,90 +280,46 @@ export default function RecipientHandoverPage() {
                   </ul>
                 </div>
 
-                {/* Status Penjemputan / Penerimaan */}
-                {arrivedStates[donation.id] ? (
-                  <div
-                    key="penerimaan"
-                    className="flex flex-col items-center justify-center rounded-2xl text-center animate-slide-in-fade"
+                {/* Konfirmasi Penerimaan */}
+                <div
+                  className="flex flex-col items-center justify-center rounded-2xl text-center"
+                  style={{
+                    padding: '0.8rem',
+                    backgroundColor: '#F3F4F6',
+                  }}
+                >
+                  <div className="mb-2 flex items-center gap-3">
+                    <img
+                      src="/recipient_retailer icon/basic-icon/Done Status.svg"
+                      alt="konfirmasi"
+                      style={{ width: 24, height: 24 }}
+                    />
+                    <h4
+                      className="font-[Manrope] font-bold text-[#0f172a]"
+                      style={{ fontSize: '18px' }}
+                    >
+                      Konfirmasi Penerimaan
+                    </h4>
+                  </div>
+                  <p
+                    className="font-[Manrope] text-[#64748b]"
+                    style={{ fontSize: '15px', marginBottom: '1.5rem', lineHeight: 1.4 }}
+                  >
+                    Pastikan kualitas makanan sesuai sebelum<br />konfirmasi.
+                  </p>
+                  <button
+                    onClick={() => handleConfirmPickup(donation.id)}
+                    className="font-[Manrope] font-bold text-white transition-all hover:opacity-90 active:scale-[0.98] cursor-pointer"
                     style={{
-                      padding: '1.25rem',
-                      backgroundColor: '#F3F4F6',
+                      backgroundColor: '#ff7a00',
+                      borderRadius: '999px',
+                      padding: '12px 32px',
+                      fontSize: '16px',
                     }}
                   >
-                    <div className="mb-2 flex items-center gap-2">
-                      <img
-                        src="/recipient_retailer icon/basic-icon/Done Status.svg"
-                        alt="konfirmasi"
-                        style={{ width: 22, height: 22 }}
-                      />
-                      <h4
-                        className="font-[Manrope] font-bold text-[#0f172a]"
-                        style={{ fontSize: '17px' }}
-                      >
-                        Konfirmasi Penerimaan
-                      </h4>
-                    </div>
-                    <p
-                      className="font-[Manrope] text-[#64748b]"
-                      style={{ fontSize: '14px', marginBottom: '1rem', lineHeight: 1.4 }}
-                    >
-                      Pastikan kualitas makanan sesuai sebelum<br />konfirmasi.
-                    </p>
-                    <button
-                      onClick={() => handleConfirmPickup(donation.id)}
-                      className="font-[Manrope] font-bold text-white transition-all hover:opacity-90 active:scale-[0.98] cursor-pointer"
-                      style={{
-                        backgroundColor: '#ff7a00',
-                        borderRadius: '999px',
-                        padding: '10px 28px',
-                        fontSize: '15px',
-                      }}
-                    >
-                      Makanan Diterima
-                    </button>
-                  </div>
-                ) : (
-                  <div
-                    key="penjemputan"
-                    className="flex flex-col items-center justify-center rounded-2xl text-center animate-slide-in-fade"
-                    style={{
-                      padding: '1.25rem',
-                      backgroundColor: '#F3F4F6',
-                    }}
-                  >
-                    <div className="mb-2 flex items-center gap-2">
-                      <img
-                        src="/recipient_retailer icon/basic-icon/blue location.svg"
-                        alt="lokasi"
-                        style={{ width: 22, height: 22 }}
-                      />
-                      <h4
-                        className="font-[Manrope] font-bold text-[#0f172a]"
-                        style={{ fontSize: '17px' }}
-                      >
-                        Konfirmasi Penjemputan
-                      </h4>
-                    </div>
-                    <p
-                      className="font-[Manrope] text-[#64748b]"
-                      style={{ fontSize: '14px', marginBottom: '1rem', lineHeight: 1.4 }}
-                    >
-                      Beritahu Mitra bahwa Anda sudah sampai di<br />lokasi penjemputan.
-                    </p>
-                    <button
-                      onClick={() => setArrivedStates(prev => ({ ...prev, [donation.id]: true }))}
-                      className="font-[Manrope] font-bold text-white transition-all hover:opacity-90 active:scale-[0.98] cursor-pointer"
-                      style={{
-                        backgroundColor: '#ff7a00',
-                        borderRadius: '999px',
-                        padding: '10px 28px',
-                        fontSize: '15px',
-                      }}
-                    >
-                      Tiba di Lokasi
-                    </button>
-                  </div>
-                )}
+                    Makanan Diterima
+                  </button>
+                </div>
               </div>
             </article>
 
@@ -447,15 +402,12 @@ export default function RecipientHandoverPage() {
                   alert(`Membuka chat dengan mitra: ${donation.storeName}`);
                 }}
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
+                <img
+                  src="/recipient_retailer icon/basic-icon/Icon chat.svg"
+                  alt="Chat Icon"
                   style={{ width: 20, height: 20 }}
-                >
-                  <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z" />
-                </svg>
-                Chat Mitra — {donation.storeName}
+                />
+                Chat Mitra
               </button>
             </aside>
           </div>

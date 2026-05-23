@@ -43,7 +43,7 @@ export function RecipientSidebar() {
       {/* ── Navigation ── */}
       <nav
         aria-label="Recipient navigation"
-        className="flex flex-1 flex-col px-2 py-5 overflow-hidden"
+        className="flex flex-1 flex-col py-5 overflow-hidden"
       >
         <div className="flex w-full flex-col gap-2">
           {recipientNavigationItems.map((item) => {
@@ -53,10 +53,10 @@ export function RecipientSidebar() {
                 to={item.to}
                 className={({ isActive }) =>
                   cn(
-                    'group flex items-center rounded-xl transition-all duration-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+                    'group flex items-center border-l-[4px] border-transparent transition-all duration-300 hover:bg-[#eaf5eb] hover:border-[#10b981] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
                     isExpanded
-                      ? 'h-12 w-full justify-start gap-3 px-3'
-                      : 'h-12 w-full justify-center',
+                      ? 'h-14 w-full justify-start gap-4 pl-[20px]'
+                      : 'h-14 w-full justify-center pr-1',
                     isActive ? 'is-active' : '',
                   )
                 }
@@ -71,8 +71,7 @@ export function RecipientSidebar() {
                     className={cn(
                       'h-[26px] w-[26px] shrink-0 transition-all duration-200',
                       // default: thicker gray, hover: green, active: green
-                      'opacity-[0.65] group-hover:opacity-100 group-[.is-active]:opacity-100',
-                      'group-hover:[filter:invert(48%)_sepia(62%)_saturate(450%)_hue-rotate(95deg)_brightness(90%)]',
+                      '[filter:brightness(0)_invert(55%)]',
                       'group-[.is-active]:[filter:invert(48%)_sepia(62%)_saturate(450%)_hue-rotate(95deg)_brightness(90%)]',
                     )}
                   />
@@ -80,7 +79,7 @@ export function RecipientSidebar() {
                 <span
                   className={cn(
                     'whitespace-nowrap font-[Manrope] text-[15px] font-semibold transition-all duration-700',
-                    'text-text-muted group-hover:text-primary group-[.is-active]:text-primary',
+                    'text-text-muted group-[.is-active]:text-primary',
                     isExpanded
                       ? 'w-auto opacity-100'
                       : 'pointer-events-none w-0 overflow-hidden opacity-0',
@@ -95,12 +94,12 @@ export function RecipientSidebar() {
       </nav>
 
       {/* ── Logout ── */}
-      <div className="flex flex-col border-t border-border/80 px-2 py-4 overflow-hidden">
+      <div className="flex flex-col border-t border-border/80 py-4 overflow-hidden">
         <button
           type="button"
           className={cn(
-            'flex items-center rounded-xl text-red-normal transition-all duration-700 hover:text-red-dark active:translate-y-0 cursor-pointer',
-            isExpanded ? 'h-12 w-full justify-start gap-3 px-3' : 'h-12 w-full justify-center',
+            'flex items-center border-l-[4px] border-transparent text-red-normal transition-all duration-300 hover:bg-red-50 hover:border-red-500 hover:text-red-dark active:translate-y-0 cursor-pointer',
+            isExpanded ? 'h-14 w-full justify-start gap-4 pl-[20px]' : 'h-14 w-full justify-center pr-1',
           )}
           aria-label="Keluar"
           title={!isExpanded ? 'Keluar' : undefined}

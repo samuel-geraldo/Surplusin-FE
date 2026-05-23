@@ -51,6 +51,8 @@ export default function RecipientProfilePage() {
   const [profile, setProfile] = useState(mockProfile);
   const [draft, setDraft] = useState(mockProfile);
   const [saving, setSaving] = useState(false);
+  const [showCancelPopup, setShowCancelPopup] = useState(false);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
   // ── Map state ──
   const [lat, setLat] = useState(-6.2500);
@@ -116,7 +118,8 @@ export default function RecipientProfilePage() {
       
       setProfile({ ...draft, lat, lng });
       setIsEditing(false);
-      alert('Profil berhasil diperbarui!');
+      setShowSuccessPopup(true);
+      setTimeout(() => setShowSuccessPopup(false), 2500);
     } catch (error) {
       console.error('Gagal menyimpan profil:', error);
       alert('Terjadi kesalahan saat menyimpan data.');
@@ -124,7 +127,13 @@ export default function RecipientProfilePage() {
       setSaving(false);
     }
   };
-  const handleCancel = () => { setDraft(profile); setIsEditing(false); };
+  const handleCancel = () => setShowCancelPopup(true);
+  const confirmCancel = () => {
+    setDraft(profile);
+    setIsEditing(false);
+    setShowCancelPopup(false);
+  };
+  const rejectCancel = () => setShowCancelPopup(false);
 
   // ── Initialize Map ──
   const initMap = useCallback(() => {
@@ -595,6 +604,58 @@ export default function RecipientProfilePage() {
           </p>
         </div>
       </aside>
+
+      {/* ════════════ CANCEL CONFIRMATION POPUP ════════════ */}
+      {showCancelPopup && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 px-4">
+          <div className="w-full max-w-[340px] rounded-3xl bg-white p-6 pb-7 text-center shadow-2xl">
+            {/* Icon */}
+            <div className="mx-auto mb-4 flex h-[42px] w-[42px] items-center justify-center rounded-full bg-[#2563eb]">
+              <span className="font-[Manrope] text-[20px] font-bold text-white">!</span>
+            </div>
+            
+            {/* Text */}
+            <h3 className="mb-7 font-[Manrope] text-[17px] font-semibold text-[#0f172a] leading-snug">
+              Apakah Anda yakin ingin<br />membatalkan perubahan?
+            </h3>
+            
+            {/* Buttons */}
+            <div className="flex items-center gap-3">
+              <button
+                onClick={rejectCancel}
+                className="flex-1 rounded-full bg-transparent py-3 font-[Manrope] text-[15px] font-medium text-[#374151] transition-colors hover:bg-slate-50"
+              >
+                Tidak
+              </button>
+              <button
+                onClick={confirmCancel}
+                className="flex-1 rounded-full bg-[#f97316] py-3 font-[Manrope] text-[15px] font-bold text-white transition-colors hover:bg-[#ea580c]"
+              >
+                Ya
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ════════════ SUCCESS POPUP ════════════ */}
+      {showSuccessPopup && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 px-4">
+          <div className="w-full max-w-[340px] rounded-3xl bg-[#dcfce7] p-8 text-center shadow-2xl">
+            {/* Icon */}
+            <div className="mx-auto mb-5 flex h-[52px] w-[52px] items-center justify-center rounded-full bg-[#4ade80]">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" style={{ width: 26, height: 26 }}>
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
+            
+            {/* Text */}
+            <h3 className="font-[Manrope] text-[18px] font-semibold text-[#0f172a] leading-snug">
+              Perubahan berhasil<br />disimpan!
+            </h3>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

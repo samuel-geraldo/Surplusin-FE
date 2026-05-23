@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@/lib/constants';
 import { MOCK_CATEGORIES } from '@/features/recipient-dashboard/data/mockRecipientDashboardData';
+import { claimDonation } from '@/services/api/recipient';
 import { ClaimDonationModal } from './ClaimDonationModal';
 import { ClaimSuccessPopup } from './ClaimSuccessPopup';
 
@@ -23,19 +24,35 @@ export function DonationListCard({ data, onClaimed }) {
   // State untuk dua popup terpisah
   const [showConfirm, setShowConfirm] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [claiming, setClaiming] = useState(false);
 
-  // Simpan donasi yang diklaim ke localStorage
-  const saveClaimed = () => {
+  // Klaim donasi via API, lalu simpan ke localStorage untuk mock fallback
+  const handleClaim = async () => {
     try {
-      const stored = localStorage.getItem('surplusin_claimed_donations');
-      const existing = stored ? JSON.parse(stored) : [];
-      // Hindari duplikat
-      if (!existing.find((d) => d.id === data.id)) {
-        existing.push(data);
+      setClaiming(true);
+      // Panggil API backend: POST /api/klaim/:donasi_id
+      await claimDonation(data.id);
+
+      // Simpan ke localStorage juga (untuk mock flow & halaman Handover)
+      try {
+        const stored = localStorage.getItem('surplusin_claimed_donations');
+        const existing = stored ? JSON.parse(stored) : [];
+        if (!existing.find((d) => d.id === data.id)) {
+          existing.push(data);
+        }
+        localStorage.setItem('surplusin_claimed_donations', JSON.stringify(existing));
+      } catch (e) {
+        console.error('Gagal menyimpan klaim ke localStorage:', e);
       }
-      localStorage.setItem('surplusin_claimed_donations', JSON.stringify(existing));
-    } catch (e) {
-      console.error('Gagal menyimpan klaim:', e);
+
+      setShowConfirm(false);
+      setShowSuccess(true);
+    } catch (error) {
+      console.error('Gagal mengklaim donasi:', error);
+      alert('Terjadi kesalahan saat mengklaim donasi. Silakan coba lagi.');
+      setShowConfirm(false);
+    } finally {
+      setClaiming(false);
     }
   };
 
@@ -175,11 +192,8 @@ export function DonationListCard({ data, onClaimed }) {
     {/* ── Confirmation Modal ── */}
     <ClaimDonationModal
       donation={showConfirm ? data : null}
-      onConfirm={() => {
-        saveClaimed();
-        setShowConfirm(false);
-        setShowSuccess(true);
-      }}
+      isClaiming={claiming}
+      onConfirm={handleClaim}
       onClose={() => setShowConfirm(false)}
     />
 
