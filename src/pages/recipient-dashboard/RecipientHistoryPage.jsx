@@ -1,20 +1,32 @@
-import { useState, useMemo } from 'react';
-import {
-  mockHistoryDonations,
-  mockHistorySummary,
-} from '@/features/recipient-dashboard/data/mockRecipientDashboardData';
+import { useState, useMemo, useEffect } from 'react';
+import { getDonationHistory } from '@/services/api/recipient';
+import { mockHistorySummary } from '@/features/recipient-dashboard/data/mockRecipientDashboardData';
 
 export default function RecipientHistoryPage() {
-  // Gabungkan mock data + data dari localStorage (donasi yang selesai dijemput)
-  const [historyDonations] = useState(() => {
-    try {
-      const stored = localStorage.getItem('surplusin_history_donations');
-      const fromStorage = stored ? JSON.parse(stored) : [];
-      return [...mockHistoryDonations, ...fromStorage];
-    } catch {
-      return [...mockHistoryDonations];
+  const [historyDonations, setHistoryDonations] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadHistory() {
+      try {
+        const data = await getDonationHistory();
+
+        // Gabungkan dengan data dari localStorage untuk mock behavior yang konsisten
+        if (import.meta.env.VITE_USE_MOCK_API === 'true') {
+          const stored = localStorage.getItem('surplusin_history_donations');
+          const fromStorage = stored ? JSON.parse(stored) : [];
+          setHistoryDonations([...data, ...fromStorage]);
+        } else {
+          setHistoryDonations(data);
+        }
+      } catch (error) {
+        console.error('Failed to load history:', error);
+      } finally {
+        setLoading(false);
+      }
     }
-  });
+    loadHistory();
+  }, []);
 
   // ── Computed stats (real-time dari data riwayat) ──
   const donasiDiterima = historyDonations.length;
@@ -29,29 +41,29 @@ export default function RecipientHistoryPage() {
   const orangTerbantu = mockHistorySummary.orangTerbantu;
 
 
+  if (loading) {
+    return <div className="p-10 text-center font-[Manrope] text-slate-500">Memuat riwayat donasi...</div>;
+  }
+
   return (
-    <div
-      className="flex flex-col gap-8"
-      style={{ padding: '2rem 2rem 4rem', marginTop: '1rem' }}
-    >
+    <div className="flex flex-col gap-8 pb-16">
       {/* ════════════ SUMMARY CARDS ════════════ */}
-      <div
-        className="grid grid-cols-1 gap-5 sm:grid-cols-3"
-        style={{ marginLeft: '1rem', marginRight: '1rem' }}
+      <div 
+        className="grid gap-5 mx-4 sm:mx-auto lg:max-w-[100%] xl:max-w-[88%]"
+        style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))' }}
       >
         {/* Card 1: Orang Terbantu */}
         <div
-          className="relative flex items-center gap-5 overflow-hidden rounded-2xl bg-white"
+          className="relative flex items-center gap-5 overflow-hidden rounded-2xl bg-white shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-shadow duration-300 hover:shadow-[0_0px_30px_rgba(37,99,235,0.35)] cursor-default"
           style={{
-            padding: '1.75rem',
+            padding: '2.5rem 3rem',
             borderLeft: '4px solid #2563eb',
-            boxShadow: '0 8px 30px rgba(0,0,0,0.06)',
           }}
         >
           <div className="flex shrink-0 items-center justify-center">
             <img src="/recipient_retailer icon/basic-icon/orang terbantu.svg" alt="Orang Terbantu" style={{ width: 48, height: 48 }} />
           </div>
-          <div className="flex flex-col">
+          <div className="flex flex-col whitespace-nowrap">
             <p
               className="font-[Manrope] font-extrabold text-[#2563eb]"
               style={{ fontSize: '28px', lineHeight: 1.2 }}
@@ -69,17 +81,16 @@ export default function RecipientHistoryPage() {
 
         {/* Card 2: Donasi Telah Diterima */}
         <div
-          className="relative flex items-center gap-5 overflow-hidden rounded-2xl bg-white"
+          className="relative flex items-center gap-5 overflow-hidden rounded-2xl bg-white shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-shadow duration-300 hover:shadow-[0_0px_30px_rgba(16,185,129,0.35)] cursor-default"
           style={{
-            padding: '1.75rem',
+            padding: '2.5rem 3rem',
             borderLeft: '4px solid #10b981',
-            boxShadow: '0 8px 30px rgba(0,0,0,0.06)',
           }}
         >
           <div className="flex shrink-0 items-center justify-center">
             <img src="/recipient_retailer icon/basic-icon/donasi diterima.svg" alt="Donasi Diterima" style={{ width: 48, height: 48 }} />
           </div>
-          <div className="flex flex-col">
+          <div className="flex flex-col whitespace-nowrap">
             <p
               className="font-[Manrope] font-extrabold text-[#10b981]"
               style={{ fontSize: '28px', lineHeight: 1.2 }}
@@ -97,17 +108,16 @@ export default function RecipientHistoryPage() {
 
         {/* Card 3: Jumlah Toko */}
         <div
-          className="relative flex items-center gap-5 overflow-hidden rounded-2xl bg-white"
+          className="relative flex items-center gap-5 overflow-hidden rounded-2xl bg-white shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-shadow duration-300 hover:shadow-[0_0px_30px_rgba(249,115,22,0.35)] cursor-default"
           style={{
-            padding: '1.75rem',
+            padding: '2.5rem 3rem',
             borderLeft: '4px solid #f97316',
-            boxShadow: '0 8px 30px rgba(0,0,0,0.06)',
           }}
         >
           <div className="flex shrink-0 items-center justify-center">
             <img src="/recipient_retailer icon/basic-icon/toko mengirimkan donasi.svg" alt="Jumlah Toko" style={{ width: 48, height: 48 }} />
           </div>
-          <div className="flex flex-col">
+          <div className="flex flex-col whitespace-nowrap">
             <p
               className="font-[Manrope] font-extrabold text-[#f97316]"
               style={{ fontSize: '28px', lineHeight: 1.2 }}
@@ -125,17 +135,9 @@ export default function RecipientHistoryPage() {
       </div>
 
       {/* ════════════ RIWAYAT PENERIMA DONASI ════════════ */}
-      <section
-        className="rounded-2xl"
-        style={{
-          marginLeft: '1rem',
-          marginRight: '1rem',
-          padding: '1.75rem 2rem',
-          backgroundColor: '#f8fafc',
-        }}
-      >
+      <section className="rounded-lg mx-4 sm:mx-0 px-6 py-1 sm:px-2 bg-slate-50">
         <h2
-          className="mb-5 font-[Manrope] font-bold text-[#0f172a]"
+          className="mb-5 font-[Manrope] font-bold text-text"
           style={{ fontSize: '20px' }}
         >
           Riwayat Penerima Donasi
@@ -145,20 +147,16 @@ export default function RecipientHistoryPage() {
           {historyDonations.map((item, idx) => (
             <div
               key={item.id}
-              className="flex items-center gap-4 rounded-2xl bg-white transition-shadow hover:shadow-md"
-              style={{
-                padding: '1.1rem 1.5rem',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-              }}
+              className="flex items-center gap-4 rounded-2xl bg-white px-5 py-6 shadow-sm transition-shadow hover:shadow-md"
             >
               {/* Numbered badge */}
               <div
-                className="flex shrink-0 items-center justify-center rounded-full font-[Manrope] font-bold text-white"
+                className="flex shrink-0 items-center justify-center rounded-full font-[Manrope] text-white"
                 style={{
-                  width: 44,
-                  height: 44,
-                  backgroundColor: '#4ade80',
-                  fontSize: '18px',
+                  width: 56,
+                  height: 56,
+                  backgroundColor: '#50c878',
+                  fontSize: '24px',
                 }}
               >
                 {idx + 1}
@@ -168,12 +166,12 @@ export default function RecipientHistoryPage() {
               <div className="flex flex-1 flex-col" style={{ minWidth: 0 }}>
                 <p
                   className="font-[Manrope] text-[#0f172a]"
-                  style={{ fontSize: '15px', lineHeight: 1.3 }}
+                  style={{ fontSize: '18px', lineHeight: 1.3 }}
                 >
                   {item.storeName}
                 </p>
                 <p
-                  className="font-[Manrope] text-[#94a3b8]"
+                  className="font-[Manrope] text-text-muted"
                   style={{ fontSize: '13px', marginTop: '2px' }}
                 >
                   {item.location}  -  {item.foodName}
@@ -181,16 +179,16 @@ export default function RecipientHistoryPage() {
               </div>
 
               {/* Right info */}
-              <div className="flex shrink-0 flex-col items-end">
+              <div className="flex shrink-0 flex-col items-center">
                 <p
-                  className="font-[Manrope] font-semibold text-[#0f172a]"
+                  className="font-[Manrope] font-semibold text-text"
                   style={{ fontSize: '18px', lineHeight: 1.2 }}
                 >
                   {item.portion}
                 </p>
                 <p
-                  className="font-[Manrope] text-[#94a3b8]"
-                  style={{ fontSize: '12px', marginTop: '2px' }}
+                  className="font-[Manrope] text-text-muted"
+                  style={{ fontSize: '16px', marginTop: '2px' }}
                 >
                   {item.date} - {item.donationCount} Donasi
                 </p>

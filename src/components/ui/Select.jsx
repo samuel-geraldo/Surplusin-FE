@@ -43,8 +43,8 @@ export function Select({
       <button
         type="button"
         className={cn(
-          'flex h-[45px] w-full items-center justify-between gap-2 rounded-xl border border-black bg-transparent pl-2 pr-3 text-left text-body1 font-normal text-[#0f172a]',
-          'transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-normal/30',
+          'flex h-[45px] w-full items-center justify-between gap-2 rounded-xl border border-[#94a3b8] bg-transparent px-4 text-left text-[15px] font-medium text-[#64748b]',
+          'transition-colors duration-200 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary',
           disabled && 'cursor-not-allowed opacity-50',
           triggerClassName
         )}
@@ -53,7 +53,7 @@ export function Select({
         aria-haspopup="listbox"
         aria-expanded={isOpen}
       >
-        <span className={cn(!selectedOption && 'text-[#64748b]')}>
+        <span>
           {selectedOption?.label ?? placeholder}
         </span>
         <svg
@@ -77,7 +77,7 @@ export function Select({
 
       {isOpen && (
         <div
-          className="absolute left-0 top-[calc(100%+8px)] z-50 max-h-60 w-full overflow-y-auto rounded-xl border border-black bg-white py-1 shadow-sm"
+          className="absolute left-0 top-[calc(100%+8px)] z-50 max-h-60 w-full overflow-y-auto rounded-xl border border-[#94a3b8] bg-white py-1 shadow-sm"
           role="listbox"
         >
           {options.map((option) => (

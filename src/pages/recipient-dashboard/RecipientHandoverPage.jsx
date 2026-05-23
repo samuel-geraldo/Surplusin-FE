@@ -1,99 +1,132 @@
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@/lib/constants';
+import { getActiveHandovers, updateClaimStatus, getRecipientProfile } from '@/services/api/recipient';
 
-const MAPS_API_KEY = 'AIzaSyAxvkMdHwDpYBUi62RVVoO4O9SmG_AgPp0';
-
-// Koordinat penerima (Panti Jenaka Sukarela – contoh)
-const RECIPIENT_LAT = -6.2000;
-const RECIPIENT_LNG = 106.8450;
-
-// Mock notifikasi
-const MOCK_NOTIFICATIONS = [
+// Tips statis sebagai fallback ketika tidak ada klaim aktif
+const TIPS_NOTIFICATIONS = [
   {
-    id: 1,
+    id: 'tip-1',
     title: 'Tips!',
     message: 'Jangan lupa bawa tas belanja sendiri untuk mengurangi plastik.',
-    time: 'Baru saja',
-    isNew: true,
+    time: '',
   },
   {
-    id: 2,
+    id: 'tip-2',
     title: 'Tips!',
     message: 'Pastikan kamu datang tepat waktu agar makanan tetap segar.',
-    time: '5 menit lalu',
-    isNew: false,
+    time: '',
   },
   {
-    id: 3,
+    id: 'tip-3',
     title: 'Tips!',
     message: 'Konfirmasi kehadiran saat sudah sampai di lokasi penjemputan.',
-    time: '10 menit lalu',
-    isNew: false,
+    time: '',
   },
 ];
 
-export default function RecipientHandoverPage() {
-  // Ambil data donasi yang diklaim dari localStorage
-  const [claimedDonations, setClaimedDonations] = useState(() => {
-    try {
-      const stored = localStorage.getItem('surplusin_claimed_donations');
-      return stored ? JSON.parse(stored) : [];
-    } catch {
-      return [];
-    }
-  });
+/** Format waktu klaim jadi teks relatif */
+function formatClaimTime(value) {
+  if (!value) return 'Baru saja';
+  const date = new Date(value);
+  const diffMs = Date.now() - date.getTime();
+  if (Number.isNaN(date.getTime()) || diffMs < 60000) return 'Baru saja';
+  const minutes = Math.floor(diffMs / 60000);
+  if (minutes < 60) return `${minutes} menit lalu`;
+  const hours = Math.floor(minutes / 60);
+  return `${hours} jam lalu`;
+}
 
-  const [activeNotifs, setActiveNotifs] = useState({});
+export default function RecipientHandoverPage() {
+  const [claimedDonations, setClaimedDonations] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [activeNotifId, setActiveNotifId] = useState(null);
+  // Koordinat penerima (diambil dari profil via API)
+  const [recipientLat, setRecipientLat] = useState(-6.2000);
+  const [recipientLng, setRecipientLng] = useState(106.8450);
+
+  // Generate notifikasi dinamis dari data klaim aktif, fallback ke tips
+  const notifications = useMemo(() => {
+    if (claimedDonations.length === 0) return TIPS_NOTIFICATIONS;
+
+    return claimedDonations.map((claim) => ({
+      id: `claim-${claim.id}`,
+      title: 'Penjemputan Aktif',
+      message: `Jemput ${claim.quantity || claim.jumlah || ''} ${claim.unit || claim.satuan || 'porsi'} ${claim.foodName || claim.nama || 'donasi'} dari ${claim.storeName || claim.nama_toko || 'mitra'}.`,
+      time: formatClaimTime(claim.claimedAt || claim.claimed_at),
+    }));
+  }, [claimedDonations]);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        // Fetch handovers dan profil penerima secara paralel
+        const [handovers, profile] = await Promise.all([
+          getActiveHandovers(),
+          getRecipientProfile().catch(() => null),
+        ]);
+        setClaimedDonations(handovers);
+        if (profile) {
+          if (profile.latitude) setRecipientLat(Number(profile.latitude));
+          if (profile.longitude) setRecipientLng(Number(profile.longitude));
+        }
+      } catch (error) {
+        console.error('Failed to load active handovers:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
 
   const navigate = useNavigate();
 
-  // Konfirmasi penjemputan — simpan ke riwayat lalu hapus dari claimed
-  const handleConfirmPickup = (id) => {
-    // Cari donasi yang dikonfirmasi
-    const donation = claimedDonations.find((d) => d.id === id);
-
-    // Simpan ke riwayat di localStorage
-    if (donation) {
-      try {
-        const stored = localStorage.getItem('surplusin_history_donations');
-        const history = stored ? JSON.parse(stored) : [];
-
-        // Format tanggal hari ini
-        const now = new Date();
-        const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-        const dateStr = `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
-
-        // Tambahkan ke riwayat
-        history.push({
-          id: donation.id,
-          storeName: donation.storeName,
-          location: donation.patokan || '-',
-          foodName: donation.foodName,
-          portion: donation.portion || '-',
-          date: dateStr,
-          donationCount: (donation.items || []).length || 1,
-        });
-
-        localStorage.setItem('surplusin_history_donations', JSON.stringify(history));
-      } catch (e) {
-        console.error('Gagal menyimpan riwayat:', e);
+  // Konfirmasi penjemputan
+  const handleConfirmPickup = async (id) => {
+    try {
+      await updateClaimStatus(id, 'completed');
+      
+      // Update state (remove from list)
+      const updated = claimedDonations.filter((d) => d.id !== id);
+      setClaimedDonations(updated);
+      
+      // Untuk mock localStorage update (simulasi)
+      if (import.meta.env.VITE_USE_MOCK_API === 'true') {
+        const donation = claimedDonations.find((d) => d.id === id);
+        if (donation) {
+          const stored = localStorage.getItem('surplusin_history_donations');
+          const history = stored ? JSON.parse(stored) : [];
+          const now = new Date();
+          const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+          const dateStr = `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+          history.push({
+            id: donation.id,
+            storeName: donation.storeName,
+            location: donation.patokan || '-',
+            foodName: donation.foodName,
+            portion: donation.portion || '-',
+            date: dateStr,
+            donationCount: (donation.items || []).length || 1,
+          });
+          localStorage.setItem('surplusin_history_donations', JSON.stringify(history));
+        }
+        localStorage.setItem('surplusin_claimed_donations', JSON.stringify(updated));
       }
+      
+    } catch (error) {
+      console.error('Gagal mengkonfirmasi penjemputan:', error);
+      alert('Terjadi kesalahan saat konfirmasi penjemputan.');
     }
-
-    // Hapus dari daftar claimed
-    const updated = claimedDonations.filter((d) => d.id !== id);
-    localStorage.setItem('surplusin_claimed_donations', JSON.stringify(updated));
-    setClaimedDonations(updated);
   };
+
+  if (loading) {
+    return <div className="p-10 text-center font-[Manrope] text-slate-500">Memuat data penjemputan...</div>;
+  }
 
   // Jika belum ada donasi yang diklaim
   if (claimedDonations.length === 0) {
     return (
-      <div
-        className="flex flex-col items-center justify-center gap-4"
-        style={{ minHeight: '60vh', padding: '2rem' }}
-      >
+      <div className="flex flex-col items-center justify-center gap-4 min-h-[60vh] px-8">
         <img
           src="/recipient_retailer icon/basic-icon/box.svg"
           alt="empty"
@@ -122,46 +155,49 @@ export default function RecipientHandoverPage() {
   }
 
   return (
-    <div
-      className="flex flex-col gap-8"
-      style={{ padding: '2rem 2rem 4rem', marginTop: '1rem' }}
-    >
+    <div className="flex flex-col gap-8 pb-16">
       {claimedDonations.map((donation) => {
-        const storeLat = donation.lat || RECIPIENT_LAT;
-        const storeLng = donation.lng || RECIPIENT_LNG;
+        const storeLat = donation.lat || recipientLat;
+        const storeLng = donation.lng || recipientLng;
 
         // URL embed Google Maps
         const mapsEmbedUrl = `https://maps.google.com/maps?q=${storeLat},${storeLng}&z=16&output=embed`;
-        const mapsOpenUrl = `https://www.google.com/maps/dir/${storeLat},${storeLng}/${RECIPIENT_LAT},${RECIPIENT_LNG}`;
+        const mapsOpenUrl = `https://www.google.com/maps/dir/${recipientLat},${recipientLng}/${storeLat},${storeLng}`;
 
         return (
-          <div key={donation.id} className="flex gap-6" style={{ alignItems: 'flex-start' }}>
+          <div key={donation.id} className="flex flex-col lg:flex-row gap-6" style={{ alignItems: 'flex-start' }}>
             {/* ════════════ LEFT: Donation Card ════════════ */}
             <article
-              className="flex-1 rounded-3xl bg-white"
-              style={{
-                padding: '2rem',
-                boxShadow: '0 8px 30px rgba(0,0,0,0.06)',
-                border: '1px solid #f1f5f9',
-                minWidth: 0,
-              }}
+              className="flex-[1.5] rounded-3xl bg-white p-6 sm:p-8 shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-slate-100 min-w-0"
             >
               {/* ── Header: Badge + Info + Estimasi ── */}
               <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div className="flex flex-col gap-2">
                   {/* Badge */}
-                  <span
-                    className="inline-block w-fit rounded-full font-[Manrope] font-bold uppercase"
-                    style={{
-                      backgroundColor: '#fed7aa',
-                      color: '#c2410c',
-                      padding: '6px 16px',
-                      fontSize: '11px',
-                      letterSpacing: '0.08em',
-                    }}
-                  >
-                    Siap Dijemput
-                  </span>
+                  {(() => {
+                    const statusMap = {
+                      'on_the_way': { label: 'DALAM PERJALANAN', bg: '#fed7aa', text: '#ea580c' },
+                      'completed': { label: 'DITERIMA', bg: '#bbf7d0', text: '#16a34a' },
+                      'arrived': { label: 'SIAP DIJEMPUT', bg: '#bfdbfe', text: '#2563eb' },
+                      'claimed': { label: 'SIAP DIJEMPUT', bg: '#bfdbfe', text: '#2563eb' },
+                    };
+                    const st = donation.status || 'claimed';
+                    const config = statusMap[st] || statusMap['claimed'];
+                    return (
+                      <span
+                        className="inline-block w-fit rounded-full font-[Manrope] font-bold uppercase"
+                        style={{
+                          backgroundColor: config.bg,
+                          color: config.text,
+                          padding: '6px 16px',
+                          fontSize: '11px',
+                          letterSpacing: '0.08em',
+                        }}
+                      >
+                        {config.label}
+                      </span>
+                    );
+                  })()}
 
                   {/* Food name */}
                   <h3
@@ -246,36 +282,35 @@ export default function RecipientHandoverPage() {
               {/* ── Bottom Row: Daftar Item + Konfirmasi ── */}
               <div
                 className="grid grid-cols-1 gap-4 sm:grid-cols-2"
-                style={{ marginTop: '1.5rem' }}
+                style={{ marginTop: '1.9rem' }}
               >
                 {/* Daftar Item Donasi */}
                 <div
                   className="rounded-2xl"
                   style={{
-                    padding: '1.25rem',
-                    border: '1px solid #e2e8f0',
-                    backgroundColor: '#ffffff',
+                    padding: '0.8rem',
+                    backgroundColor: '#F3F4F6',
                   }}
                 >
-                  <div className="mb-3 flex items-center gap-2">
+                  <div className="mb-4 flex items-center justify-center gap-3">
                     <img
-                      src="/recipient_retailer icon/basic-icon/piring.svg"
+                      src="/recipient_retailer icon/basic-icon/box.svg"
                       alt="items"
-                      style={{ width: 18, height: 18 }}
+                      style={{ width: 22, height: 22 }}
                     />
                     <h4
                       className="font-[Manrope] font-bold text-[#0f172a]"
-                      style={{ fontSize: '15px' }}
+                      style={{ fontSize: '18px' }}
                     >
                       Daftar Item Donasi
                     </h4>
                   </div>
-                  <ul style={{ paddingLeft: '0.5rem' }}>
-                    {(donation.items || []).map((item, idx) => (
+                  <ul className="flex flex-col gap-2 pl-4">
+                    {(donation.items && donation.items.length > 0 ? donation.items : ['Nasi Box', 'Ayam Bakar', 'Kerupuk udang', 'Sayur Lodeh']).map((item, idx) => (
                       <li
                         key={idx}
-                        className="font-[Manrope] text-[#334155]"
-                        style={{ fontSize: '14px', padding: '3px 0' }}
+                        className="font-[Manrope] text-[#0f172a]"
+                        style={{ fontSize: '16px' }}
                       >
                         {item}
                       </li>
@@ -283,45 +318,44 @@ export default function RecipientHandoverPage() {
                   </ul>
                 </div>
 
-                {/* Konfirmasi Penjemputan */}
+                {/* Konfirmasi Penerimaan */}
                 <div
                   className="flex flex-col items-center justify-center rounded-2xl text-center"
                   style={{
-                    padding: '1.25rem',
-                    border: '1px solid #e2e8f0',
-                    backgroundColor: '#ffffff',
+                    padding: '0.8rem',
+                    backgroundColor: '#F3F4F6',
                   }}
                 >
-                  <div className="mb-3 flex items-center gap-2">
+                  <div className="mb-2 flex items-center gap-3">
                     <img
-                      src="/recipient_retailer icon/basic-icon/location.svg"
+                      src="/recipient_retailer icon/basic-icon/Done Status.svg"
                       alt="konfirmasi"
-                      style={{ width: 18, height: 18 }}
+                      style={{ width: 24, height: 24 }}
                     />
                     <h4
                       className="font-[Manrope] font-bold text-[#0f172a]"
-                      style={{ fontSize: '15px' }}
+                      style={{ fontSize: '18px' }}
                     >
-                      Konfirmasi Penjemputan
+                      Konfirmasi Penerimaan
                     </h4>
                   </div>
                   <p
                     className="font-[Manrope] text-[#64748b]"
-                    style={{ fontSize: '13px', marginBottom: '1rem' }}
+                    style={{ fontSize: '15px', marginBottom: '1.5rem', lineHeight: 1.4 }}
                   >
-                    Beritahu Mitra bahwa Anda sudah sampai di lokasi penjemputan.
+                    Pastikan kualitas makanan sesuai sebelum<br />konfirmasi.
                   </p>
                   <button
                     onClick={() => handleConfirmPickup(donation.id)}
-                    className="font-[Manrope] font-bold text-white transition-opacity hover:opacity-90 cursor-pointer"
+                    className="font-[Manrope] font-bold text-white transition-all hover:opacity-90 active:scale-[0.98] cursor-pointer"
                     style={{
-                      backgroundColor: '#ff6600',
+                      backgroundColor: '#ff7a00',
                       borderRadius: '999px',
-                      padding: '10px 32px',
-                      fontSize: '14px',
+                      padding: '12px 32px',
+                      fontSize: '16px',
                     }}
                   >
-                    Tiba di Lokasi
+                    Makanan Diterima
                   </button>
                 </div>
               </div>
@@ -329,16 +363,14 @@ export default function RecipientHandoverPage() {
 
             {/* ════════════ RIGHT: Pusat Notifikasi + Chat Mitra ════════════ */}
             <aside
-              className="hidden shrink-0 flex-col gap-0 xl:flex"
-              style={{ width: 360 }}
+              className="hidden flex-1 shrink-0 flex-col gap-0 lg:flex"
             >
               {/* ── Pusat Notifikasi Card ── */}
               <div
-                className="flex flex-col rounded-3xl bg-white"
+                className="flex flex-col rounded-3xl bg-transparent"
                 style={{
                   padding: '1.75rem',
-                  boxShadow: '0 8px 30px rgba(0,0,0,0.06)',
-                  border: '1px solid #f1f5f9',
+                  border: '1px solid #1e293b',
                 }}
               >
                 <h3
@@ -350,13 +382,13 @@ export default function RecipientHandoverPage() {
 
                 {/* Notification items */}
                 <div className="flex flex-col gap-3">
-                  {MOCK_NOTIFICATIONS.map((notif) => {
-                    const isActive = (activeNotifs[donation.id] || MOCK_NOTIFICATIONS[0].id) === notif.id;
+                  {notifications.map((notif) => {
+                    const isActive = (activeNotifId || notifications[0]?.id) === notif.id;
 
                     return (
                       <div
                         key={notif.id}
-                        onClick={() => setActiveNotifs(prev => ({ ...prev, [donation.id]: notif.id }))}
+                        onClick={() => setActiveNotifId(notif.id)}
                         className="rounded-2xl bg-white cursor-pointer transition-colors hover:bg-slate-50"
                         style={{
                           padding: '1rem',
@@ -377,12 +409,14 @@ export default function RecipientHandoverPage() {
                         >
                           {notif.message}
                         </p>
-                        <span
-                          className="font-[Manrope] font-medium text-[#94a3b8]"
-                          style={{ fontSize: '11px' }}
-                        >
-                          {notif.time}
-                        </span>
+                        {notif.time ? (
+                          <span
+                            className="font-[Manrope] font-medium text-[#94a3b8]"
+                            style={{ fontSize: '11px' }}
+                          >
+                            {notif.time}
+                          </span>
+                        ) : null}
                       </div>
                     );
                   })}
@@ -406,15 +440,12 @@ export default function RecipientHandoverPage() {
                   alert(`Membuka chat dengan mitra: ${donation.storeName}`);
                 }}
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
+                <img
+                  src="/recipient_retailer icon/basic-icon/Icon chat.svg"
+                  alt="Chat Icon"
                   style={{ width: 20, height: 20 }}
-                >
-                  <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z" />
-                </svg>
-                Chat Mitra — {donation.storeName}
+                />
+                Chat Mitra
               </button>
             </aside>
           </div>

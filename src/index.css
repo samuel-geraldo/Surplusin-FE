@@ -225,3 +225,19 @@
     font-size: 20px;
   }
 }
+
+@keyframes slide-in-fade {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-in-fade {
+  animation: slide-in-fade 0.9s ease-out forwards;
+}
+
