@@ -63,10 +63,14 @@ export async function getDonationSummary() {
     return mockDonationSummary;
   }
 
-  const { data } = await apiClient.get('/donasi/statistik');
+  const [nearbyResponse, activeClaimsResponse] = await Promise.all([
+    apiClient.get('/penerima/nearby'),
+    apiClient.get('/klaim/penerima/aktif'),
+  ]);
+
   return {
-    available: data.total_diklaim ?? 0,
-    claimed: data.total_diterima ?? 0,
+    available: nearbyResponse.data?.total_donasi ?? nearbyResponse.data?.donasi?.length ?? 0,
+    claimed: Array.isArray(activeClaimsResponse.data) ? activeClaimsResponse.data.length : 0,
   };
 }
 
@@ -197,7 +201,21 @@ export async function getActiveHandovers() {
   }
 
   const { data } = await apiClient.get('/klaim/penerima/aktif');
-  return (Array.isArray(data) ? data : []).map(mapActiveHandoverToUI);
+  const claims = Array.isArray(data) ? data : [];
+
+  let retailers = [];
+  if (claims.some((klaim) => !getRetailerWhatsappFromClaim(klaim))) {
+    try {
+      const response = await apiClient.get('/penyalur');
+      retailers = Array.isArray(response.data) ? response.data : [];
+    } catch {
+      retailers = [];
+    }
+  }
+
+  const snapshots = readClaimedDonationSnapshots();
+
+  return claims.map((klaim) => mapActiveHandoverToUI(klaim, retailers, snapshots));
 }
 
 // ────────────────────────────────────────────
@@ -392,7 +410,48 @@ function estimatePickupTime(distanceKm) {
  *   longitude_penyalur   → lng
  *   claimed_at           → expiry (for display)
  */
-function mapActiveHandoverToUI(klaim) {
+function getRetailerWhatsappFromClaim(klaim) {
+  return klaim.nomor_whatsapp_penyalur ?? klaim.whatsapp_penyalur ?? klaim.nomor_whatsapp ?? '';
+}
+
+function findRetailerForClaim(klaim, retailers) {
+  const retailerName = String(klaim.penyalur ?? klaim.nama_toko ?? '').trim().toLowerCase();
+  const retailerAddress = String(klaim.alamat_penyalur ?? klaim.alamat ?? '').trim().toLowerCase();
+
+  return retailers.find((retailer) => (
+    String(retailer.nama_toko ?? '').trim().toLowerCase() === retailerName &&
+    (!retailerAddress || String(retailer.alamat ?? '').trim().toLowerCase() === retailerAddress)
+  ));
+}
+
+function readClaimedDonationSnapshots() {
+  try {
+    const stored = localStorage.getItem('surplusin_claimed_donations');
+    const snapshots = stored ? JSON.parse(stored) : [];
+    return Array.isArray(snapshots) ? snapshots : [];
+  } catch {
+    return [];
+  }
+}
+
+function findClaimSnapshot(klaim, snapshots) {
+  const claimStore = String(klaim.penyalur ?? '').trim().toLowerCase();
+  const claimFood = String(klaim.nama_donasi ?? '').trim().toLowerCase();
+  const claimPortion = `${klaim.jumlah ?? ''} ${klaim.satuan ?? ''}`.trim().toLowerCase();
+
+  return snapshots.find((snapshot) => (
+    String(snapshot.storeName ?? '').trim().toLowerCase() === claimStore &&
+    String(snapshot.foodName ?? '').trim().toLowerCase() === claimFood &&
+    String(snapshot.portion ?? '').trim().toLowerCase() === claimPortion
+  ));
+}
+
+function mapActiveHandoverToUI(klaim, retailers = [], snapshots = []) {
+  const matchedRetailer = findRetailerForClaim(klaim, retailers);
+  const snapshot = findClaimSnapshot(klaim, snapshots);
+  const claimItems = parseItemDetail(klaim.item_detail);
+  const fallbackItems = klaim.nama_donasi ? [klaim.nama_donasi] : [];
+
   return {
     id: klaim.klaim_id,
     storeName: klaim.penyalur || 'Toko Mitra',
@@ -402,8 +461,9 @@ function mapActiveHandoverToUI(klaim) {
     patokan: klaim.alamat_penyalur || '-',
     lat: klaim.latitude_penyalur ? parseFloat(klaim.latitude_penyalur) : null,
     lng: klaim.longitude_penyalur ? parseFloat(klaim.longitude_penyalur) : null,
+    nomor_whatsapp: getRetailerWhatsappFromClaim(klaim) || matchedRetailer?.nomor_whatsapp || '',
     expiry: klaim.claimed_at ? new Date(klaim.claimed_at).toLocaleString('id-ID') : '-',
-    items: [], // BE doesn't return item_detail for active handovers
+    items: claimItems.length > 0 ? claimItems : snapshot?.items || fallbackItems,
   };
 }
 

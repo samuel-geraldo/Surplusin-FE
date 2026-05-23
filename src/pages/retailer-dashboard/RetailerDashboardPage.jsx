@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Check, ChevronDown, Minus, Plus, Trash2, X, XCircle } from 'lucide-react';
 import {
   createRetailerDonation,
@@ -123,15 +123,16 @@ function DonationRow({ item, onDelete }) {
       {/* Status badge */}
       <StatusBadge status={item.status ?? 'tersedia'} />
 
-      {/* Delete button */}
-      <button
-        type="button"
-        aria-label="Hapus donasi"
-        onClick={() => onDelete(item.id)}
-        className="ml-2 grid size-8 shrink-0 place-items-center rounded-full text-[#94a3b8] transition-colors hover:bg-red-50 hover:text-red-500"
-      >
-        <Trash2 className="size-4" />
-      </button>
+      {item.status === 'tersedia' ? (
+        <button
+          type="button"
+          aria-label="Hapus donasi"
+          onClick={() => onDelete(item.id)}
+          className="ml-2 grid size-8 shrink-0 place-items-center rounded-full text-[#94a3b8] transition-colors hover:bg-red-50 hover:text-red-500"
+        >
+          <Trash2 className="size-4" />
+        </button>
+      ) : null}
     </article>
   );
 }
@@ -480,9 +481,12 @@ export default function RetailerDashboardPage() {
   }
 
   async function handleDelete(id) {
+    const confirmed = window.confirm('Hapus donasi ini?');
+    if (!confirmed) return;
+
     try {
       await deleteRetailerDonation(id);
-      setDonations((current) => current.filter((item) => item.id !== id));
+      await loadDonations();
     } catch (err) {
       setError(getRetailerErrorMessage(err, 'Gagal menghapus donasi'));
     }

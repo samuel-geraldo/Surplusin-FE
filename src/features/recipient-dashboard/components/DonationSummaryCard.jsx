@@ -57,7 +57,7 @@ export function DonationSummaryCard({ icon, count, label, accentColor, isLoading
             >
               {count} Donasi
             </p>
-            <p 
+            <p
               className={cn(
                 "font-[Manrope] text-[14px] font-medium",
                 isBlue ? "text-[#1F66F4]" : "text-[#FF6600]"

@@ -77,8 +77,8 @@ export default function RecipientDashboardPage() {
           </div>
 
           {/* Category Dropdown */}
-          <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center sm:gap-3 md:w-auto cursor-pointer">
-            <span className="shrink-0 font-[Manrope] text-[15px] font-bold text-[#0f172a]">
+          <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center sm:gap-3 md:w-auto hover:cursor-pointer">
+            <span className="shrink-0 font-[Manrope] text-[15px] font-bold text-text">
               Jenis Makanan:
             </span>
             <div className="w-full sm:w-[220px]">

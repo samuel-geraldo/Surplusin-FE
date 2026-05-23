@@ -43,7 +43,7 @@ export function Select({
       <button
         type="button"
         className={cn(
-          'flex h-[45px] w-full items-center justify-between gap-2 rounded-xl border border-[#94a3b8] bg-transparent px-4 text-left text-[15px] font-medium text-[#64748b]',
+          'flex h-[45px] w-full items-center justify-between gap-2 rounded-xl border border-[#94a3b8] bg-transparent px-4 text-left text-[15px] font-medium text-[#64748b] cursor-pointer',
           'transition-colors duration-200 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary',
           disabled && 'cursor-not-allowed opacity-50',
           triggerClassName

@@ -13,6 +13,7 @@ import {
 import {
   createRoleProfile,
   getAuthErrorMessage,
+  hasRoleProfile,
   loginUser,
   registerUser,
 } from './authApi';
@@ -45,7 +46,7 @@ function getGoogleCallbackData(searchParams) {
   }
 
   const decodedUser = decodeJwtPayload(token);
-  const backendRole = getParam('role') ?? decodedUser?.role;
+  const backendRole = decodedUser?.role ?? getParam('role');
   const role =
     backendRole === 'penerima' ? AUTH_ROLES.RECIPIENT : AUTH_ROLES.RETAILER;
   const user = {
@@ -111,12 +112,36 @@ export function AuthFlow() {
       return;
     }
 
-    setSession({
-      user: googleCallbackData.user,
-      accessToken: googleCallbackData.token,
-    });
-    window.history.replaceState(null, '', window.location.pathname);
-  }, [googleCallbackData, setSession]);
+    let cancelled = false;
+
+    async function resolveGoogleCallback() {
+      setSession({
+        user: googleCallbackData.user,
+        accessToken: googleCallbackData.token,
+      });
+      window.history.replaceState(null, '', window.location.pathname);
+
+      const profileExists = await hasRoleProfile(googleCallbackData.user.role);
+
+      if (cancelled) {
+        return;
+      }
+
+      if (profileExists) {
+        const destination = getRoleDestination(googleCallbackData.user.role);
+        setAuthResult({ destination, user: googleCallbackData.user });
+        setStep(AUTH_STEPS.AUTHENTICATED);
+        toast.success('Login berhasil');
+        navigate(destination, { replace: true });
+      }
+    }
+
+    resolveGoogleCallback();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [googleCallbackData, navigate, setSession]);
 
   useEffect(() => {
     if (!isHydrated || googleCallbackData || !storedAccessToken) {

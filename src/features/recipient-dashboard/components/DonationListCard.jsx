@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@/lib/constants';
 import { claimDonation } from '@/services/api/recipient';
+import { env } from '@/lib/env';
 import { ClaimDonationModal } from './ClaimDonationModal';
 import { ClaimSuccessPopup } from './ClaimSuccessPopup';
 
@@ -38,6 +39,17 @@ export function DonationListCard({ data, onClaimed }) {
       setClaiming(true);
       // Panggil API backend: POST /api/klaim/:donasi_id
       await claimDonation(data.id);
+
+      try {
+        const stored = localStorage.getItem('surplusin_claimed_donations');
+        const existing = stored ? JSON.parse(stored) : [];
+        if (!existing.find((d) => d.id === data.id)) {
+          existing.push(data);
+        }
+        localStorage.setItem('surplusin_claimed_donations', JSON.stringify(existing));
+      } catch (e) {
+        if (env.USE_MOCK_API) console.error('Gagal menyimpan klaim ke localStorage:', e);
+      }
 
       setShowConfirm(false);
       setShowSuccess(true);

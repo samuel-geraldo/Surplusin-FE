@@ -37,6 +37,17 @@ function formatClaimTime(value) {
   return `${hours} jam lalu`;
 }
 
+function buildWhatsAppUrl(phone, message) {
+  const digits = String(phone ?? '').replace(/\D/g, '');
+  if (!digits) return '';
+
+  const normalized = digits.startsWith('0')
+    ? `62${digits.slice(1)}`
+    : digits;
+
+  return `https://wa.me/${normalized}?text=${encodeURIComponent(message)}`;
+}
+
 export default function RecipientHandoverPage() {
   const [claimedDonations, setClaimedDonations] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -85,11 +96,11 @@ export default function RecipientHandoverPage() {
   const handleConfirmPickup = async (id) => {
     try {
       await updateClaimStatus(id, 'completed');
-      
+
       // Update state (remove from list)
       const updated = claimedDonations.filter((d) => d.id !== id);
       setClaimedDonations(updated);
-      
+
     } catch (error) {
       console.error('Gagal mengkonfirmasi penjemputan:', error);
       alert('Terjadi kesalahan saat konfirmasi penjemputan.');
@@ -137,9 +148,13 @@ export default function RecipientHandoverPage() {
         const storeLat = donation.lat || recipientLat;
         const storeLng = donation.lng || recipientLng;
 
-        // URL embed Google Maps
-        const mapsEmbedUrl = `https://maps.google.com/maps?q=${storeLat},${storeLng}&z=16&output=embed`;
-        const mapsOpenUrl = `https://www.google.com/maps/dir/${recipientLat},${recipientLng}/${storeLat},${storeLng}`;
+        const bbox = [storeLng - 0.01, storeLat - 0.01, storeLng + 0.01, storeLat + 0.01].join('%2C');
+        const mapsEmbedUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${storeLat}%2C${storeLng}`;
+        const mapsOpenUrl = `https://www.openstreetmap.org/?mlat=${storeLat}&mlon=${storeLng}#map=16/${storeLat}/${storeLng}`;
+        const chatUrl = buildWhatsAppUrl(
+          donation.nomor_whatsapp,
+          `Halo ${donation.storeName}, saya ingin koordinasi penjemputan donasi ${donation.foodName}.`,
+        );
 
         return (
           <div key={donation.id} className="flex flex-col lg:flex-row gap-6" style={{ alignItems: 'flex-start' }}>
@@ -218,7 +233,7 @@ export default function RecipientHandoverPage() {
                 </div>
               </div>
 
-              {/* ── Google Maps Embed ── */}
+              {/* ── OpenStreetMap Embed ── */}
               <div
                 className="relative overflow-hidden rounded-2xl"
                 style={{ marginTop: '1.5rem', height: 280, border: '1px solid #e2e8f0' }}
@@ -232,7 +247,7 @@ export default function RecipientHandoverPage() {
                   referrerPolicy="no-referrer-when-downgrade"
                 />
 
-                {/* Buka di Google Maps */}
+                {/* Buka di OpenStreetMap */}
                 <a
                   href={mapsOpenUrl}
                   target="_blank"
@@ -252,7 +267,7 @@ export default function RecipientHandoverPage() {
                     alt="maps"
                     style={{ width: 16, height: 16 }}
                   />
-                  Buka di Google Maps
+                  Buka di OpenStreetMap
                 </a>
               </div>
 
@@ -282,17 +297,23 @@ export default function RecipientHandoverPage() {
                       Daftar Item Donasi
                     </h4>
                   </div>
-                  <ul className="flex flex-col gap-2 pl-4">
-                    {(donation.items && donation.items.length > 0 ? donation.items : ['Nasi Box', 'Ayam Bakar', 'Kerupuk udang', 'Sayur Lodeh']).map((item, idx) => (
-                      <li
-                        key={idx}
-                        className="font-[Manrope] text-[#0f172a]"
-                        style={{ fontSize: '16px' }}
-                      >
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
+                  {donation.items && donation.items.length > 0 ? (
+                    <ul className="flex flex-col gap-2 pl-4">
+                      {donation.items.map((item) => (
+                        <li
+                          key={item}
+                          className="font-[Manrope] text-[#0f172a]"
+                          style={{ fontSize: '16px' }}
+                        >
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-center font-[Manrope] text-[15px] text-[#64748b]">
+                      Belum ada detail item untuk klaim ini.
+                    </p>
+                  )}
                 </div>
 
                 {/* Konfirmasi Penerimaan */}
@@ -359,7 +380,7 @@ export default function RecipientHandoverPage() {
 
                 {/* Notification items */}
                 <div className="flex flex-col gap-3">
-                  {notifications.map((notif, index) => {
+                  {notifications.map((notif) => {
                     const isActive = (activeNotifId || notifications[0]?.id) === notif.id;
 
                     return (
@@ -401,8 +422,12 @@ export default function RecipientHandoverPage() {
               </div>
 
               {/* ── Chat Mitra Button ── */}
-              <button
-                className="flex w-full items-center justify-center gap-3 font-[Manrope] font-bold text-white transition-opacity hover:opacity-90"
+              <a
+                href={chatUrl || undefined}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-disabled={!chatUrl}
+                className="flex w-full items-center justify-center gap-3 font-[Manrope] font-bold text-white transition-opacity hover:opacity-90 aria-disabled:pointer-events-none aria-disabled:opacity-50"
                 style={{
                   marginTop: '1.25rem',
                   background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
@@ -413,9 +438,6 @@ export default function RecipientHandoverPage() {
                   cursor: 'pointer',
                   boxShadow: '0 4px 14px rgba(34,197,94,0.30)',
                 }}
-                onClick={() => {
-                  alert(`Membuka chat dengan mitra: ${donation.storeName}`);
-                }}
               >
                 <img
                   src="/recipient_retailer icon/basic-icon/Icon chat.svg"
@@ -423,7 +445,7 @@ export default function RecipientHandoverPage() {
                   style={{ width: 20, height: 20 }}
                 />
                 Chat Mitra
-              </button>
+              </a>
             </aside>
           </div>
         );

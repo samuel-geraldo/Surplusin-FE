@@ -4,11 +4,13 @@ import { RetailerTopNavbar } from './RetailerTopNavbar';
 
 export function RetailerLayout() {
   return (
-    <div className="min-h-screen bg-[#f3f3f6]">
+    <div className="flex min-h-screen bg-[#f4f6f8]">
       <RetailerSidebar />
-      <div className="ml-[61px] flex min-w-0 flex-1 flex-col">
+
+      <div className="flex min-w-0 flex-1 flex-col">
         <RetailerTopNavbar />
-        <main className="flex-1 bg-[#f3f3f6] pt-[77px]">
+
+        <main className="flex-1 px-5 py-5 sm:px-8 sm:py-6">
           <Outlet />
         </main>
       </div>

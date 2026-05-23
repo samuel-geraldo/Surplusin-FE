@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { LocateFixed, Search } from 'lucide-react';
-import { GoogleLocationMap } from '@/components/ui';
+import { GoogleLocationMap, CancelEditPopup, FailedUpdatePopup, SuccessUpdatePopup } from '@/components/ui';
 import {
   searchAddresses,
   shouldSearchAddress,
@@ -82,7 +82,7 @@ function FieldBox({ field, value, draftValue, error, isEditing, onChange }) {
   const sharedInputClass = 'w-full rounded-xl font-[Manrope] text-[#374151] outline-none';
 
   return (
-    <label className={`flex flex-col ${field.id === 'category' || field.id === 'whatsapp' ? '' : 'col-span-2'}`}>
+    <label className={`flex min-w-0 flex-col ${field.id === 'category' || field.id === 'whatsapp' ? '' : 'sm:col-span-2'}`}>
       <span className="mb-1 block font-[Manrope] font-medium text-[#374151]" style={{ fontSize: '14px' }}>
         {field.label}
       </span>
@@ -111,7 +111,7 @@ function FieldBox({ field, value, draftValue, error, isEditing, onChange }) {
         )
       ) : (
         <span
-          className="w-full rounded-xl font-[Manrope] text-[#374151]"
+          className="w-full break-words rounded-xl font-[Manrope] text-[#374151]"
           style={{
             padding: '10px 14px',
             fontSize: '14px',
@@ -331,6 +331,9 @@ export default function RetailerProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [showCancelPopup, setShowCancelPopup] = useState(false);
+  const [showFailedPopup, setShowFailedPopup] = useState(false);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -390,10 +393,17 @@ export default function RetailerProfilePage() {
     });
   }, []);
 
-  const handleCancel = () => {
+  const handleCancelClick = () => {
+    setShowCancelPopup(true);
+  };
+
+  const handleCancelConfirm = () => {
     setDraft(profile);
     setErrors({});
     setIsEditing(false);
+    setShowCancelPopup(false);
+    setShowFailedPopup(true);
+    setTimeout(() => setShowFailedPopup(false), 2000);
   };
 
   const handleSave = async () => {
@@ -427,6 +437,8 @@ export default function RetailerProfilePage() {
       setProfile(nextProfile);
       setDraft(nextProfile);
       setIsEditing(false);
+      setShowSuccessPopup(true);
+      setTimeout(() => setShowSuccessPopup(false), 2000);
     } catch (error) {
       setErrorMessage(
         error?.response?.data?.message ||
@@ -439,7 +451,7 @@ export default function RetailerProfilePage() {
   };
 
   return (
-    <div className="flex gap-6 px-8 py-8 font-[Manrope]" style={{ marginTop: '1rem' }}>
+    <div className="flex flex-col gap-6 px-4 py-6 font-[Manrope] sm:px-6 lg:px-8 xl:flex-row xl:py-8" style={{ marginTop: '1rem' }}>
       {isLoading && (
         <div className="fixed inset-x-0 top-20 z-40 mx-auto w-fit rounded-full bg-white px-5 py-2 text-sm font-semibold text-[#64748b] shadow">
           Memuat profil...
@@ -452,8 +464,8 @@ export default function RetailerProfilePage() {
       )}
       <div className="flex flex-1 flex-col gap-6" style={{ minWidth: 0 }}>
         <section
-          className="rounded-3xl bg-white"
-          style={{ padding: '1.75rem 2rem', boxShadow: '0 8px 30px rgba(0,0,0,0.06)', border: '1px solid #f1f5f9' }}
+          className="rounded-3xl bg-white p-5 sm:p-7 lg:px-8"
+          style={{ boxShadow: '0 8px 30px rgba(0,0,0,0.06)', border: '1px solid #f1f5f9' }}
         >
           <div className="mb-5 flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
@@ -474,7 +486,7 @@ export default function RetailerProfilePage() {
             ) : null}
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <FieldBox
               field={profileFields[0]}
               value={profile.storeName}
@@ -517,11 +529,11 @@ export default function RetailerProfilePage() {
             />
           </div>
           {isEditing ? (
-            <div className="mt-6 flex items-center justify-end gap-3">
+            <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-end">
               <button
                 type="button"
-                onClick={handleCancel}
-                className="rounded-xl font-[Manrope] font-semibold text-[#374151] transition-colors hover:bg-[#e2e8f0] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#64748b]"
+                onClick={handleCancelClick}
+                className="w-full rounded-xl font-[Manrope] font-semibold text-[#374151] transition-colors hover:bg-[#e2e8f0] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#64748b] sm:w-auto"
                 style={{ padding: '10px 28px', fontSize: '14px', backgroundColor: '#f1f5f9' }}
               >
                 Batal
@@ -530,7 +542,7 @@ export default function RetailerProfilePage() {
                 type="button"
                 onClick={handleSave}
                 disabled={isSaving}
-                className="rounded-xl font-[Manrope] font-bold text-white transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff6600]"
+                className="w-full rounded-xl font-[Manrope] font-bold text-white transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff6600] sm:w-auto"
                 style={{
                   padding: '10px 28px',
                   fontSize: '14px',
@@ -545,10 +557,10 @@ export default function RetailerProfilePage() {
         </section>
       </div>
 
-      <aside className="hidden shrink-0 flex-col gap-0 xl:flex" style={{ width: 380 }}>
+      <aside className="flex w-full shrink-0 flex-col gap-0 xl:w-[380px]">
         <section
-          className="flex flex-col rounded-3xl bg-white"
-          style={{ padding: '1.75rem', boxShadow: '0 8px 30px rgba(0,0,0,0.06)', border: '1px solid #f1f5f9' }}
+          className="flex flex-col rounded-3xl bg-white p-5 sm:p-7"
+          style={{ boxShadow: '0 8px 30px rgba(0,0,0,0.06)', border: '1px solid #f1f5f9' }}
         >
           <div className="flex min-w-0 flex-col">
             <div className="flex items-center gap-2">
@@ -576,6 +588,14 @@ export default function RetailerProfilePage() {
           </div>
         </section>
       </aside>
+
+      <CancelEditPopup
+        isOpen={showCancelPopup}
+        onConfirm={handleCancelConfirm}
+        onCancel={() => setShowCancelPopup(false)}
+      />
+      <FailedUpdatePopup isOpen={showFailedPopup} />
+      <SuccessUpdatePopup isOpen={showSuccessPopup} />
     </div>
   );
 }

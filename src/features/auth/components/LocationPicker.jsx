@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Button, GoogleLocationMap, Input } from '@/components/ui';
+import { Button, Input, GoogleLocationMap } from '@/components/ui';
 import { searchAddresses, shouldSearchAddress } from './locationSearch';
 
 const DEFAULT_CENTER = [106.8456, -6.2088];
@@ -188,8 +188,8 @@ export function LocationPicker({ register, confirmed, setValue }) {
       <div className="relative min-h-[190px] overflow-hidden rounded-2xl border border-[#d6dbe3] bg-[#edf2f7]">
         <GoogleLocationMap
           center={center}
-          onPick={handlePick}
           editable={!confirmed}
+          onPick={handlePick}
           className="absolute inset-0"
         />
         {confirmed ? (

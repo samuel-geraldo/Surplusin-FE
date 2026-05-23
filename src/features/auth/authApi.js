@@ -31,6 +31,24 @@ export async function createRoleProfile({ role, userId, profileData }) {
   return response.data;
 }
 
+export async function hasRoleProfile(role) {
+  const isRetailer = role === 'penyalur' || role === 'retailer';
+
+  try {
+    await apiClient.get(isRetailer ? '/penyalur/data' : '/penerima/data');
+    return true;
+  } catch (error) {
+    const status = error?.response?.status;
+    const message = `${error?.response?.data?.message ?? ''} ${error?.response?.data?.error ?? ''}`;
+
+    if (status === 404 || /not found|belum lengkap|belum ditemukan/i.test(message)) {
+      return false;
+    }
+
+    return false;
+  }
+}
+
 function mapProfileCategory(category, isRetailer) {
   if (isRetailer) {
     if (category === 'restoran') return 'Makanan Siap Saji';
