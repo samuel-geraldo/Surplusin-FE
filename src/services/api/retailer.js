@@ -35,7 +35,20 @@ export async function deleteRetailerDonation(id) {
 
 export async function getRetailerActiveClaims() {
   const response = await apiClient.get('/klaim/penyalur/aktif');
-  return response.data;
+  return (Array.isArray(response.data) ? response.data : []).map((claim) => ({
+    id: claim.klaim_id ?? claim.id,
+    status: claim.status,
+    nama_instansi: claim.nama_penerima ?? claim.nama_instansi ?? '-',
+    nama_donasi: claim.nama_donasi ?? '-',
+    jumlah: claim.jumlah ?? 0,
+    satuan: claim.satuan ?? '',
+    claimed_at: claim.claimed_at,
+    alamat: claim.alamat_penerima ?? claim.alamat ?? '',
+    latitude: claim.latitude_penerima,
+    longitude: claim.longitude_penerima,
+    nomor_whatsapp: claim.nomor_whatsapp_penerima ?? '',
+    item_detail: claim.item_detail ?? '',
+  }));
 }
 
 export async function getRetailerProfile() {

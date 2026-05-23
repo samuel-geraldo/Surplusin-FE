@@ -1,6 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
 import { getDonationHistory } from '@/services/api/recipient';
-import { mockHistorySummary } from '@/features/recipient-dashboard/data/mockRecipientDashboardData';
 
 export default function RecipientHistoryPage() {
   const [historyDonations, setHistoryDonations] = useState([]);
@@ -37,8 +36,14 @@ export default function RecipientHistoryPage() {
     [historyDonations]
   );
 
-  // Orang terbantu tetap menggunakan data statis untuk saat ini sesuai permintaan
-  const orangTerbantu = mockHistorySummary.orangTerbantu;
+  const orangTerbantu = useMemo(
+    () =>
+      historyDonations.reduce((sum, item) => {
+        const match = String(item.portion ?? '').match(/\d+/);
+        return sum + (match ? Number(match[0]) : 0);
+      }, 0),
+    [historyDonations],
+  );
 
 
   if (loading) {

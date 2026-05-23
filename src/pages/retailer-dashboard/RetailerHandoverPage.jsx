@@ -127,9 +127,13 @@ export default function RetailerHandoverPage() {
     }
 
     loadClaims();
+    const intervalId = window.setInterval(loadClaims, 10000);
+    window.addEventListener('focus', loadClaims);
 
     return () => {
       cancelled = true;
+      window.clearInterval(intervalId);
+      window.removeEventListener('focus', loadClaims);
     };
   }, []);
 

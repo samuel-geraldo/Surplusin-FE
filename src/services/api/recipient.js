@@ -68,10 +68,14 @@ export async function getDonationSummary() {
     return mockDonationSummary;
   }
 
-  const { data } = await apiClient.get('/donasi/statistik');
+  const [nearbyResponse, activeClaimsResponse] = await Promise.all([
+    apiClient.get('/penerima/nearby'),
+    apiClient.get('/klaim/penerima/aktif'),
+  ]);
+
   return {
-    available: data.total_diklaim ?? 0,
-    claimed: data.total_diterima ?? 0,
+    available: nearbyResponse.data?.total_donasi ?? nearbyResponse.data?.donasi?.length ?? 0,
+    claimed: Array.isArray(activeClaimsResponse.data) ? activeClaimsResponse.data.length : 0,
   };
 }
 
