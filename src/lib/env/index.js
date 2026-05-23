@@ -5,6 +5,5 @@ export const env = {
   APP_NAME: viteEnv.VITE_APP_NAME || 'SurplusIn',
   MAP_TILE_URLS: viteEnv.VITE_MAP_TILE_URLS || '',
   GEOCODING_SEARCH_URL: viteEnv.VITE_GEOCODING_SEARCH_URL || '',
-  GOOGLE_MAPS_API_KEY: viteEnv.VITE_GOOGLE_MAPS_API_KEY || '',
-  USE_MOCK_API: viteEnv.VITE_USE_MOCK_API !== 'false',
+  GOOGLE_MAPS_API_KEY: viteEnv.VITE_GOOGLE_MAPS_API_KEY || 'AIzaSyAxvkMdHwDpYBUi62RVVoO4O9SmG_AgPp0',
 };
