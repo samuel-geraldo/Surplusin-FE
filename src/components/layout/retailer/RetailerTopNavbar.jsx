@@ -1,3 +1,4 @@
+import { UserRound } from 'lucide-react';
 import { Link, useMatches } from 'react-router-dom';
 import { ROUTES } from '@/lib/constants';
 
@@ -14,19 +15,20 @@ export function RetailerTopNavbar() {
   const pageTitle = getActivePageTitle(matches);
 
   return (
-    <header className="fixed left-[61px] right-0 top-0 z-30 h-[77px] border-b border-[#dddddd] bg-white">
-      <div className="flex h-full items-center justify-between px-[30px]">
-        <h1 className="font-[Manrope] text-[28px] font-bold leading-none tracking-[-0.56px] text-[#0f172a]">
-          {pageTitle}
-        </h1>
+    <header className="sticky top-0 z-30 border-b border-border/80 bg-surface/95 backdrop-blur-md">
+      <div className="flex h-12 items-center justify-between gap-4 px-5 sm:h-[72px] sm:px-8 md:h-14">
+        <div className="min-w-0">
+          <h1 className="truncate text-[18px] font-bold tracking-[-0.02em] text-text sm:text-[26px] md:text-[20px]">
+            {pageTitle}
+          </h1>
+        </div>
+
         <Link
           to={ROUTES.RETAILER.PROFILE}
+          className="flex size-10 shrink-0 items-center justify-center rounded-full border border-border bg-background text-text-muted shadow-sm transition-colors duration-200 hover:border-primary/20 hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
           aria-label="Retailer profile"
-          className="relative flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#050505] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3c965a]"
         >
-          <span className="absolute size-[22px] rounded-full bg-[#d6b08b]" />
-          <span className="absolute top-[9px] size-[10px] rounded-full bg-[#111827]" />
-          <span className="absolute bottom-[6px] h-[12px] w-[24px] rounded-t-full bg-[#111827]" />
+          <UserRound className="size-5" strokeWidth={2.1} />
         </Link>
       </div>
     </header>

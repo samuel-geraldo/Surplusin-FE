@@ -4,15 +4,17 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { recipientNavigationItems } from './recipientNavigation';
 import { cn } from '@/lib/utils';
 import { APP_NAME } from '@/lib/constants';
+import { useAuthStore } from '@/store/auth/useAuthStore';
 
 export function RecipientSidebar() {
   const [isExpanded, setIsExpanded] = useState(false);
   const [showLogoutPopup, setShowLogoutPopup] = useState(false);
+  const clearSession = useAuthStore((state) => state.clearSession);
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    // Arahkan ke landing page jika Ya diklik
-    navigate('/');
+    clearSession();
+    navigate('/', { replace: true });
   };
 
   return (
