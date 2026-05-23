@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
+import { env } from '@/lib/env';
 
-const MAPS_API_KEY = 'AIzaSyAxvkMdHwDpYBUi62RVVoO4O9SmG_AgPp0';
+const MAPS_API_KEY = env.GOOGLE_MAPS_API_KEY;
 const DEFAULT_CENTER = [106.8456, -6.2088];
 
 let mapsScriptLoaded = false;
