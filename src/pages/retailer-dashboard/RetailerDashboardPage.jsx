@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Check, ChevronDown, Minus, Plus, Trash2, X, XCircle } from 'lucide-react';
 import {
   createRetailerDonation,
