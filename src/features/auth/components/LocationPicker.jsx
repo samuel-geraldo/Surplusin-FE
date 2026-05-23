@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Button, Input, Map } from '@/components/ui';
+import { Button, Input, GoogleLocationMap as Map } from '@/components/ui';
 import { searchAddresses, shouldSearchAddress } from './locationSearch';
 
 const DEFAULT_CENTER = [106.8456, -6.2088];
@@ -171,18 +171,10 @@ export function LocationPicker({ register, confirmed, setValue }) {
       <div className="relative min-h-[190px] overflow-hidden rounded-2xl border border-[#d6dbe3] bg-[#edf2f7]">
         <Map
           center={center}
-          zoom={13}
+          editable={!confirmed}
           onPick={handlePick}
           className="absolute inset-0"
-        >
-          <div
-            className="pointer-events-none absolute left-1/2 top-1/2 grid size-12 -translate-x-1/2 -translate-y-full place-items-center rounded-full bg-orange-normal text-white shadow-lg"
-            aria-hidden="true"
-          >
-            <span className="size-3 rounded-full bg-white" />
-            <span className="absolute top-[42px] h-4 w-1 rounded-full bg-orange-normal" />
-          </div>
-        </Map>
+        />
         {confirmed ? (
           <div
             className="absolute inset-0 z-10 cursor-not-allowed"
