@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/store/auth/useAuthStore';
@@ -69,8 +69,12 @@ function getGoogleCallbackData(searchParams) {
 
 export function AuthFlow() {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const reducedMotion = useReducedMotion();
   const setSession = useAuthStore((state) => state.setSession);
+  const storedAccessToken = useAuthStore((state) => state.accessToken);
+  const storedUser = useAuthStore((state) => state.user);
+  const isHydrated = useAuthStore((state) => state.isHydrated);
   const googleCallbackData = useMemo(
     () => getGoogleCallbackData(searchParams),
     [searchParams],
@@ -114,6 +118,14 @@ export function AuthFlow() {
     window.history.replaceState(null, '', window.location.pathname);
   }, [googleCallbackData, setSession]);
 
+  useEffect(() => {
+    if (!isHydrated || googleCallbackData || !storedAccessToken) {
+      return;
+    }
+
+    navigate(getRoleDestination(storedUser?.role), { replace: true });
+  }, [googleCallbackData, isHydrated, navigate, storedAccessToken, storedUser?.role]);
+
   function resetError() {
     setSubmitState({ type: 'idle', message: '' });
   }
@@ -132,7 +144,7 @@ export function AuthFlow() {
       const response = await loginUser(values);
       const accessToken = response.token;
       const decodedUser = decodeJwtPayload(accessToken);
-      const user = decodedUser ?? { role: AUTH_ROLES.USER };
+      const user = decodedUser ?? { role: currentRole };
       const destination = getRoleDestination(user.role);
 
       setSession({ user, accessToken });
@@ -140,6 +152,7 @@ export function AuthFlow() {
       setStep(AUTH_STEPS.AUTHENTICATED);
       setSubmitState({ type: 'idle', message: '' });
       toast.success(response.message ?? 'Login berhasil');
+      navigate(destination, { replace: true });
     } catch (error) {
       setSubmitState({
         type: 'error',
@@ -160,18 +173,44 @@ export function AuthFlow() {
 
     try {
       const payload = buildRegisterPayload(accountData, values);
-      const response = accountData?.isGoogleProfile
-        ? await createRoleProfile({
-            role: accountData.backendRole,
-            userId: accountData.userId,
-            profileData: values,
-          })
-        : await registerUser(payload);
+      let user = null;
+      let response = null;
 
-      setRegisteredUser(response.user ?? response);
-      setStep(AUTH_STEPS.REGISTERED);
+      if (accountData?.isGoogleProfile) {
+        response = await createRoleProfile({
+          role: accountData.backendRole,
+          userId: accountData.userId,
+          profileData: values,
+        });
+        user = {
+          id: accountData.userId,
+          email: accountData.email,
+          role: accountData.backendRole,
+        };
+      } else {
+        response = await registerUser(payload);
+        const sessionResponse = await loginUser({
+          email: accountData.email,
+          password: accountData.password,
+        });
+        const accessToken = sessionResponse.token;
+        user = decodeJwtPayload(accessToken) ?? response.user;
+
+        setSession({ user, accessToken });
+
+        await createRoleProfile({
+          role: user.role,
+          userId: user.id,
+          profileData: values,
+        });
+      }
+
+      const destination = getRoleDestination(user?.role ?? accountData?.role);
+
+      setRegisteredUser(user ?? response.user ?? response);
       setSubmitState({ type: 'idle', message: '' });
       toast.success(response.message ?? 'Registrasi berhasil');
+      navigate(destination, { replace: true });
     } catch (error) {
       setSubmitState({
         type: 'error',
@@ -243,22 +282,18 @@ export function AuthFlow() {
 
     if (step === AUTH_STEPS.REGISTERED) {
       return (
-        <StatusCard
-          title="Registrasi Berhasil"
-          message={`${registeredUser?.name ?? 'Akun'} berhasil dibuat. Silakan login untuk menyimpan token sesi.`}
-          actionLabel="Masuk"
-          onAction={() => setStep(AUTH_STEPS.LOGIN)}
+        <Navigate
+          to={getRoleDestination(registeredUser?.role ?? accountData?.role)}
+          replace
         />
       );
     }
 
     if (step === AUTH_STEPS.AUTHENTICATED) {
       return (
-        <StatusCard
-          title="Login Berhasil"
-          message={`Sesi tersimpan. Tujuan berikutnya: ${authResult?.destination ?? 'role-completion'}.`}
-          actionLabel="Kembali ke Login"
-          onAction={() => setStep(AUTH_STEPS.LOGIN)}
+        <Navigate
+          to={authResult?.destination ?? getRoleDestination(currentRole)}
+          replace
         />
       );
     }
@@ -285,26 +320,5 @@ export function AuthFlow() {
         </Motion.div>
       </AnimatePresence>
     </AuthShell>
-  );
-}
-
-function StatusCard({ title, message, actionLabel, onAction }) {
-  return (
-    <Motion.div
-      className="mx-auto w-full max-w-[460px] rounded-[20px] bg-white p-8 text-center shadow-[0_0_2px_rgba(0,0,0,0.25)]"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.16, ease: 'easeOut' }}
-    >
-      <h1 className="text-h1 font-extrabold text-[#0f172a]">{title}</h1>
-      <p className="mt-3 text-body2 text-[#64748b]">{message}</p>
-      <button
-        type="button"
-        className="mt-6 h-[56px] w-full rounded-2xl bg-orange-normal px-6 text-body2 font-bold text-white transition-colors hover:bg-orange-normal-hover focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-orange-normal"
-        onClick={onAction}
-      >
-        {actionLabel}
-      </button>
-    </Motion.div>
   );
 }

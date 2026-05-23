@@ -1,6 +1,6 @@
 import { createElement, useRef } from 'react';
 import { motion, useInView, useReducedMotion } from 'motion/react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui';
 import { ROUTES } from '@/lib/constants';
 import { createLandingVariants, viewportOnce } from '@/lib/animations/landingMotion';
@@ -264,6 +264,7 @@ function HeroTitleLine({ children, variants }) {
 }
 
 function HeroSection({ variants, reducedMotion }) {
+  const navigate = useNavigate();
   return (
     <section className="overflow-hidden bg-[#f3f3f6] px-5 py-14 sm:px-8 lg:py-24">
       <div className="mx-auto grid max-w-[1320px] items-center gap-12 lg:grid-cols-[0.86fr_1.14fr]">
@@ -319,9 +320,7 @@ function HeroSection({ variants, reducedMotion }) {
                 type="button"
                 size="md"
                 className="rounded-2xl px-8 text-lg sm:px-10"
-                onClick={() => {
-                  window.location.href = ROUTES.AUTH;
-                }}
+                onClick={() => navigate(ROUTES.AUTH)}
               >
                 Mulai Sekarang
               </Button>
@@ -481,6 +480,7 @@ function MetricsStrip({ variants, reducedMotion }) {
 }
 
 function FinalCTASection({ variants, reducedMotion }) {
+  const navigate = useNavigate();
   return (
     <section id="daftar" className="relative scroll-mt-24 overflow-hidden bg-[#f3f3f6] px-5 py-20 text-center sm:px-8 lg:py-24">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(255,102,0,0.10),transparent_42%)]" />
@@ -512,9 +512,7 @@ function FinalCTASection({ variants, reducedMotion }) {
             variant="secondary"
             size="md"
             className="min-h-[56px] rounded-2xl px-8 text-base hover:shadow-[0_14px_34px_rgba(255,102,0,0.28)] sm:px-10 sm:text-lg"
-            onClick={() => {
-              window.location.href = ROUTES.AUTH;
-            }}
+            onClick={() => navigate(ROUTES.AUTH)}
           >
             Daftar Sebagai Mitra
           </Button>

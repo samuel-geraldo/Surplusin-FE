@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Button, Input, Map } from '@/components/ui';
+import { Button, GoogleLocationMap, Input } from '@/components/ui';
 import { searchAddresses, shouldSearchAddress } from './locationSearch';
 
 const DEFAULT_CENTER = [106.8456, -6.2088];
@@ -17,16 +17,24 @@ export function LocationPicker({ register, confirmed, setValue }) {
 
   const handlePick = useCallback(
     (nextCenter) => {
+      if (confirmed) {
+        return;
+      }
+
       setCenter(nextCenter);
       setLocationError('');
       setValue('longitude', nextCenter[0], { shouldDirty: true });
       setValue('latitude', nextCenter[1], { shouldDirty: true });
       setValue('locationConfirmed', false, { shouldDirty: true });
     },
-    [setValue],
+    [confirmed, setValue],
   );
 
   function handleLocate() {
+    if (confirmed) {
+      return;
+    }
+
     setLocationError('');
 
     if (!navigator.geolocation) {
@@ -94,6 +102,10 @@ export function LocationPicker({ register, confirmed, setValue }) {
   function handleAddressChange(event) {
     const nextQuery = event.target.value;
 
+    if (confirmed) {
+      return;
+    }
+
     addressField.onChange(event);
     selectedAddressRef.current = '';
     setAddressQuery(nextQuery);
@@ -108,6 +120,10 @@ export function LocationPicker({ register, confirmed, setValue }) {
   }
 
   function handleAddressSelect(result) {
+    if (confirmed) {
+      return;
+    }
+
     selectedAddressRef.current = result.label;
     setAddressQuery(result.label);
     setAddressResults([]);
@@ -128,6 +144,7 @@ export function LocationPicker({ register, confirmed, setValue }) {
         <Input
           placeholder="Cari alamat..."
           className="h-[56px] rounded-lg border-black px-10 pr-11 text-body2"
+          disabled={confirmed}
           {...addressField}
           value={addressQuery}
           onChange={handleAddressChange}
@@ -136,12 +153,12 @@ export function LocationPicker({ register, confirmed, setValue }) {
           type="button"
           className="absolute right-3 top-1/2 grid size-6 -translate-y-1/2 place-items-center text-[#3b9b5b] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-normal"
           aria-label="Gunakan lokasi saat ini"
-          disabled={isLocating}
+          disabled={confirmed || isLocating}
           onClick={handleLocate}
         >
           <TargetIcon />
         </button>
-        {(addressResults.length > 0 || isSearching || searchError) && (
+        {!confirmed && (addressResults.length > 0 || isSearching || searchError) && (
           <div className="absolute left-0 right-0 top-[calc(100%+8px)] z-20 overflow-hidden rounded-xl border border-[#d6dbe3] bg-white shadow-lg">
             {isSearching && (
               <p className="px-4 py-3 text-label text-[#64748b]">
@@ -169,20 +186,12 @@ export function LocationPicker({ register, confirmed, setValue }) {
       </div>
 
       <div className="relative min-h-[190px] overflow-hidden rounded-2xl border border-[#d6dbe3] bg-[#edf2f7]">
-        <Map
+        <GoogleLocationMap
           center={center}
-          zoom={13}
           onPick={handlePick}
+          editable={!confirmed}
           className="absolute inset-0"
-        >
-          <div
-            className="pointer-events-none absolute left-1/2 top-1/2 grid size-12 -translate-x-1/2 -translate-y-full place-items-center rounded-full bg-orange-normal text-white shadow-lg"
-            aria-hidden="true"
-          >
-            <span className="size-3 rounded-full bg-white" />
-            <span className="absolute top-[42px] h-4 w-1 rounded-full bg-orange-normal" />
-          </div>
-        </Map>
+        />
         {confirmed ? (
           <div
             className="absolute inset-0 z-10 cursor-not-allowed"
