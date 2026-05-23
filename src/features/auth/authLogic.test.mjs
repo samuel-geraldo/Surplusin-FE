@@ -46,6 +46,18 @@ describe('auth schemas', () => {
 
     assert.equal(result.success, false);
   });
+
+  it('requires confirmed location before register submit', () => {
+    const result = profileSchema.safeParse({
+      name: 'Toko Pangan',
+      category: 'warung',
+      whatsapp: '08123456789',
+      address: 'Jakarta',
+      locationConfirmed: false,
+    });
+
+    assert.equal(result.success, false);
+  });
 });
 
 describe('auth helpers', () => {
@@ -89,9 +101,12 @@ describe('auth helpers', () => {
     });
   });
 
-  it('maps roles to future dashboard placeholders', () => {
-    assert.equal(getRoleDestination('retailer'), 'retailer-dashboard');
-    assert.equal(getRoleDestination('recipients'), 'recipient-dashboard');
-    assert.equal(getRoleDestination('user'), 'role-completion');
+  it('maps roles to dashboard routes', () => {
+    assert.equal(getRoleDestination('retailer'), '/retailer/dashboard');
+    assert.equal(getRoleDestination('penyalur'), '/retailer/dashboard');
+    assert.equal(getRoleDestination('recipients'), '/recipient/dashboard');
+    assert.equal(getRoleDestination('recipient'), '/recipient/dashboard');
+    assert.equal(getRoleDestination('penerima'), '/recipient/dashboard');
+    assert.equal(getRoleDestination('user'), '/auth');
   });
 });

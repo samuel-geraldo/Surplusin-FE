@@ -43,14 +43,17 @@ export const PROFILE_CATEGORY_OPTIONS = [
 ];
 
 export const ROLE_DESTINATIONS = {
-  [AUTH_ROLES.RETAILER]: 'retailer-dashboard',
-  [AUTH_ROLES.RECIPIENT]: 'recipient-dashboard',
-  [AUTH_ROLES.ADMIN]: 'admin-dashboard',
-  [AUTH_ROLES.USER]: 'role-completion',
+  [AUTH_ROLES.RETAILER]: '/retailer/dashboard',
+  [AUTH_ROLES.RECIPIENT]: '/recipient/dashboard',
+  penyalur: '/retailer/dashboard',
+  penerima: '/recipient/dashboard',
+  recipient: '/recipient/dashboard',
+  [AUTH_ROLES.ADMIN]: '/admin/dashboard',
+  [AUTH_ROLES.USER]: '/auth',
 };
 
 export function getRoleDestination(role) {
-  return ROLE_DESTINATIONS[role] ?? 'role-completion';
+  return ROLE_DESTINATIONS[role] ?? '/auth';
 }
 
 export function buildRegisterPayload(accountData, profileData) {
