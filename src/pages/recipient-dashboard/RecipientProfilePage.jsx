@@ -44,6 +44,47 @@ function loadMapsScript(apiKey, callback) {
   document.head.appendChild(script);
 }
 
+// ── Reusable field components ──
+const Field = ({ label, value, half }) => (
+  <div className={half ? '' : 'col-span-2'}>
+    <label className="mb-1 block font-[Manrope] font-medium text-[#374151]" style={{ fontSize: '14px' }}>
+      {label}
+    </label>
+    <div
+      className="w-full rounded-xl font-[Manrope] text-[#374151]"
+      style={{ padding: '10px 14px', fontSize: '14px', backgroundColor: '#f0fdf4', border: '1px solid #d1fae5', minHeight: 42 }}
+    >
+      {value || '-'}
+    </div>
+  </div>
+);
+
+// Edit field: plain input
+const EditField = ({ label, field, multiline, half, draft, setDraft }) => (
+  <div className={half ? '' : 'col-span-2'}>
+    <label className="mb-1 block font-[Manrope] font-medium text-[#374151]" style={{ fontSize: '14px' }}>
+      {label}
+    </label>
+    {multiline ? (
+      <textarea
+        value={draft[field]}
+        onChange={(e) => setDraft({ ...draft, [field]: e.target.value })}
+        rows={3}
+        className="w-full rounded-xl font-[Manrope] text-[#374151] outline-none"
+        style={{ padding: '10px 14px', fontSize: '14px', border: '1.5px solid #e2e8f0', backgroundColor: '#fff', resize: 'none' }}
+      />
+    ) : (
+      <input
+        type="text"
+        value={draft[field]}
+        onChange={(e) => setDraft({ ...draft, [field]: e.target.value })}
+        className="w-full rounded-xl font-[Manrope] text-[#374151] outline-none"
+        style={{ padding: '10px 14px', fontSize: '14px', border: '1.5px solid #e2e8f0', backgroundColor: '#fff' }}
+      />
+    )}
+  </div>
+);
+
 export default function RecipientProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
   const [profile, setProfile] = useState(mockProfile);
@@ -188,47 +229,6 @@ export default function RecipientProfilePage() {
     setSearchResults([]);
   }, []);
 
-  // ── Reusable field components ──
-  const Field = ({ label, value, half }) => (
-    <div className={half ? '' : 'col-span-2'}>
-      <label className="mb-1 block font-[Manrope] font-medium text-[#374151]" style={{ fontSize: '14px' }}>
-        {label}
-      </label>
-      <div
-        className="w-full rounded-xl font-[Manrope] text-[#374151]"
-        style={{ padding: '10px 14px', fontSize: '14px', backgroundColor: '#f0fdf4', border: '1px solid #d1fae5', minHeight: 42 }}
-      >
-        {value || '-'}
-      </div>
-    </div>
-  );
-
-  // Edit field: plain input
-  const EditField = ({ label, field, multiline, half }) => (
-    <div className={half ? '' : 'col-span-2'}>
-      <label className="mb-1 block font-[Manrope] font-medium text-[#374151]" style={{ fontSize: '14px' }}>
-        {label}
-      </label>
-      {multiline ? (
-        <textarea
-          value={draft[field]}
-          onChange={(e) => setDraft({ ...draft, [field]: e.target.value })}
-          rows={3}
-          className="w-full rounded-xl font-[Manrope] text-[#374151] outline-none"
-          style={{ padding: '10px 14px', fontSize: '14px', border: '1.5px solid #e2e8f0', backgroundColor: '#fff', resize: 'none' }}
-        />
-      ) : (
-        <input
-          type="text"
-          value={draft[field]}
-          onChange={(e) => setDraft({ ...draft, [field]: e.target.value })}
-          className="w-full rounded-xl font-[Manrope] text-[#374151] outline-none"
-          style={{ padding: '10px 14px', fontSize: '14px', border: '1.5px solid #e2e8f0', backgroundColor: '#fff' }}
-        />
-      )}
-    </div>
-  );
-
   return (
     <div
       className="flex gap-6"
@@ -270,7 +270,7 @@ export default function RecipientProfilePage() {
             {/* Nama Panti/Yayasan */}
             {!isEditing
               ? <Field label="Nama Panti/Yayasan" value={profile.name} half={false} />
-              : <EditField label="Nama Panti/Yayasan" field="name" half={false} />}
+              : <EditField label="Nama Panti/Yayasan" field="name" half={false} draft={draft} setDraft={setDraft} />}
 
             {/* Kategori Usaha + Nomor Whatsapp */}
             {!isEditing ? (
@@ -298,19 +298,19 @@ export default function RecipientProfilePage() {
                     </svg>
                   </div>
                 </div>
-                <EditField label="Nomor Whatsapp" field="whatsapp" half />
+                <EditField label="Nomor Whatsapp" field="whatsapp" half draft={draft} setDraft={setDraft} />
               </>
             )}
 
             {/* Alamat Lengkap */}
             {!isEditing
               ? <Field label="Alamat Lengkap" value={profile.address} half={false} />
-              : <EditField label="Alamat Lengkap" field="address" multiline half={false} />}
+              : <EditField label="Alamat Lengkap" field="address" multiline half={false} draft={draft} setDraft={setDraft} />}
 
             {/* Patokan */}
             {!isEditing
               ? <Field label="Patokan (Opsional)" value={profile.patokan} half={false} />
-              : <EditField label="Patokan (Opsional)" field="patokan" half={false} />}
+              : <EditField label="Patokan (Opsional)" field="patokan" half={false} draft={draft} setDraft={setDraft} />}
           </div>
 
           {/* Action buttons — only in edit mode, at the bottom */}
@@ -464,7 +464,6 @@ export default function RecipientProfilePage() {
                       border: i < searchResults.length - 1 ? '0 0 1px 0 solid #f1f5f9' : 'none',
                       cursor: 'pointer',
                       display: 'flex',
-                      borderBottom: i < searchResults.length - 1 ? '1px solid #f1f5f9' : 'none',
                     }}
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#22c55e" style={{ width: 16, height: 16, flexShrink: 0, marginTop: 2 }}>
