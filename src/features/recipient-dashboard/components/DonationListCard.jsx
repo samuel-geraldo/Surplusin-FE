@@ -88,11 +88,11 @@ export function DonationListCard({ data, onClaimed }) {
 
   return (<>
     <article
-      className="flex flex-col sm:flex-row max-w-[700px] gap-5 rounded-3xl border border-[#f1f5f9] bg-white shadow-[0_4px_20px_rgba(0,0,0,0.04)] transition-shadow hover:shadow-[0_4px_20px_rgba(0,0,0,0.08)]"
+      className="flex max-w-[700px] gap-5 rounded-3xl border border-[#f1f5f9] bg-white shadow-[0_4px_20px_rgba(0,0,0,0.04)] transition-shadow hover:shadow-[0_4px_20px_rgba(0,0,0,0.08)]"
       style={{ padding: '1rem', paddingLeft: '1rem' }}
     >
       {/* ── Left Column: Icon & Category ── */}
-      <div className="flex w-full sm:w-[200px] shrink sm:min-w-[120px] flex-col">
+      <div className="flex w-[200px] shrink min-w-[120px] flex-col">
         {/* Main Box */}
         <div className={`flex h-[160px] w-full items-center justify-center rounded-2xl ${config.bg}`}>
           <img
@@ -114,7 +114,7 @@ export function DonationListCard({ data, onClaimed }) {
       </div>
 
       {/* ── Right Column: Details & Button ── */}
-      <div className="flex flex-1 shrink-0 min-w-0 flex-col justify-between">
+      <div className="flex flex-1 shrink-0 min-w-[280px] flex-col justify-between">
         {/* Header Texts */}
         <div>
           <h3 className="font-[Manrope] text-[22px] sm:text-[24px] font-bold tracking-tight leading-tight text-[#0f172a]">

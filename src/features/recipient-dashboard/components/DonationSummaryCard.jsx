@@ -17,7 +17,7 @@ export function DonationSummaryCard({ icon, count, label, accentColor, isLoading
   return (
     <article
       className={cn(
-        'relative flex h-32 items-center gap-4 overflow-hidden rounded-2xl bg-white px-4 sm:px-2 py-4',
+        'relative flex h-32 items-center gap-4 overflow-hidden rounded-2xl bg-white px-2 py-4',
         'border-l-4',
         isBlue ? 'border-l-[#1F66F4]' : 'border-l-[#FF6600]',
       )}
