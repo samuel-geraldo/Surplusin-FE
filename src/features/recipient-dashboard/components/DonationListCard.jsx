@@ -83,7 +83,7 @@ export function DonationListCard({ data, onClaimed }) {
       {/* ── Left Column: Icon & Category ── */}
       <div className="flex w-[200px] shrink min-w-[120px] flex-col">
         {/* Main Box */}
-        <div className={`flex h-[140px] w-full items-center justify-center rounded-2xl ${config.bg}`}>
+        <div className={`flex h-[160px] w-full items-center justify-center rounded-2xl ${config.bg}`}>
           <img
             src={config.icon}
             alt={categoryLabel}
@@ -106,10 +106,10 @@ export function DonationListCard({ data, onClaimed }) {
       <div className="flex flex-1 shrink-0 min-w-[280px] flex-col justify-between">
         {/* Header Texts */}
         <div>
-          <h3 className="font-[Manrope] text-[18px] font-extrabold leading-tight text-[#0f172a]">
+          <h3 className="font-[Manrope] text-[22px] sm:text-[24px] font-bold tracking-tight leading-tight text-[#0f172a]">
             {storeName}
           </h3>
-          <p className="mt-1 font-[Manrope] text-[14px] font-medium text-[#334155]">
+          <p className="mt-1 font-[Manrope] text-[15px] sm:text-[16px] text-text font-semibold">
             {foodName}
           </p>
         </div>
@@ -117,7 +117,7 @@ export function DonationListCard({ data, onClaimed }) {
         {/* 3 Gray Detail Boxes */}
         <div className="mt-3 h-20 flex gap-2">
           {/* Jumlah */}
-          <div className="flex flex-1 flex-col items-center justify-center rounded-xl bg-[#f8fafc] py-2 px-1">
+          <div className="flex flex-1 flex-col items-center justify-center rounded-xl bg-[#F3F3F6] py-2 px-1">
             <img
               src="/recipient_retailer icon/basic-icon/pan.svg"
               alt="jumlah"
@@ -126,13 +126,13 @@ export function DonationListCard({ data, onClaimed }) {
             <span className="font-[Manrope] text-[12px] font-semibold uppercase tracking-wider text-[#64748b]">
               Jumlah
             </span>
-            <span className="mt-0.5 font-[Manrope] text-[14px] font-extrabold text-[#0f172a]">
+            <span className="mt-0.5 font-[Manrope] text-[14px] font-semibold text-[#0f172a]">
               {portion}
             </span>
           </div>
 
           {/* Jarak */}
-          <div className="flex flex-1 flex-col items-center justify-center rounded-xl bg-[#f8fafc] py-2 px-1">
+          <div className="flex flex-1 flex-col items-center justify-center rounded-xl bg-[#F3F3F6] py-2 px-1">
             <img
               src="/recipient_retailer icon/basic-icon/location.svg"
               alt="jarak"
@@ -141,13 +141,13 @@ export function DonationListCard({ data, onClaimed }) {
             <span className="font-[Manrope] text-[12px] font-semibold uppercase tracking-wider text-[#64748b]">
               Jarak
             </span>
-            <span className="mt-0.5 font-[Manrope] text-[14px] font-extrabold text-[#0f172a]">
+            <span className="mt-0.5 font-[Manrope] text-[14px] font-semibold text-[#0f172a]">
               {distance}
             </span>
           </div>
 
           {/* Kedaluwarsa */}
-          <div className="flex flex-1 flex-col items-center justify-center rounded-xl bg-[#f8fafc] py-2 px-1">
+          <div className="flex flex-1 flex-col items-center justify-center rounded-xl bg-[#F3F3F6] py-2 px-1">
             <img
               src="/recipient_retailer icon/basic-icon/clock.svg"
               alt="kedaluwarsa"
@@ -156,7 +156,7 @@ export function DonationListCard({ data, onClaimed }) {
             <span className="font-[Manrope] text-[12px] font-semibold uppercase tracking-wider text-[#64748b]">
               Kedaluwarsa
             </span>
-            <span className="mt-0.5 font-[Manrope] text-[14px] font-extrabold text-[#0f172a]">
+            <span className="mt-0.5 font-[Manrope] text-[14px] font-semibold text-[#0f172a]">
               {expiry}
             </span>
           </div>
@@ -165,7 +165,7 @@ export function DonationListCard({ data, onClaimed }) {
         {/* Ambil Button */}
         <button
           onClick={() => setShowConfirm(true)}
-          className="mt-4 h-10 w-full rounded-xl bg-[#ff7a00] py-[10px] font-[Manrope] text-[15px] font-bold text-white transition-colors hover:bg-[#e66e00] focus:outline-none focus:ring-4 focus:ring-[#ff7a00]/30 cursor-pointer"
+          className="mt-4 h-11 w-full rounded-2xl bg-[#ff6600] py-[10px] font-[Manrope] text-[17px] font-semibold text-white transition-colors hover:opacity-80 focus:outline-none focus:ring-4 focus:ring-[#ff7a00]/30 cursor-pointer"
         >
           Ambil
         </button>

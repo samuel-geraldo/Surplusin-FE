@@ -1,20 +1,32 @@
-import { useState, useMemo } from 'react';
-import {
-  mockHistoryDonations,
-  mockHistorySummary,
-} from '@/features/recipient-dashboard/data/mockRecipientDashboardData';
+import { useState, useMemo, useEffect } from 'react';
+import { getDonationHistory } from '@/services/api/recipient';
+import { mockHistorySummary } from '@/features/recipient-dashboard/data/mockRecipientDashboardData';
 
 export default function RecipientHistoryPage() {
-  // Gabungkan mock data + data dari localStorage (donasi yang selesai dijemput)
-  const [historyDonations] = useState(() => {
-    try {
-      const stored = localStorage.getItem('surplusin_history_donations');
-      const fromStorage = stored ? JSON.parse(stored) : [];
-      return [...mockHistoryDonations, ...fromStorage];
-    } catch {
-      return [...mockHistoryDonations];
+  const [historyDonations, setHistoryDonations] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadHistory() {
+      try {
+        const data = await getDonationHistory();
+
+        // Gabungkan dengan data dari localStorage untuk mock behavior yang konsisten
+        if (import.meta.env.VITE_USE_MOCK_API === 'true') {
+          const stored = localStorage.getItem('surplusin_history_donations');
+          const fromStorage = stored ? JSON.parse(stored) : [];
+          setHistoryDonations([...data, ...fromStorage]);
+        } else {
+          setHistoryDonations(data);
+        }
+      } catch (error) {
+        console.error('Failed to load history:', error);
+      } finally {
+        setLoading(false);
+      }
     }
-  });
+    loadHistory();
+  }, []);
 
   // ── Computed stats (real-time dari data riwayat) ──
   const donasiDiterima = historyDonations.length;
@@ -29,15 +41,19 @@ export default function RecipientHistoryPage() {
   const orangTerbantu = mockHistorySummary.orangTerbantu;
 
 
+  if (loading) {
+    return <div className="p-10 text-center font-[Manrope] text-slate-500">Memuat riwayat donasi...</div>;
+  }
+
   return (
     <div className="flex flex-col gap-8 pb-16">
       {/* ════════════ SUMMARY CARDS ════════════ */}
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-3 mx-4 sm:mx-0">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-3 mx-4 sm:mx-auto lg:max-w-[100%] xl:max-w-[88%]">
         {/* Card 1: Orang Terbantu */}
         <div
           className="relative flex items-center gap-5 overflow-hidden rounded-2xl bg-white"
           style={{
-            padding: '1.75rem',
+            padding: '2rem 3rem',
             borderLeft: '4px solid #2563eb',
             boxShadow: '0 8px 30px rgba(0,0,0,0.06)',
           }}
@@ -65,7 +81,7 @@ export default function RecipientHistoryPage() {
         <div
           className="relative flex items-center gap-5 overflow-hidden rounded-2xl bg-white"
           style={{
-            padding: '1.75rem',
+            padding: '2rem 3rem',
             borderLeft: '4px solid #10b981',
             boxShadow: '0 8px 30px rgba(0,0,0,0.06)',
           }}
@@ -93,7 +109,7 @@ export default function RecipientHistoryPage() {
         <div
           className="relative flex items-center gap-5 overflow-hidden rounded-2xl bg-white"
           style={{
-            padding: '1.75rem',
+            padding: '2rem 3rem',
             borderLeft: '4px solid #f97316',
             boxShadow: '0 8px 30px rgba(0,0,0,0.06)',
           }}

@@ -56,7 +56,7 @@ export default function RecipientDashboardPage() {
       <section
         className="mt-6 flex flex-col gap-5 sm:gap-6"
       >
-        <h2 className="font-[Manrope] text-[22px] font-semibold text-text sm:text-[26px]">
+        <h2 className="font-[Manrope] text-[24px] font-semibold text-text sm:text-[26px]">
           Daftar Donasi yang Tersedia
         </h2>
 
@@ -77,7 +77,7 @@ export default function RecipientDashboardPage() {
           </div>
 
           {/* Category Dropdown */}
-          <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center sm:gap-3 md:w-auto">
+          <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center sm:gap-3 md:w-auto cursor-pointer">
             <span className="shrink-0 font-[Manrope] text-[15px] font-bold text-[#0f172a]">
               Jenis Makanan:
             </span>

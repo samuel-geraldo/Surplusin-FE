@@ -9,47 +9,55 @@ export function ClaimDonationModal({ donation, onConfirm, onClose }) {
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center"
-      style={{ backgroundColor: 'rgba(0,0,0,0.55)' }}
+      style={{ backgroundColor: 'rgba(0,0,0,0.45)' }}
       onClick={onClose}
     >
       <div
-        className="relative w-[90%] max-w-[420px] rounded-3xl bg-white"
-        style={{ padding: '2rem', boxShadow: '0 24px 60px rgba(0,0,0,0.18)' }}
+        className="relative w-[50%] max-w-[410px] rounded-2xl bg-white"
+        style={{
+          padding: '2rem 2.5rem 1.5rem',
+          boxShadow: '0 32px 80px rgba(0,0,0,0.22)',
+        }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Title */}
+        {/* ── Title ── */}
         <h2
-          className="mb-6 text-center font-[Manrope] font-extrabold text-[#0f172a]"
-          style={{ fontSize: '22px' }}
+          className="mb-6 text-center font-[Manrope] font-bold text-[#0f172a]"
+          style={{ fontSize: '26px', letterSpacing: '-0.3px' }}
         >
           Konfirmasi Pengambilan
         </h2>
 
         {/* ── Info Row: Nama Donasi ── */}
         <div
-          className="mb-3 flex items-center gap-4 rounded-2xl"
-          style={{ backgroundColor: '#f0fdf4', padding: '1rem' }}
+          className="mb-3 flex items-center gap-4 rounded-xl"
+          style={{ backgroundColor: '#eefaf2', padding: '10px 16px' }}
         >
+          {/* Icon box */}
           <div
-            className="flex shrink-0 items-center justify-center rounded-xl"
-            style={{ width: 48, height: 48, backgroundColor: '#bbf7d0' }}
+            className="flex shrink-0 items-center justify-center rounded-lg"
+            style={{ width: 58, height: 58, backgroundColor: '#c9eed5' }}
           >
             <img
               src="/recipient_retailer icon/basic-icon/piring.svg"
               alt="makanan"
-              style={{ width: 26, height: 26 }}
+              style={{
+                width: 25,
+                height: 30,
+                filter: 'brightness(0) saturate(100%) invert(38%) sepia(62%) saturate(420%) hue-rotate(104deg) brightness(90%) contrast(90%)',
+              }}
             />
           </div>
           <div>
             <p
-              className="font-[Manrope] font-bold uppercase tracking-widest text-[#15803d]"
-              style={{ fontSize: '11px' }}
+              className="font-[Manrope] font-semibold uppercase text-text"
+              style={{ fontSize: '16px' }}
             >
               Nama Donasi
             </p>
             <p
-              className="mt-0.5 font-[Manrope] font-medium text-[#0f172a]"
-              style={{ fontSize: '15px' }}
+              className="mt-1 font-[Manrope] text-text"
+              style={{ fontSize: '16px' }}
             >
               {donation.foodName}
             </p>
@@ -58,29 +66,30 @@ export function ClaimDonationModal({ donation, onConfirm, onClose }) {
 
         {/* ── Info Row: Estimasi Penjemputan ── */}
         <div
-          className="flex items-center gap-4 rounded-2xl"
-          style={{ backgroundColor: '#fff7ed', padding: '1rem' }}
+          className="flex items-center gap-4 rounded-xl"
+          style={{ backgroundColor: '#eefaf2', padding: '10px 16px' }}
         >
+          {/* Icon box */}
           <div
-            className="flex shrink-0 items-center justify-center rounded-xl"
-            style={{ width: 48, height: 48, backgroundColor: '#fed7aa' }}
+            className="flex shrink-0 items-center justify-center rounded-lg"
+            style={{ width: 58, height: 58, backgroundColor: '#ffc8a0' }}
           >
             <img
-              src="/recipient_retailer icon/basic-icon/clock.svg"
+              src="/recipient_retailer icon/basic-icon/Estimasi Penjemputan.svg"
               alt="estimasi"
-              style={{ width: 26, height: 26 }}
+              style={{ width: 25, height: 30 }}
             />
           </div>
           <div>
             <p
-              className="font-[Manrope] font-bold uppercase tracking-widest text-[#c2410c]"
-              style={{ fontSize: '11px' }}
+              className="font-[Manrope] font-semibold uppercase text-black"
+              style={{ fontSize: '16px' }}
             >
               Estimasi Penjemputan
             </p>
             <p
-              className="mt-0.5 font-[Manrope] font-medium text-[#0f172a]"
-              style={{ fontSize: '15px' }}
+              className="mt-1 font-[Manrope] text-text"
+              style={{ fontSize: '16px' }}
             >
               {donation.expiry}
             </p>
@@ -90,25 +99,27 @@ export function ClaimDonationModal({ donation, onConfirm, onClose }) {
         {/* ── Klaim Donasi Button ── */}
         <button
           onClick={onConfirm}
-          className="mt-6 w-full font-[Manrope] font-bold text-white transition-opacity hover:opacity-90 focus:outline-none"
+          className="mt-7 w-full font-[Manrope] font-semibold text-white transition-all hover:opacity-70 active:scale-[0.98] focus:outline-none cursor-pointer"
           style={{
-            backgroundColor: '#ff7a00',
-            borderRadius: '999px',
-            padding: '14px 0',
-            fontSize: '17px',
+            backgroundColor: '#ff6600',
+            borderRadius: '18px',
+            padding: '11px 0',
+            fontSize: '18px',
           }}
         >
           Klaim Donasi
         </button>
 
         {/* ── Batal ── */}
-        <button
-          onClick={onClose}
-          className="mt-3 w-full font-[Manrope] font-medium text-[#64748b] transition-colors hover:text-[#0f172a] focus:outline-none"
-          style={{ fontSize: '15px', padding: '8px 0' }}
-        >
-          Batal
-        </button>
+        <div className="mt-4 flex justify-center">
+          <button
+            onClick={onClose}
+            className="font-[Manrope] text-text transition-all hover:bg-[#dde8fd] hover:text-[#0f172a] focus:outline-none cursor-pointer rounded-full"
+            style={{ fontSize: '18px', padding: '2px 20px' }}
+          >
+            Batal
+          </button>
+        </div>
       </div>
     </div>
   );

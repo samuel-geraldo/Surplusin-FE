@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@/lib/constants';
+import { getActiveHandovers, updateClaimStatus } from '@/services/api/recipient';
 
 const MAPS_API_KEY = 'AIzaSyAxvkMdHwDpYBUi62RVVoO4O9SmG_AgPp0';
 
@@ -34,58 +35,68 @@ const MOCK_NOTIFICATIONS = [
 ];
 
 export default function RecipientHandoverPage() {
-  // Ambil data donasi yang diklaim dari localStorage
-  const [claimedDonations, setClaimedDonations] = useState(() => {
-    try {
-      const stored = localStorage.getItem('surplusin_claimed_donations');
-      return stored ? JSON.parse(stored) : [];
-    } catch {
-      return [];
-    }
-  });
-
+  const [claimedDonations, setClaimedDonations] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [activeNotifs, setActiveNotifs] = useState({});
+  const [arrivedStates, setArrivedStates] = useState({});
+
+  useEffect(() => {
+    async function fetchHandovers() {
+      try {
+        const data = await getActiveHandovers();
+        setClaimedDonations(data);
+      } catch (error) {
+        console.error('Failed to load active handovers:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchHandovers();
+  }, []);
 
   const navigate = useNavigate();
 
-  // Konfirmasi penjemputan — simpan ke riwayat lalu hapus dari claimed
-  const handleConfirmPickup = (id) => {
-    // Cari donasi yang dikonfirmasi
-    const donation = claimedDonations.find((d) => d.id === id);
-
-    // Simpan ke riwayat di localStorage
-    if (donation) {
-      try {
-        const stored = localStorage.getItem('surplusin_history_donations');
-        const history = stored ? JSON.parse(stored) : [];
-
-        // Format tanggal hari ini
-        const now = new Date();
-        const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-        const dateStr = `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
-
-        // Tambahkan ke riwayat
-        history.push({
-          id: donation.id,
-          storeName: donation.storeName,
-          location: donation.patokan || '-',
-          foodName: donation.foodName,
-          portion: donation.portion || '-',
-          date: dateStr,
-          donationCount: (donation.items || []).length || 1,
-        });
-
-        localStorage.setItem('surplusin_history_donations', JSON.stringify(history));
-      } catch (e) {
-        console.error('Gagal menyimpan riwayat:', e);
+  // Konfirmasi penjemputan
+  const handleConfirmPickup = async (id) => {
+    try {
+      await updateClaimStatus(id, 'completed');
+      
+      // Update state (remove from list)
+      const updated = claimedDonations.filter((d) => d.id !== id);
+      setClaimedDonations(updated);
+      
+      // Untuk mock localStorage update (simulasi)
+      if (import.meta.env.VITE_USE_MOCK_API === 'true') {
+        const donation = claimedDonations.find((d) => d.id === id);
+        if (donation) {
+          const stored = localStorage.getItem('surplusin_history_donations');
+          const history = stored ? JSON.parse(stored) : [];
+          const now = new Date();
+          const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+          const dateStr = `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+          history.push({
+            id: donation.id,
+            storeName: donation.storeName,
+            location: donation.patokan || '-',
+            foodName: donation.foodName,
+            portion: donation.portion || '-',
+            date: dateStr,
+            donationCount: (donation.items || []).length || 1,
+          });
+          localStorage.setItem('surplusin_history_donations', JSON.stringify(history));
+        }
+        localStorage.setItem('surplusin_claimed_donations', JSON.stringify(updated));
       }
+      
+    } catch (error) {
+      console.error('Gagal mengkonfirmasi penjemputan:', error);
+      alert('Terjadi kesalahan saat konfirmasi penjemputan.');
     }
-
-    // Hapus dari daftar claimed
-    const updated = claimedDonations.filter((d) => d.id !== id);
-    localStorage.setItem('surplusin_claimed_donations', JSON.stringify(updated));
-    setClaimedDonations(updated);
   };
+
+  if (loading) {
+    return <div className="p-10 text-center font-[Manrope] text-slate-500">Memuat data penjemputan...</div>;
+  }
 
   // Jika belum ada donasi yang diklaim
   if (claimedDonations.length === 0) {
@@ -234,36 +245,35 @@ export default function RecipientHandoverPage() {
               {/* ── Bottom Row: Daftar Item + Konfirmasi ── */}
               <div
                 className="grid grid-cols-1 gap-4 sm:grid-cols-2"
-                style={{ marginTop: '1.5rem' }}
+                style={{ marginTop: '1.9rem' }}
               >
                 {/* Daftar Item Donasi */}
                 <div
                   className="rounded-2xl"
                   style={{
                     padding: '1.25rem',
-                    border: '1px solid #e2e8f0',
-                    backgroundColor: '#ffffff',
+                    backgroundColor: '#F3F4F6',
                   }}
                 >
-                  <div className="mb-3 flex items-center gap-2">
+                  <div className="mb-4 flex items-center justify-center gap-3">
                     <img
-                      src="/recipient_retailer icon/basic-icon/piring.svg"
+                      src="/recipient_retailer icon/basic-icon/box.svg"
                       alt="items"
-                      style={{ width: 18, height: 18 }}
+                      style={{ width: 22, height: 22 }}
                     />
                     <h4
                       className="font-[Manrope] font-bold text-[#0f172a]"
-                      style={{ fontSize: '15px' }}
+                      style={{ fontSize: '18px' }}
                     >
                       Daftar Item Donasi
                     </h4>
                   </div>
-                  <ul style={{ paddingLeft: '0.5rem' }}>
-                    {(donation.items || []).map((item, idx) => (
+                  <ul className="flex flex-col gap-2 pl-4">
+                    {(donation.items && donation.items.length > 0 ? donation.items : ['Nasi Box', 'Ayam Bakar', 'Kerupuk udang', 'Sayur Lodeh']).map((item, idx) => (
                       <li
                         key={idx}
-                        className="font-[Manrope] text-[#334155]"
-                        style={{ fontSize: '14px', padding: '3px 0' }}
+                        className="font-[Manrope] text-[#0f172a]"
+                        style={{ fontSize: '16px' }}
                       >
                         {item}
                       </li>
@@ -271,47 +281,90 @@ export default function RecipientHandoverPage() {
                   </ul>
                 </div>
 
-                {/* Konfirmasi Penjemputan */}
-                <div
-                  className="flex flex-col items-center justify-center rounded-2xl text-center"
-                  style={{
-                    padding: '1.25rem',
-                    border: '1px solid #e2e8f0',
-                    backgroundColor: '#ffffff',
-                  }}
-                >
-                  <div className="mb-3 flex items-center gap-2">
-                    <img
-                      src="/recipient_retailer icon/basic-icon/location.svg"
-                      alt="konfirmasi"
-                      style={{ width: 18, height: 18 }}
-                    />
-                    <h4
-                      className="font-[Manrope] font-bold text-[#0f172a]"
-                      style={{ fontSize: '15px' }}
-                    >
-                      Konfirmasi Penjemputan
-                    </h4>
-                  </div>
-                  <p
-                    className="font-[Manrope] text-[#64748b]"
-                    style={{ fontSize: '13px', marginBottom: '1rem' }}
-                  >
-                    Beritahu Mitra bahwa Anda sudah sampai di lokasi penjemputan.
-                  </p>
-                  <button
-                    onClick={() => handleConfirmPickup(donation.id)}
-                    className="font-[Manrope] font-bold text-white transition-opacity hover:opacity-90 cursor-pointer"
+                {/* Status Penjemputan / Penerimaan */}
+                {arrivedStates[donation.id] ? (
+                  <div
+                    key="penerimaan"
+                    className="flex flex-col items-center justify-center rounded-2xl text-center animate-slide-in-fade"
                     style={{
-                      backgroundColor: '#ff6600',
-                      borderRadius: '999px',
-                      padding: '10px 32px',
-                      fontSize: '14px',
+                      padding: '1.25rem',
+                      backgroundColor: '#F3F4F6',
                     }}
                   >
-                    Tiba di Lokasi
-                  </button>
-                </div>
+                    <div className="mb-2 flex items-center gap-2">
+                      <img
+                        src="/recipient_retailer icon/basic-icon/Done Status.svg"
+                        alt="konfirmasi"
+                        style={{ width: 22, height: 22 }}
+                      />
+                      <h4
+                        className="font-[Manrope] font-bold text-[#0f172a]"
+                        style={{ fontSize: '17px' }}
+                      >
+                        Konfirmasi Penerimaan
+                      </h4>
+                    </div>
+                    <p
+                      className="font-[Manrope] text-[#64748b]"
+                      style={{ fontSize: '14px', marginBottom: '1rem', lineHeight: 1.4 }}
+                    >
+                      Pastikan kualitas makanan sesuai sebelum<br />konfirmasi.
+                    </p>
+                    <button
+                      onClick={() => handleConfirmPickup(donation.id)}
+                      className="font-[Manrope] font-bold text-white transition-all hover:opacity-90 active:scale-[0.98] cursor-pointer"
+                      style={{
+                        backgroundColor: '#ff7a00',
+                        borderRadius: '999px',
+                        padding: '10px 28px',
+                        fontSize: '15px',
+                      }}
+                    >
+                      Makanan Diterima
+                    </button>
+                  </div>
+                ) : (
+                  <div
+                    key="penjemputan"
+                    className="flex flex-col items-center justify-center rounded-2xl text-center animate-slide-in-fade"
+                    style={{
+                      padding: '1.25rem',
+                      backgroundColor: '#F3F4F6',
+                    }}
+                  >
+                    <div className="mb-2 flex items-center gap-2">
+                      <img
+                        src="/recipient_retailer icon/basic-icon/blue location.svg"
+                        alt="lokasi"
+                        style={{ width: 22, height: 22 }}
+                      />
+                      <h4
+                        className="font-[Manrope] font-bold text-[#0f172a]"
+                        style={{ fontSize: '17px' }}
+                      >
+                        Konfirmasi Penjemputan
+                      </h4>
+                    </div>
+                    <p
+                      className="font-[Manrope] text-[#64748b]"
+                      style={{ fontSize: '14px', marginBottom: '1rem', lineHeight: 1.4 }}
+                    >
+                      Beritahu Mitra bahwa Anda sudah sampai di<br />lokasi penjemputan.
+                    </p>
+                    <button
+                      onClick={() => setArrivedStates(prev => ({ ...prev, [donation.id]: true }))}
+                      className="font-[Manrope] font-bold text-white transition-all hover:opacity-90 active:scale-[0.98] cursor-pointer"
+                      style={{
+                        backgroundColor: '#ff7a00',
+                        borderRadius: '999px',
+                        padding: '10px 28px',
+                        fontSize: '15px',
+                      }}
+                    >
+                      Tiba di Lokasi
+                    </button>
+                  </div>
+                )}
               </div>
             </article>
 

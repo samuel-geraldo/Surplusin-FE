@@ -165,23 +165,44 @@ export async function getFoodCategories() {
 // Claim Donation
 // ────────────────────────────────────────────
 
-/**
- * Klaim sebuah donasi.
- *
- * Real API: POST /api/klaim/:donasi_id
- * Response: klaim object { id, donasi_id, penerima_id, status, claimed_at }
- *
- * @param {string|number} donasiId - ID donasi yang akan diklaim
- * @returns {Promise<Object>} klaim result
- */
 export async function claimDonation(donasiId) {
   if (USE_MOCK) {
     await mockDelay(500);
+    // Note: Frontend writes to localStorage directly in DonationListCard for mock flow
     return { id: Date.now(), donasi_id: donasiId, status: 'claimed' };
   }
 
   const { data } = await apiClient.post(`/klaim/${donasiId}`);
   return data;
+}
+
+// ────────────────────────────────────────────
+// Active Handovers (Donasi Sedang Dijemput)
+// ────────────────────────────────────────────
+
+/**
+ * Mengambil daftar donasi yang sedang dalam proses penjemputan.
+ *
+ * Real API: GET /api/klaim (kemudian difilter status on_the_way/arrived)
+ * atau butuh endpoint khusus di backend.
+ *
+ * @returns {Promise<Array>}
+ */
+export async function getActiveHandovers() {
+  if (USE_MOCK) {
+    await mockDelay(300);
+    try {
+      const stored = localStorage.getItem('surplusin_claimed_donations');
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  }
+
+  // Jika backend tidak ada endpoint khusus, fetch semua klaim lalu filter
+  const { data } = await apiClient.get('/klaim');
+  // Asumsi response berisi data detail donasi juga
+  return data.filter(k => k.status !== 'completed');
 }
 
 // ────────────────────────────────────────────
@@ -225,6 +246,7 @@ export async function getRecipientProfile() {
   if (USE_MOCK) {
     await mockDelay(300);
     return {
+      id: 1, // Fallback ID for testing updates
       nama_instansi: 'Panti Asuhan Kasih Ibu',
       kategori: 'Panti Asuhan',
       nomor_whatsapp: '081234567890',
@@ -238,6 +260,25 @@ export async function getRecipientProfile() {
   const { data } = await apiClient.get('/penerima/data');
   // BE returns array, ambil elemen pertama
   return Array.isArray(data) ? data[0] : data;
+}
+
+/**
+ * Memperbarui data profil penerima.
+ *
+ * Real API: PUT /api/penerima/:id
+ *
+ * @param {string|number} id - ID penerima
+ * @param {Object} payload - Data profile (nama_instansi, kategori, dll)
+ * @returns {Promise<Object>} updated profil
+ */
+export async function updateRecipientProfile(id, payload) {
+  if (USE_MOCK) {
+    await mockDelay(500);
+    return { id, ...payload };
+  }
+
+  const { data } = await apiClient.put(`/penerima/${id}`, payload);
+  return data;
 }
 
 // ────────────────────────────────────────────

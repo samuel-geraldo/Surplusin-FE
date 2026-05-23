@@ -44,10 +44,13 @@ function loadMapsScript(apiKey, callback) {
   document.head.appendChild(script);
 }
 
+import { getRecipientProfile, updateRecipientProfile } from '../../services/api/recipient';
+
 export default function RecipientProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
   const [profile, setProfile] = useState(mockProfile);
   const [draft, setDraft] = useState(mockProfile);
+  const [saving, setSaving] = useState(false);
 
   // ── Map state ──
   const [lat, setLat] = useState(-6.2500);
@@ -64,9 +67,63 @@ export default function RecipientProfilePage() {
   const mapInstanceRef = useRef(null);
   const markerRef = useRef(null);
 
+  // ── Fetch Profile ──
+  useEffect(() => {
+    async function loadProfile() {
+      try {
+        const data = await getRecipientProfile();
+        if (data) {
+          const mappedProfile = {
+            id: data.id || data.penerima_id || 1, // Fallback ID if not provided
+            name: data.nama_instansi || '',
+            category: data.kategori || 'Panti Asuhan',
+            whatsapp: data.nomor_whatsapp || '',
+            address: data.alamat || '',
+            patokan: data.patokan || '',
+            email: data.email || '', // Optional
+          };
+          setProfile(mappedProfile);
+          setDraft(mappedProfile);
+          if (data.latitude) setLat(Number(data.latitude));
+          if (data.longitude) setLng(Number(data.longitude));
+        }
+      } catch (error) {
+        console.error('Gagal mengambil profil:', error);
+      }
+    }
+    loadProfile();
+  }, []);
+
   // ── Profile handlers ──
   const handleEdit = () => { setDraft(profile); setIsEditing(true); };
-  const handleSave = () => { setProfile(draft); setIsEditing(false); };
+  const handleSave = async () => {
+    try {
+      setSaving(true);
+      const payload = {
+        nama_instansi: draft.name,
+        kategori: draft.category,
+        nomor_whatsapp: draft.whatsapp,
+        alamat: draft.address,
+        latitude: lat,
+        longitude: lng,
+        patokan: draft.patokan
+      };
+      
+      // Jika profil punya ID, lakukan PUT update. Jika backend butuh ID dari JWT, mungkin endpoint berbeda.
+      if (profile.id) {
+        await updateRecipientProfile(profile.id, payload);
+      }
+      
+      setProfile({ ...draft, lat, lng });
+      setIsEditing(false);
+      alert('Profil berhasil diperbarui!');
+    } catch (error) {
+      console.error('Gagal menyimpan profil:', error);
+      alert('Terjadi kesalahan saat menyimpan data.');
+    } finally {
+      setSaving(false);
+    }
+  };
   const handleCancel = () => { setDraft(profile); setIsEditing(false); };
 
   // ── Initialize Map ──
@@ -281,11 +338,10 @@ export default function RecipientProfilePage() {
                       className="w-full appearance-none rounded-xl font-[Manrope] text-[#374151] outline-none"
                       style={{ padding: '10px 36px 10px 14px', fontSize: '14px', border: '1.5px solid #e2e8f0', backgroundColor: '#fff', cursor: 'pointer' }}
                     >
-                      <option>Panti Asuhan</option>
-                      <option>Rumah Singgah</option>
-                      <option>Lembaga Sosial</option>
-                      <option>Yayasan Pendidikan</option>
-                      <option>Komunitas Sosial</option>
+                      <option value="Panti Asuhan">Panti Asuhan</option>
+                      <option value="Panti Jompo">Panti Jompo</option>
+                      <option value="Yayasan Sosial">Yayasan Sosial</option>
+                      <option value="Lainnya">Lainnya</option>
                     </select>
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#94a3b8" className="pointer-events-none absolute" style={{ width: 18, height: 18, right: 10, top: '50%', transform: 'translateY(-50%)' }}>
                       <path d="M7 10l5 5 5-5z" />
@@ -319,17 +375,19 @@ export default function RecipientProfilePage() {
               </button>
               <button
                 onClick={handleSave}
-                className="rounded-xl font-[Manrope] font-bold text-white"
+                disabled={saving}
+                className="rounded-xl font-[Manrope] font-bold text-white transition-opacity"
                 style={{
                   padding: '10px 28px',
                   fontSize: '14px',
                   border: 'none',
-                  cursor: 'pointer',
+                  cursor: saving ? 'wait' : 'pointer',
+                  opacity: saving ? 0.7 : 1,
                   background: 'linear-gradient(135deg, #ff7a00 0%, #ff9500 100%)',
                   boxShadow: '0 4px 14px rgba(255,122,0,0.35)',
                 }}
               >
-                Simpan Perubahan
+                {saving ? 'Menyimpan...' : 'Simpan Perubahan'}
               </button>
             </div>
           )}
