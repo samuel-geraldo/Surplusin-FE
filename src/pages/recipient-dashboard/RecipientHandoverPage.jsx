@@ -1,40 +1,61 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@/lib/constants';
 import { getActiveHandovers, updateClaimStatus, getRecipientProfile } from '@/services/api/recipient';
 
-// Mock notifikasi
-const MOCK_NOTIFICATIONS = [
+// Tips statis sebagai fallback ketika tidak ada klaim aktif
+const TIPS_NOTIFICATIONS = [
   {
-    id: 1,
+    id: 'tip-1',
     title: 'Tips!',
     message: 'Jangan lupa bawa tas belanja sendiri untuk mengurangi plastik.',
-    time: 'Baru saja',
-    isNew: true,
+    time: '',
   },
   {
-    id: 2,
+    id: 'tip-2',
     title: 'Tips!',
     message: 'Pastikan kamu datang tepat waktu agar makanan tetap segar.',
-    time: '5 menit lalu',
-    isNew: false,
+    time: '',
   },
   {
-    id: 3,
+    id: 'tip-3',
     title: 'Tips!',
     message: 'Konfirmasi kehadiran saat sudah sampai di lokasi penjemputan.',
-    time: '10 menit lalu',
-    isNew: false,
+    time: '',
   },
 ];
+
+/** Format waktu klaim jadi teks relatif */
+function formatClaimTime(value) {
+  if (!value) return 'Baru saja';
+  const date = new Date(value);
+  const diffMs = Date.now() - date.getTime();
+  if (Number.isNaN(date.getTime()) || diffMs < 60000) return 'Baru saja';
+  const minutes = Math.floor(diffMs / 60000);
+  if (minutes < 60) return `${minutes} menit lalu`;
+  const hours = Math.floor(minutes / 60);
+  return `${hours} jam lalu`;
+}
 
 export default function RecipientHandoverPage() {
   const [claimedDonations, setClaimedDonations] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeNotifs, setActiveNotifs] = useState({});
+  const [activeNotifId, setActiveNotifId] = useState(null);
   // Koordinat penerima (diambil dari profil via API)
   const [recipientLat, setRecipientLat] = useState(-6.2000);
   const [recipientLng, setRecipientLng] = useState(106.8450);
+
+  // Generate notifikasi dinamis dari data klaim aktif, fallback ke tips
+  const notifications = useMemo(() => {
+    if (claimedDonations.length === 0) return TIPS_NOTIFICATIONS;
+
+    return claimedDonations.map((claim) => ({
+      id: `claim-${claim.id}`,
+      title: 'Penjemputan Aktif',
+      message: `Jemput ${claim.quantity || claim.jumlah || ''} ${claim.unit || claim.satuan || 'porsi'} ${claim.foodName || claim.nama || 'donasi'} dari ${claim.storeName || claim.nama_toko || 'mitra'}.`,
+      time: formatClaimTime(claim.claimedAt || claim.claimed_at),
+    }));
+  }, [claimedDonations]);
 
   useEffect(() => {
     async function fetchData() {
@@ -361,13 +382,13 @@ export default function RecipientHandoverPage() {
 
                 {/* Notification items */}
                 <div className="flex flex-col gap-3">
-                  {MOCK_NOTIFICATIONS.map((notif) => {
-                    const isActive = (activeNotifs[donation.id] || MOCK_NOTIFICATIONS[0].id) === notif.id;
+                  {notifications.map((notif, index) => {
+                    const isActive = (activeNotifId || notifications[0]?.id) === notif.id;
 
                     return (
                       <div
                         key={notif.id}
-                        onClick={() => setActiveNotifs(prev => ({ ...prev, [donation.id]: notif.id }))}
+                        onClick={() => setActiveNotifId(notif.id)}
                         className="rounded-2xl bg-white cursor-pointer transition-colors hover:bg-slate-50"
                         style={{
                           padding: '1rem',
@@ -388,12 +409,14 @@ export default function RecipientHandoverPage() {
                         >
                           {notif.message}
                         </p>
-                        <span
-                          className="font-[Manrope] font-medium text-[#94a3b8]"
-                          style={{ fontSize: '11px' }}
-                        >
-                          {notif.time}
-                        </span>
+                        {notif.time ? (
+                          <span
+                            className="font-[Manrope] font-medium text-[#94a3b8]"
+                            style={{ fontSize: '11px' }}
+                          >
+                            {notif.time}
+                          </span>
+                        ) : null}
                       </div>
                     );
                   })}
