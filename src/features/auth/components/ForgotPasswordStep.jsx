@@ -26,7 +26,7 @@ export function ForgotPasswordStep({ onBackToLogin }) {
       `Halo Tim SurplusIn,\n\nSaya ingin mengajukan pemulihan akun.\n\nEmail akun: ${values.email}\n\nTerima kasih.`,
     );
 
-    window.location.href = `mailto:support@surplusin.id?subject=${subject}&body=${body}`;
+    window.location.assign(`mailto:support@surplusin.id?subject=${subject}&body=${body}`);
   }
 
   return (

@@ -1,39 +1,24 @@
-import { Navigate, Outlet } from 'react-router-dom';
-import { STORAGE_KEYS, ROUTES } from '@/lib/constants';
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
+import { ROUTES } from '@/lib/constants';
+import { useAuthStore } from '@/store/auth/useAuthStore';
 
-/**
- * ProtectedRoute — Mengecek apakah user sudah login dan punya role yang sesuai.
- *
- * Jika belum login → redirect ke halaman Auth.
- * Jika role tidak sesuai → redirect ke halaman utama.
- *
- * @param {{ allowedRoles: string[] }} props
- */
 export function ProtectedRoute({ allowedRoles = [] }) {
-  const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+  const location = useLocation();
+  const accessToken = useAuthStore((state) => state.accessToken);
+  const isHydrated = useAuthStore((state) => state.isHydrated);
+  const user = useAuthStore((state) => state.user);
 
-  // Belum login → redirect ke auth
-  if (!token) {
+  if (!isHydrated) {
+    return null;
+  }
+
+  if (!accessToken) {
+    return <Navigate to={ROUTES.AUTH} replace state={{ from: location }} />;
+  }
+
+  if (allowedRoles.length > 0 && !allowedRoles.includes(user?.role)) {
     return <Navigate to={ROUTES.AUTH} replace />;
   }
 
-  // Cek role user dari localStorage
-  let user = null;
-  try {
-    const stored = localStorage.getItem(STORAGE_KEYS.USER);
-    if (stored) user = JSON.parse(stored);
-  } catch {
-    // JSON parse error — anggap belum login
-    return <Navigate to={ROUTES.AUTH} replace />;
-  }
-
-  // Jika allowedRoles ditentukan, cek apakah role user termasuk
-  if (allowedRoles.length > 0 && user?.role) {
-    if (!allowedRoles.includes(user.role)) {
-      return <Navigate to={ROUTES.HOME} replace />;
-    }
-  }
-
-  // User terautentikasi dan role sesuai → render child routes
   return <Outlet />;
 }
