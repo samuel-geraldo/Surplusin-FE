@@ -3,13 +3,13 @@ import { env } from '@/lib/env';
 
 const MAPS_API_KEY = env.GOOGLE_MAPS_API_KEY;
 
-const mockProfile = {
-  name: 'Panti Jenaka Sukarela',
-  category: 'Panti Asuhan',
-  whatsapp: '080987654321',
-  address: 'Jl. Kesedihan No.321, Kebayoran Lama, Jakarta Selatan',
-  patokan: 'Depan Indomaret',
-  email: 'pantijenaka@gmail.com',
+const initialProfile = {
+  name: '',
+  category: '',
+  whatsapp: '',
+  address: '',
+  patokan: '',
+  email: '',
   avatar: null,
 };
 
@@ -49,8 +49,8 @@ import { getRecipientProfile, updateRecipientProfile } from '../../services/api/
 
 export default function RecipientProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
-  const [profile, setProfile] = useState(mockProfile);
-  const [draft, setDraft] = useState(mockProfile);
+  const [profile, setProfile] = useState(initialProfile);
+  const [draft, setDraft] = useState(initialProfile);
   const [saving, setSaving] = useState(false);
   const [showCancelPopup, setShowCancelPopup] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);

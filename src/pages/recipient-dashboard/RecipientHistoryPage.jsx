@@ -1,6 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
 import { getDonationHistory } from '@/services/api/recipient';
-import { mockHistorySummary } from '@/features/recipient-dashboard/data/mockRecipientDashboardData';
 
 export default function RecipientHistoryPage() {
   const [historyDonations, setHistoryDonations] = useState([]);
@@ -11,14 +10,7 @@ export default function RecipientHistoryPage() {
       try {
         const data = await getDonationHistory();
 
-        // Gabungkan dengan data dari localStorage untuk mock behavior yang konsisten
-        if (import.meta.env.VITE_USE_MOCK_API === 'true') {
-          const stored = localStorage.getItem('surplusin_history_donations');
-          const fromStorage = stored ? JSON.parse(stored) : [];
-          setHistoryDonations([...data, ...fromStorage]);
-        } else {
-          setHistoryDonations(data);
-        }
+        setHistoryDonations(data);
       } catch (error) {
         console.error('Failed to load history:', error);
       } finally {
@@ -37,8 +29,11 @@ export default function RecipientHistoryPage() {
     [historyDonations]
   );
 
-  // Orang terbantu tetap menggunakan data statis untuk saat ini sesuai permintaan
-  const orangTerbantu = mockHistorySummary.orangTerbantu;
+  // Estimasi orang terbantu berdasarkan jumlah donasi diterima
+  const orangTerbantu = useMemo(
+    () => historyDonations.reduce((sum, d) => sum + (Number(d.donationCount) || 1), 0),
+    [historyDonations]
+  );
 
 
   if (loading) {
