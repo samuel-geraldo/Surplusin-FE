@@ -206,7 +206,19 @@ export async function getActiveHandovers() {
   }
 
   const { data } = await apiClient.get('/klaim/penerima/aktif');
-  return (Array.isArray(data) ? data : []).map(mapActiveHandoverToUI);
+  const claims = Array.isArray(data) ? data : [];
+
+  let retailers = [];
+  if (claims.some((klaim) => !getRetailerWhatsappFromClaim(klaim))) {
+    try {
+      const response = await apiClient.get('/penyalur');
+      retailers = Array.isArray(response.data) ? response.data : [];
+    } catch {
+      retailers = [];
+    }
+  }
+
+  return claims.map((klaim) => mapActiveHandoverToUI(klaim, retailers));
 }
 
 // ────────────────────────────────────────────
@@ -405,7 +417,23 @@ function estimatePickupTime(distanceKm) {
  *   longitude_penyalur   → lng
  *   claimed_at           → expiry (for display)
  */
-function mapActiveHandoverToUI(klaim) {
+function getRetailerWhatsappFromClaim(klaim) {
+  return klaim.nomor_whatsapp_penyalur ?? klaim.whatsapp_penyalur ?? klaim.nomor_whatsapp ?? '';
+}
+
+function findRetailerForClaim(klaim, retailers) {
+  const retailerName = String(klaim.penyalur ?? klaim.nama_toko ?? '').trim().toLowerCase();
+  const retailerAddress = String(klaim.alamat_penyalur ?? klaim.alamat ?? '').trim().toLowerCase();
+
+  return retailers.find((retailer) => (
+    String(retailer.nama_toko ?? '').trim().toLowerCase() === retailerName &&
+    (!retailerAddress || String(retailer.alamat ?? '').trim().toLowerCase() === retailerAddress)
+  ));
+}
+
+function mapActiveHandoverToUI(klaim, retailers = []) {
+  const matchedRetailer = findRetailerForClaim(klaim, retailers);
+
   return {
     id: klaim.klaim_id,
     storeName: klaim.penyalur || 'Toko Mitra',
@@ -415,7 +443,7 @@ function mapActiveHandoverToUI(klaim) {
     patokan: klaim.alamat_penyalur || '-',
     lat: klaim.latitude_penyalur ? parseFloat(klaim.latitude_penyalur) : null,
     lng: klaim.longitude_penyalur ? parseFloat(klaim.longitude_penyalur) : null,
-    nomor_whatsapp: klaim.nomor_whatsapp_penyalur || '',
+    nomor_whatsapp: getRetailerWhatsappFromClaim(klaim) || matchedRetailer?.nomor_whatsapp || '',
     expiry: klaim.claimed_at ? new Date(klaim.claimed_at).toLocaleString('id-ID') : '-',
     items: [], // BE doesn't return item_detail for active handovers
   };
