@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import maplibregl from 'maplibre-gl';
+import 'maplibre-gl/dist/maplibre-gl.css';
 import { cn } from '@/lib/utils';
-import { env } from '@/lib/env';
+import { MAPCN_LIGHT_STYLE } from './mapConfig';
 
 const DEFAULT_CENTER = [106.8456, -6.2088];
-let googleMapsPromise;
 
 function toLngLat(center) {
   const nextCenter = Array.isArray(center) ? center : DEFAULT_CENTER;
@@ -13,37 +14,16 @@ function toLngLat(center) {
   ];
 }
 
-function loadGoogleMaps() {
-  if (window.google?.maps) {
-    return Promise.resolve(window.google.maps);
-  }
+function buildOpenStreetMapEmbedUrl(center) {
+  const [lng, lat] = center;
+  const bounds = [
+    lng - 0.01,
+    lat - 0.01,
+    lng + 0.01,
+    lat + 0.01,
+  ].join('%2C');
 
-  if (!env.GOOGLE_MAPS_API_KEY) {
-    return Promise.reject(new Error('Google Maps API key missing'));
-  }
-
-  if (!googleMapsPromise) {
-    googleMapsPromise = new Promise((resolve, reject) => {
-      const existingScript = document.querySelector('script[data-surplusin-google-maps]');
-
-      if (existingScript) {
-        existingScript.addEventListener('load', () => resolve(window.google.maps), { once: true });
-        existingScript.addEventListener('error', reject, { once: true });
-        return;
-      }
-
-      const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${env.GOOGLE_MAPS_API_KEY}`;
-      script.async = true;
-      script.defer = true;
-      script.dataset.surplusinGoogleMaps = 'true';
-      script.onload = () => resolve(window.google.maps);
-      script.onerror = () => reject(new Error('Google Maps failed to load'));
-      document.head.appendChild(script);
-    });
-  }
-
-  return googleMapsPromise;
+  return `https://www.openstreetmap.org/export/embed.html?bbox=${bounds}&layer=mapnik&marker=${lat}%2C${lng}`;
 }
 
 export function GoogleLocationMap({
@@ -55,7 +35,6 @@ export function GoogleLocationMap({
   const containerRef = useRef(null);
   const mapRef = useRef(null);
   const markerRef = useRef(null);
-  const clickListenerRef = useRef(null);
   const editableRef = useRef(editable);
   const onPickRef = useRef(onPick);
   const [mapError, setMapError] = useState('');
@@ -67,15 +46,19 @@ export function GoogleLocationMap({
 
   const applyMapMode = useCallback((map, marker) => {
     const isEditable = editableRef.current;
-    map.setOptions({
-      draggable: isEditable,
-      gestureHandling: isEditable ? 'auto' : 'none',
-      keyboardShortcuts: isEditable,
-      zoomControl: isEditable,
-      streetViewControl: false,
-      mapTypeControl: false,
-      fullscreenControl: false,
-    });
+
+    if (isEditable) {
+      map.dragPan.enable();
+      map.scrollZoom.enable();
+      map.doubleClickZoom.enable();
+      map.keyboard.enable();
+    } else {
+      map.dragPan.disable();
+      map.scrollZoom.disable();
+      map.doubleClickZoom.disable();
+      map.keyboard.disable();
+    }
+
     marker.setDraggable(isEditable);
   }, []);
 
@@ -83,55 +66,64 @@ export function GoogleLocationMap({
     if (!containerRef.current || mapRef.current) return;
 
     const position = toLngLat(center);
+    const map = new maplibregl.Map({
+      container: containerRef.current,
+      style: MAPCN_LIGHT_STYLE,
+      center: position,
+      zoom: 16,
+      attributionControl: false,
+    });
 
-    loadGoogleMaps()
-      .then((maps) => {
-        if (!containerRef.current || mapRef.current) return;
+    map.on('load', () => {
+      setMapError('');
+      map.resize();
+    });
 
-        const latLng = { lat: position[1], lng: position[0] };
-        const map = new maps.Map(containerRef.current, {
-          center: latLng,
-          zoom: 16,
-          disableDefaultUI: !editableRef.current,
-        });
-        const marker = new maps.Marker({
-          position: latLng,
-          map,
-          draggable: editableRef.current,
-        });
+    map.on('error', () => {
+      if (!map.loaded()) {
+        setMapError('Peta interaktif tidak bisa dimuat. Menampilkan fallback OpenStreetMap.');
+      }
+    });
 
-        marker.addListener('dragend', () => {
-          if (!editableRef.current) return;
-          const nextPosition = marker.getPosition();
-          if (!nextPosition) return;
-          onPickRef.current?.([nextPosition.lng(), nextPosition.lat()]);
-        });
+    if (editableRef.current) {
+      map.addControl(new maplibregl.NavigationControl(), 'top-right');
+    }
 
-        clickListenerRef.current = map.addListener('click', (event) => {
-          if (!editableRef.current || !event.latLng) return;
-          marker.setPosition(event.latLng);
-          map.panTo(event.latLng);
-          onPickRef.current?.([event.latLng.lng(), event.latLng.lat()]);
-        });
+    const marker = new maplibregl.Marker({
+      draggable: editableRef.current,
+      color: '#ef4444',
+    })
+      .setLngLat(position)
+      .addTo(map);
 
-        mapRef.current = map;
-        markerRef.current = marker;
-        applyMapMode(map, marker);
-        setMapError('');
-      })
-      .catch(() => {
-        setMapError('Peta interaktif tidak bisa dimuat. Menampilkan fallback Google Maps.');
-      });
+    marker.on('dragend', () => {
+      if (!editableRef.current) return;
+      const lngLat = marker.getLngLat();
+      onPickRef.current?.([lngLat.lng, lngLat.lat]);
+    });
+
+    map.on('click', (event) => {
+      if (!editableRef.current) return;
+      const lngLat = event.lngLat;
+      marker.setLngLat(lngLat);
+      map.panTo(lngLat);
+      onPickRef.current?.([lngLat.lng, lngLat.lat]);
+    });
+
+    mapRef.current = map;
+    markerRef.current = marker;
+    applyMapMode(map, marker);
+    window.requestAnimationFrame(() => map.resize());
   }, [applyMapMode, center]);
 
   useEffect(() => {
     initMap();
     return () => {
-      clickListenerRef.current?.remove();
-      clickListenerRef.current = null;
-      markerRef.current?.setMap(null);
-      markerRef.current = null;
-      mapRef.current = null;
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+        markerRef.current = null;
+      }
     };
   }, [initMap]);
 
@@ -139,14 +131,14 @@ export function GoogleLocationMap({
     if (!mapRef.current || !markerRef.current) return;
 
     const position = toLngLat(center);
-    const latLng = { lat: position[1], lng: position[0] };
-    markerRef.current.setPosition(latLng);
-    mapRef.current.panTo(latLng);
+    markerRef.current.setLngLat(position);
+    mapRef.current.panTo(position);
+    mapRef.current.resize();
     applyMapMode(mapRef.current, markerRef.current);
   }, [applyMapMode, center, editable]);
 
   const position = toLngLat(center);
-  const iframeSrc = `https://maps.google.com/maps?q=${position[1]},${position[0]}&z=16&output=embed`;
+  const iframeSrc = buildOpenStreetMapEmbedUrl(position);
 
   return (
     <div className={cn('relative overflow-hidden rounded-2xl border border-[#e2e8f0] bg-[#edf2f7]', className)}>
@@ -154,12 +146,10 @@ export function GoogleLocationMap({
       {mapError ? (
         <div className="absolute inset-0 z-10 bg-[#edf2f7]">
           <iframe
-            title="Fallback Google Maps"
+            title="Fallback OpenStreetMap"
             src={iframeSrc}
             className="h-full w-full border-0"
-            allowFullScreen
             loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
           />
           <div className="pointer-events-none absolute inset-x-3 top-3 rounded-xl bg-white/90 px-3 py-2 text-center font-[Manrope] text-[12px] font-semibold text-[#475569] shadow-[0_8px_20px_rgba(15,23,42,0.12)]">
             {mapError}
