@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 
 export function Select({
@@ -11,11 +11,27 @@ export function Select({
   placeholder = 'Pilih opsi',
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef(null);
 
   const selectedOption = useMemo(
     () => options.find((option) => option.value === value),
     [options, value],
   );
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (containerRef.current && !containerRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    }
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen]);
 
   function handleSelect(optionValue) {
     onChange?.(optionValue);
@@ -23,14 +39,14 @@ export function Select({
   }
 
   return (
-    <div className={cn('relative w-full', className)}>
+    <div ref={containerRef} className={cn('relative w-full', className)}>
       <button
         type="button"
         className={cn(
-          'flex h-[45px] w-full items-center justify-between gap-2 rounded-xl border border-black bg-white px-3 text-left text-body1 font-normal text-[#0f172a]',
+          'flex h-[45px] w-full items-center justify-between gap-2 rounded-xl border border-black bg-transparent pl-2 pr-3 text-left text-body1 font-normal text-[#0f172a]',
           'transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-normal/30',
           disabled && 'cursor-not-allowed opacity-50',
-          triggerClassName,
+          triggerClassName
         )}
         onClick={() => !disabled && setIsOpen((current) => !current)}
         disabled={disabled}
@@ -61,7 +77,7 @@ export function Select({
 
       {isOpen && (
         <div
-          className="absolute left-0 top-[calc(100%+2px)] z-20 w-full overflow-hidden bg-white shadow-sm"
+          className="absolute left-0 top-[calc(100%+8px)] z-50 max-h-60 w-full overflow-y-auto rounded-xl border border-black bg-white py-1 shadow-sm"
           role="listbox"
         >
           {options.map((option) => (
@@ -69,7 +85,7 @@ export function Select({
               key={option.value}
               type="button"
               className={cn(
-                'flex min-h-[45px] w-full items-center px-3 text-left text-body1 font-normal text-[#0f172a] transition-colors duration-150 hover:bg-green-light-hover',
+                'flex min-h-[45px] w-full items-center px-3 text-left text-body1 font-normal text-[#0f172a] transition-colors duration-150 hover:bg-green-light-hover cursor-pointer',
                 option.value === value && 'border-l-4 border-green-normal',
               )}
               onClick={() => handleSelect(option.value)}

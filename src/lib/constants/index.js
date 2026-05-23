@@ -7,6 +7,20 @@ export const STORAGE_KEYS = {
 
 export const ROUTES = {
   HOME: '/',
+  RECIPIENT: {
+    ROOT: '/recipient',
+    DASHBOARD: '/recipient/dashboard',
+    HANDOVER: '/recipient/handover',
+    HISTORY: '/recipient/history',
+    PROFILE: '/recipient/profile',
+  },
+  RETAILER: {
+    ROOT: '/retailer',
+    DASHBOARD: '/retailer/dashboard',
+    HANDOVER: '/retailer/handover',
+    HISTORY: '/retailer/history',
+    PROFILE: '/retailer/profile',
+  },
   AUTH: '/auth',
   FAQ: '/faq',
   PRIVACY: '/privacy-policy',
