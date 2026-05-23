@@ -11,14 +11,14 @@
  *   3. Tidak perlu mengubah komponen UI sama sekali
  *
  * Endpoint backend reference (Surplusin-BE):
- *   GET  /api/penerima/nearby          → donasi terdekat dari lokasi penerima
- *   GET  /api/penerima/data            → data profil penerima (by JWT)
- *   POST /api/klaim/:donasi_id         → klaim sebuah donasi
- *   PUT  /api/klaim/:id                → update status klaim (on_the_way, arrived, completed)
- *   GET  /api/donasi/riwayat-penerima  → riwayat donasi yang sudah selesai
- *   GET  /api/donasi/statistik         → statistik donasi (total_diklaim, total_diterima)
- *   GET  /api/donasi/kategori?kategori=X → filter donasi by kategori
- *   GET  /api/donasi/search?nama=X     → cari donasi by nama
+ *   GET  /api/penerima/nearby            → donasi terdekat dari lokasi penerima
+ *   GET  /api/penerima/data              → data profil penerima (by JWT)
+ *   PUT  /api/penerima/me                → update profil penerima (by JWT)
+ *   POST /api/klaim/:donasi_id           → klaim sebuah donasi
+ *   PUT  /api/klaim/:id                  → update status klaim (on_the_way, arrived, completed)
+ *   GET  /api/klaim/penerima/aktif       → klaim aktif milik penerima (handover)
+ *   GET  /api/donasi/riwayat-penerima    → riwayat donasi yang sudah selesai
+ *   GET  /api/donasi/statistik           → statistik donasi (total_diklaim, total_diterima)
  */
 
 import apiClient from './client';
@@ -183,8 +183,10 @@ export async function claimDonation(donasiId) {
 /**
  * Mengambil daftar donasi yang sedang dalam proses penjemputan.
  *
- * Real API: GET /api/klaim (kemudian difilter status on_the_way/arrived)
- * atau butuh endpoint khusus di backend.
+ * Real API: GET /api/klaim/penerima/aktif
+ * Response: Array<{ klaim_id, status, penyalur, nama_donasi, jumlah,
+ *                    satuan, claimed_at, alamat_penyalur,
+ *                    latitude_penyalur, longitude_penyalur }>
  *
  * @returns {Promise<Array>}
  */
@@ -199,10 +201,8 @@ export async function getActiveHandovers() {
     }
   }
 
-  // Jika backend tidak ada endpoint khusus, fetch semua klaim lalu filter
-  const { data } = await apiClient.get('/klaim');
-  // Asumsi response berisi data detail donasi juga
-  return data.filter(k => k.status !== 'completed');
+  const { data } = await apiClient.get('/klaim/penerima/aktif');
+  return (Array.isArray(data) ? data : []).map(mapActiveHandoverToUI);
 }
 
 // ────────────────────────────────────────────
@@ -265,19 +265,18 @@ export async function getRecipientProfile() {
 /**
  * Memperbarui data profil penerima.
  *
- * Real API: PUT /api/penerima/:id
+ * Real API: PUT /api/penerima/me (JWT-based, tidak perlu ID)
  *
- * @param {string|number} id - ID penerima
  * @param {Object} payload - Data profile (nama_instansi, kategori, dll)
  * @returns {Promise<Object>} updated profil
  */
-export async function updateRecipientProfile(id, payload) {
+export async function updateRecipientProfile(payload) {
   if (USE_MOCK) {
     await mockDelay(500);
-    return { id, ...payload };
+    return { ...payload };
   }
 
-  const { data } = await apiClient.put(`/penerima/${id}`, payload);
+  const { data } = await apiClient.put('/penerima/me', payload);
   return data;
 }
 
@@ -305,7 +304,7 @@ export async function getDonationHistory() {
   }
 
   const { data } = await apiClient.get('/donasi/riwayat-penerima');
-  return data;
+  return (Array.isArray(data) ? data : []).map(mapHistoryToUI);
 }
 
 // ────────────────────────────────────────────
@@ -385,4 +384,64 @@ function estimatePickupTime(distanceKm) {
   const minutes = Math.ceil((distanceKm / 20) * 60);
   if (minutes < 5) return '5 menit';
   return `${Math.ceil(minutes / 5) * 5} menit`;
+}
+
+/**
+ * Maps a single active handover/klaim object from BE to shape
+ * expected by RecipientHandoverPage component.
+ *
+ * BE Shape → FE Shape mapping:
+ *   klaim_id            → id
+ *   penyalur             → storeName
+ *   nama_donasi          → foodName
+ *   jumlah + satuan      → portion
+ *   status               → status
+ *   alamat_penyalur      → patokan
+ *   latitude_penyalur    → lat
+ *   longitude_penyalur   → lng
+ *   claimed_at           → expiry (for display)
+ */
+function mapActiveHandoverToUI(klaim) {
+  return {
+    id: klaim.klaim_id,
+    storeName: klaim.penyalur || 'Toko Mitra',
+    foodName: klaim.nama_donasi || 'Donasi',
+    portion: `${klaim.jumlah ?? ''} ${klaim.satuan ?? ''}`.trim() || '-',
+    status: klaim.status || 'claimed',
+    patokan: klaim.alamat_penyalur || '-',
+    lat: klaim.latitude_penyalur ? parseFloat(klaim.latitude_penyalur) : null,
+    lng: klaim.longitude_penyalur ? parseFloat(klaim.longitude_penyalur) : null,
+    expiry: klaim.claimed_at ? new Date(klaim.claimed_at).toLocaleString('id-ID') : '-',
+    items: [], // BE doesn't return item_detail for active handovers
+  };
+}
+
+/**
+ * Maps a single riwayat donasi object from BE to shape
+ * expected by RecipientHistoryPage component.
+ *
+ * BE Shape → FE Shape mapping:
+ *   nama_toko      → storeName
+ *   alamat          → location
+ *   nama_donasi     → foodName
+ *   total_porsi     → portion (e.g. "60 Porsi")
+ *   jumlah_donasi   → donationCount
+ *   terakhir        → date (formatted to locale string)
+ */
+function mapHistoryToUI(item, index) {
+  return {
+    id: `history-${index}`,
+    storeName: item.nama_toko || '-',
+    location: item.alamat || '-',
+    foodName: item.nama_donasi || '-',
+    portion: item.total_porsi ? `${item.total_porsi} Porsi` : '-',
+    donationCount: item.jumlah_donasi || 0,
+    date: item.terakhir
+      ? new Date(item.terakhir).toLocaleDateString('id-ID', {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric',
+        })
+      : '-',
+  };
 }

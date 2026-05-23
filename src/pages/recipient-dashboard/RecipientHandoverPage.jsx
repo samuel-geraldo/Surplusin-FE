@@ -1,13 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@/lib/constants';
-import { getActiveHandovers, updateClaimStatus } from '@/services/api/recipient';
-
-const MAPS_API_KEY = 'AIzaSyAxvkMdHwDpYBUi62RVVoO4O9SmG_AgPp0';
-
-// Koordinat penerima (Panti Jenaka Sukarela – contoh)
-const RECIPIENT_LAT = -6.2000;
-const RECIPIENT_LNG = 106.8450;
+import { getActiveHandovers, updateClaimStatus, getRecipientProfile } from '@/services/api/recipient';
 
 // Mock notifikasi
 const MOCK_NOTIFICATIONS = [
@@ -38,19 +32,30 @@ export default function RecipientHandoverPage() {
   const [claimedDonations, setClaimedDonations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeNotifs, setActiveNotifs] = useState({});
+  // Koordinat penerima (diambil dari profil via API)
+  const [recipientLat, setRecipientLat] = useState(-6.2000);
+  const [recipientLng, setRecipientLng] = useState(106.8450);
 
   useEffect(() => {
-    async function fetchHandovers() {
+    async function fetchData() {
       try {
-        const data = await getActiveHandovers();
-        setClaimedDonations(data);
+        // Fetch handovers dan profil penerima secara paralel
+        const [handovers, profile] = await Promise.all([
+          getActiveHandovers(),
+          getRecipientProfile().catch(() => null),
+        ]);
+        setClaimedDonations(handovers);
+        if (profile) {
+          if (profile.latitude) setRecipientLat(Number(profile.latitude));
+          if (profile.longitude) setRecipientLng(Number(profile.longitude));
+        }
       } catch (error) {
         console.error('Failed to load active handovers:', error);
       } finally {
         setLoading(false);
       }
     }
-    fetchHandovers();
+    fetchData();
   }, []);
 
   const navigate = useNavigate();
@@ -131,35 +136,47 @@ export default function RecipientHandoverPage() {
   return (
     <div className="flex flex-col gap-8 pb-16">
       {claimedDonations.map((donation) => {
-        const storeLat = donation.lat || RECIPIENT_LAT;
-        const storeLng = donation.lng || RECIPIENT_LNG;
+        const storeLat = donation.lat || recipientLat;
+        const storeLng = donation.lng || recipientLng;
 
         // URL embed Google Maps
         const mapsEmbedUrl = `https://maps.google.com/maps?q=${storeLat},${storeLng}&z=16&output=embed`;
-        const mapsOpenUrl = `https://www.google.com/maps/dir/${storeLat},${storeLng}/${RECIPIENT_LAT},${RECIPIENT_LNG}`;
+        const mapsOpenUrl = `https://www.google.com/maps/dir/${recipientLat},${recipientLng}/${storeLat},${storeLng}`;
 
         return (
-          <div key={donation.id} className="flex gap-6" style={{ alignItems: 'flex-start' }}>
+          <div key={donation.id} className="flex flex-col lg:flex-row gap-6" style={{ alignItems: 'flex-start' }}>
             {/* ════════════ LEFT: Donation Card ════════════ */}
             <article
-              className="flex-1 rounded-3xl bg-white p-6 sm:p-8 shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-slate-100 min-w-0"
+              className="flex-[1.5] rounded-3xl bg-white p-6 sm:p-8 shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-slate-100 min-w-0"
             >
               {/* ── Header: Badge + Info + Estimasi ── */}
               <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div className="flex flex-col gap-2">
                   {/* Badge */}
-                  <span
-                    className="inline-block w-fit rounded-full font-[Manrope] font-bold uppercase"
-                    style={{
-                      backgroundColor: '#fed7aa',
-                      color: '#c2410c',
-                      padding: '6px 16px',
-                      fontSize: '11px',
-                      letterSpacing: '0.08em',
-                    }}
-                  >
-                    Siap Dijemput
-                  </span>
+                  {(() => {
+                    const statusMap = {
+                      'on_the_way': { label: 'DALAM PERJALANAN', bg: '#fed7aa', text: '#ea580c' },
+                      'completed': { label: 'DITERIMA', bg: '#bbf7d0', text: '#16a34a' },
+                      'arrived': { label: 'SIAP DIJEMPUT', bg: '#bfdbfe', text: '#2563eb' },
+                      'claimed': { label: 'SIAP DIJEMPUT', bg: '#bfdbfe', text: '#2563eb' },
+                    };
+                    const st = donation.status || 'claimed';
+                    const config = statusMap[st] || statusMap['claimed'];
+                    return (
+                      <span
+                        className="inline-block w-fit rounded-full font-[Manrope] font-bold uppercase"
+                        style={{
+                          backgroundColor: config.bg,
+                          color: config.text,
+                          padding: '6px 16px',
+                          fontSize: '11px',
+                          letterSpacing: '0.08em',
+                        }}
+                      >
+                        {config.label}
+                      </span>
+                    );
+                  })()}
 
                   {/* Food name */}
                   <h3
@@ -325,16 +342,14 @@ export default function RecipientHandoverPage() {
 
             {/* ════════════ RIGHT: Pusat Notifikasi + Chat Mitra ════════════ */}
             <aside
-              className="hidden shrink-0 flex-col gap-0 xl:flex"
-              style={{ width: 360 }}
+              className="hidden flex-1 shrink-0 flex-col gap-0 lg:flex"
             >
               {/* ── Pusat Notifikasi Card ── */}
               <div
-                className="flex flex-col rounded-3xl bg-white"
+                className="flex flex-col rounded-3xl bg-transparent"
                 style={{
                   padding: '1.75rem',
-                  boxShadow: '0 8px 30px rgba(0,0,0,0.06)',
-                  border: '1px solid #f1f5f9',
+                  border: '1px solid #1e293b',
                 }}
               >
                 <h3

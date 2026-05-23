@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
+import { env } from '@/lib/env';
 
-const MAPS_API_KEY = 'AIzaSyAxvkMdHwDpYBUi62RVVoO4O9SmG_AgPp0';
+const MAPS_API_KEY = env.GOOGLE_MAPS_API_KEY;
 
 const mockProfile = {
   name: 'Panti Jenaka Sukarela',
@@ -53,6 +54,7 @@ export default function RecipientProfilePage() {
   const [saving, setSaving] = useState(false);
   const [showCancelPopup, setShowCancelPopup] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [showErrorPopup, setShowErrorPopup] = useState(false);
 
   // ── Map state ──
   const [lat, setLat] = useState(-6.2500);
@@ -110,19 +112,18 @@ export default function RecipientProfilePage() {
         longitude: lng,
         patokan: draft.patokan
       };
-      
-      // Jika profil punya ID, lakukan PUT update. Jika backend butuh ID dari JWT, mungkin endpoint berbeda.
-      if (profile.id) {
-        await updateRecipientProfile(profile.id, payload);
-      }
-      
+
+      // Backend uses JWT to identify the penerima, no ID needed
+      await updateRecipientProfile(payload);
+
       setProfile({ ...draft, lat, lng });
       setIsEditing(false);
       setShowSuccessPopup(true);
       setTimeout(() => setShowSuccessPopup(false), 2500);
     } catch (error) {
       console.error('Gagal menyimpan profil:', error);
-      alert('Terjadi kesalahan saat menyimpan data.');
+      setShowErrorPopup(true);
+      setTimeout(() => setShowErrorPopup(false), 2500);
     } finally {
       setSaving(false);
     }
@@ -257,12 +258,12 @@ export default function RecipientProfilePage() {
   // ── Reusable field components ──
   const Field = ({ label, value, half }) => (
     <div className={half ? '' : 'col-span-2'}>
-      <label className="mb-1 block font-[Manrope] font-medium text-[#374151]" style={{ fontSize: '14px' }}>
+      <label className="mb-1 block font-[Manrope] font-medium text-text" style={{ fontSize: '16px' }}>
         {label}
       </label>
       <div
-        className="w-full rounded-xl font-[Manrope] text-[#374151]"
-        style={{ padding: '10px 14px', fontSize: '14px', backgroundColor: '#f0fdf4', border: '1px solid #d1fae5', minHeight: 42 }}
+        className="w-full rounded-lg font-[Manrope] text-text"
+        style={{ padding: '10px 14px', fontSize: '14px', backgroundColor: '#e5f7eb', border: '1px solid #d1fae5', minHeight: 42 }}
       >
         {value || '-'}
       </div>
@@ -296,17 +297,15 @@ export default function RecipientProfilePage() {
   );
 
   return (
-    <div className="flex flex-col xl:flex-row gap-6 pb-16">
+    <div className="flex flex-col lg:flex-row gap-6 pb-16">
       {/* ════════════ LEFT COLUMN: Profile ════════════ */}
       <div className="flex flex-1 flex-col gap-6" style={{ minWidth: 0 }}>
         {/* ── Informasi Dasar Card ── */}
-        <div className="rounded-3xl bg-white p-6 sm:p-8 shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-slate-100">
+        <div className="flex flex-col h-full rounded-3xl bg-white p-6 sm:p-8 shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-slate-100">
           {/* Header — always visible, pencil only when not editing */}
           <div className="mb-5 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#0f172a" style={{ width: 22, height: 22 }}>
-                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
-              </svg>
+              <img src="/recipient_retailer icon/basic-icon/icon rumah.svg" alt="" style={{ width: 24, height: 24 }} />
               <h3 className="font-[Manrope] font-extrabold text-[#0f172a]" style={{ fontSize: '18px' }}>
                 Informasi Dasar
               </h3>
@@ -315,12 +314,11 @@ export default function RecipientProfilePage() {
             {!isEditing && (
               <button
                 onClick={handleEdit}
-                className="flex items-center gap-1 font-[Manrope] font-medium text-[#64748b] transition-colors hover:text-[#0f172a]"
-                style={{ fontSize: '14px', background: 'none', border: 'none', cursor: 'pointer' }}
+                className="flex items-center transition-opacity hover:opacity-70"
+                style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                title="Edit Profil"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style={{ width: 18, height: 18 }}>
-                  <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 000-1.41l-2.34-2.34a1 1 0 00-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
-                </svg>
+                <img src="/recipient_retailer icon/basic-icon/edit logo.svg" alt="Edit" style={{ width: 20, height: 20 }} />
               </button>
             )}
           </div>
@@ -374,7 +372,7 @@ export default function RecipientProfilePage() {
 
           {/* Action buttons — only in edit mode, at the bottom */}
           {isEditing && (
-            <div className="mt-6 flex items-center justify-end gap-3">
+            <div className="mt-auto pt-6 flex items-center justify-end gap-3">
               <button
                 onClick={handleCancel}
                 className="rounded-xl font-[Manrope] font-semibold text-[#374151] transition-colors hover:bg-[#e2e8f0]"
@@ -404,13 +402,11 @@ export default function RecipientProfilePage() {
       </div>
 
       {/* ════════════ RIGHT COLUMN: Pinpoint Lokasi ════════════ */}
-      <aside className="hidden shrink-0 flex-col gap-0 xl:flex" style={{ width: 380 }}>
-        <div className="flex flex-col rounded-3xl bg-white p-7 shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-slate-100">
+      <aside className="flex flex-1 flex-col gap-0" style={{ minWidth: 0 }}>
+        <div className="flex flex-col h-full rounded-3xl bg-white p-7 shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-slate-100">
           {/* ── Header ── */}
           <div className="mb-2 flex items-center gap-3">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#0f172a" style={{ width: 22, height: 22 }}>
-              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z" />
-            </svg>
+            <img src="/recipient_retailer icon/basic-icon/location black.svg" alt="" style={{ width: 24, height: 24 }} />
             <h3 className="font-[Manrope] font-extrabold text-[#0f172a]" style={{ fontSize: '18px' }}>
               Pinpoint Lokasi
             </h3>
@@ -545,7 +541,7 @@ export default function RecipientProfilePage() {
           </div>
 
           {/* ── Interactive Map (Google Maps JS API with draggable marker) ── */}
-          <div className="relative overflow-hidden rounded-2xl" style={{ height: 260, border: '1px solid #e2e8f0' }}>
+          <div className="relative overflow-hidden rounded-2xl flex-1" style={{ minHeight: 260, border: '1px solid #e2e8f0' }}>
             {/* Map container — Google Maps mounts here */}
             <div
               ref={mapContainerRef}
@@ -613,23 +609,23 @@ export default function RecipientProfilePage() {
             <div className="mx-auto mb-4 flex h-[42px] w-[42px] items-center justify-center rounded-full bg-[#2563eb]">
               <span className="font-[Manrope] text-[20px] font-bold text-white">!</span>
             </div>
-            
+
             {/* Text */}
             <h3 className="mb-7 font-[Manrope] text-[17px] font-semibold text-[#0f172a] leading-snug">
               Apakah Anda yakin ingin<br />membatalkan perubahan?
             </h3>
-            
+
             {/* Buttons */}
             <div className="flex items-center gap-3">
               <button
                 onClick={rejectCancel}
-                className="flex-1 rounded-full bg-transparent py-3 font-[Manrope] text-[15px] font-medium text-[#374151] transition-colors hover:bg-slate-50"
+                className="flex-1 rounded-full bg-transparent py-3 font-[Manrope] text-[15px] font-medium text-[#374151] transition-colors hover:bg-slate-50 cursor-pointer"
               >
                 Tidak
               </button>
               <button
                 onClick={confirmCancel}
-                className="flex-1 rounded-full bg-[#f97316] py-3 font-[Manrope] text-[15px] font-bold text-white transition-colors hover:bg-[#ea580c]"
+                className="flex-1 rounded-full bg-[#f97316] py-3 font-[Manrope] text-[15px] font-bold text-white transition-colors hover:bg-[#ea580c] cursor-pointer"
               >
                 Ya
               </button>
@@ -648,10 +644,30 @@ export default function RecipientProfilePage() {
                 <polyline points="20 6 9 17 4 12" />
               </svg>
             </div>
-            
+
             {/* Text */}
             <h3 className="font-[Manrope] text-[18px] font-semibold text-[#0f172a] leading-snug">
               Perubahan berhasil<br />disimpan!
+            </h3>
+          </div>
+        </div>
+      )}
+
+      {/* ════════════ ERROR POPUP ════════════ */}
+      {showErrorPopup && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 px-4">
+          <div className="w-full max-w-[340px] rounded-3xl bg-[#ffcaca] p-8 text-center shadow-2xl">
+            {/* Icon */}
+            <div className="mx-auto mb-5 flex h-[52px] w-[52px] items-center justify-center rounded-full bg-[#ef4444]">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" style={{ width: 24, height: 24 }}>
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </div>
+
+            {/* Text */}
+            <h3 className="font-[Manrope] text-[18px] font-semibold text-[#0f172a] leading-snug">
+              Gagal melakukan<br />perubahan!
             </h3>
           </div>
         </div>
