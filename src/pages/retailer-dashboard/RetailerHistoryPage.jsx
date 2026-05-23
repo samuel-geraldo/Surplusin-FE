@@ -13,9 +13,8 @@ function formatDate(value) {
 function SummaryCard({ card }) {
   return (
     <article
-      className="relative flex items-center gap-5 overflow-hidden rounded-2xl bg-white"
+      className="relative flex min-w-0 items-center gap-4 overflow-hidden rounded-2xl bg-white p-5 sm:gap-5 sm:p-7"
       style={{
-        padding: '1.75rem',
         borderLeft: `4px solid ${card.accent}`,
         boxShadow: '0 8px 30px rgba(0,0,0,0.06)',
       }}
@@ -36,8 +35,8 @@ function SummaryCard({ card }) {
 function HistoryRow({ row, rank }) {
   return (
     <article
-      className="flex items-center gap-4 rounded-2xl bg-white transition-shadow hover:shadow-md"
-      style={{ padding: '1.1rem 1.5rem', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}
+      className="flex flex-col gap-4 rounded-2xl bg-white p-5 transition-shadow hover:shadow-md sm:flex-row sm:items-center sm:px-6"
+      style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}
     >
       <div
         className="flex shrink-0 items-center justify-center rounded-full font-[Manrope] font-bold text-white"
@@ -50,12 +49,12 @@ function HistoryRow({ row, rank }) {
         <p className="truncate font-[Manrope] text-[#0f172a]" style={{ fontSize: '15px', lineHeight: 1.3 }}>
           {row.nama_instansi ?? '-'}
         </p>
-        <p className="font-[Manrope] text-[#94a3b8]" style={{ fontSize: '13px', marginTop: '2px' }}>
+        <p className="break-words font-[Manrope] text-[#94a3b8]" style={{ fontSize: '13px', marginTop: '2px' }}>
           {row.alamat ?? '-'} - {row.jumlah_pengiriman ?? 0} Kali Pengiriman
         </p>
       </div>
 
-      <div className="flex shrink-0 flex-col items-end">
+      <div className="flex w-full shrink-0 flex-col items-start sm:w-auto sm:items-end">
         <p className="font-[Manrope] font-semibold text-[#0f172a]" style={{ fontSize: '18px', lineHeight: 1.2 }}>
           {row.total_porsi ?? 0} Porsi
         </p>
@@ -128,19 +127,16 @@ export default function RetailerHistoryPage() {
   ];
 
   return (
-    <div className="flex flex-col gap-8" style={{ padding: '2rem 2rem 4rem', marginTop: '1rem' }}>
-      <section className="grid grid-cols-1 gap-5 sm:grid-cols-3" style={{ marginLeft: '1rem', marginRight: '1rem' }}>
+    <div className="flex flex-col gap-6 px-4 py-6 font-[Manrope] sm:px-6 lg:px-8" style={{ marginTop: '1rem' }}>
+      <section className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
         {summaryCards.map((card) => (
           <SummaryCard key={card.label} card={card} />
         ))}
       </section>
 
       <section
-        className="rounded-2xl"
+        className="rounded-2xl p-5 sm:p-7 lg:px-8"
         style={{
-          marginLeft: '1rem',
-          marginRight: '1rem',
-          padding: '1.75rem 2rem',
           backgroundColor: '#f8fafc',
         }}
       >
