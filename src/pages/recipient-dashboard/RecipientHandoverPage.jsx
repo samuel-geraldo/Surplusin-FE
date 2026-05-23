@@ -37,6 +37,17 @@ function formatClaimTime(value) {
   return `${hours} jam lalu`;
 }
 
+function buildWhatsAppUrl(phone, message) {
+  const digits = String(phone ?? '').replace(/\D/g, '');
+  if (!digits) return '';
+
+  const normalized = digits.startsWith('0')
+    ? `62${digits.slice(1)}`
+    : digits;
+
+  return `https://wa.me/${normalized}?text=${encodeURIComponent(message)}`;
+}
+
 export default function RecipientHandoverPage() {
   const [claimedDonations, setClaimedDonations] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -163,6 +174,10 @@ export default function RecipientHandoverPage() {
         const bbox = [storeLng - 0.01, storeLat - 0.01, storeLng + 0.01, storeLat + 0.01].join('%2C');
         const mapsEmbedUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${storeLat}%2C${storeLng}`;
         const mapsOpenUrl = `https://www.openstreetmap.org/?mlat=${storeLat}&mlon=${storeLng}#map=16/${storeLat}/${storeLng}`;
+        const chatUrl = buildWhatsAppUrl(
+          donation.nomor_whatsapp,
+          `Halo ${donation.storeName}, saya ingin koordinasi penjemputan donasi ${donation.foodName}.`,
+        );
 
         return (
           <div key={donation.id} className="flex flex-col lg:flex-row gap-6" style={{ alignItems: 'flex-start' }}>
@@ -424,8 +439,12 @@ export default function RecipientHandoverPage() {
               </div>
 
               {/* ── Chat Mitra Button ── */}
-              <button
-                className="flex w-full items-center justify-center gap-3 font-[Manrope] font-bold text-white transition-opacity hover:opacity-90"
+              <a
+                href={chatUrl || undefined}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-disabled={!chatUrl}
+                className="flex w-full items-center justify-center gap-3 font-[Manrope] font-bold text-white transition-opacity hover:opacity-90 aria-disabled:pointer-events-none aria-disabled:opacity-50"
                 style={{
                   marginTop: '1.25rem',
                   background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
@@ -436,9 +455,6 @@ export default function RecipientHandoverPage() {
                   cursor: 'pointer',
                   boxShadow: '0 4px 14px rgba(34,197,94,0.30)',
                 }}
-                onClick={() => {
-                  alert(`Membuka chat dengan mitra: ${donation.storeName}`);
-                }}
               >
                 <img
                   src="/recipient_retailer icon/basic-icon/Icon chat.svg"
@@ -446,7 +462,7 @@ export default function RecipientHandoverPage() {
                   style={{ width: 20, height: 20 }}
                 />
                 Chat Mitra
-              </button>
+              </a>
             </aside>
           </div>
         );

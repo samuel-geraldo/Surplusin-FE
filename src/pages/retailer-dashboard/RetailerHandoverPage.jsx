@@ -42,6 +42,17 @@ function getPickupStatus(claim) {
   return 'on_the_way';
 }
 
+function buildWhatsAppUrl(phone, message) {
+  const digits = String(phone ?? '').replace(/\D/g, '');
+  if (!digits) return '';
+
+  const normalized = digits.startsWith('0')
+    ? `62${digits.slice(1)}`
+    : digits;
+
+  return `https://wa.me/${normalized}?text=${encodeURIComponent(message)}`;
+}
+
 const PICKUP_STATUS = {
   waiting: {
     title: 'Menunggu klaim dari penerima',
@@ -127,9 +138,13 @@ export default function RetailerHandoverPage() {
     }
 
     loadClaims();
+    const intervalId = window.setInterval(loadClaims, 10000);
+    window.addEventListener('focus', loadClaims);
 
     return () => {
       cancelled = true;
+      window.clearInterval(intervalId);
+      window.removeEventListener('focus', loadClaims);
     };
   }, []);
 
@@ -137,6 +152,12 @@ export default function RetailerHandoverPage() {
   const pickupStatus = PICKUP_STATUS[getPickupStatus(activeClaim)];
   const PickupIcon = pickupStatus.Icon;
   const preparationItems = splitItems(activeClaim?.item_detail);
+  const chatUrl = activeClaim
+    ? buildWhatsAppUrl(
+      activeClaim.nomor_whatsapp,
+      `Halo ${activeClaim.nama_instansi}, saya ingin koordinasi pengambilan donasi ${activeClaim.nama_donasi}.`,
+    )
+    : '';
 
   const notifications = useMemo(
     () =>
@@ -241,9 +262,11 @@ export default function RetailerHandoverPage() {
               <p className="mx-auto mt-2 max-w-[520px] text-[15px] text-[#64748b]">{activeClaim.alamat}</p>
             ) : null}
             <a
-              href={activeClaim?.nomor_whatsapp ? `https://wa.me/${activeClaim.nomor_whatsapp.replace(/\D/g, '')}` : undefined}
+              href={chatUrl || undefined}
+              target="_blank"
+              rel="noopener noreferrer"
               className="mt-5 flex min-h-11 w-full items-center justify-center gap-2 rounded-[12px] bg-[#50c878] px-5 text-[14px] font-bold text-white transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#50c878] aria-disabled:pointer-events-none aria-disabled:opacity-50"
-              aria-disabled={!activeClaim?.nomor_whatsapp}
+              aria-disabled={!chatUrl}
             >
               <MessageSquare className="size-5" strokeWidth={2} />
               Chat Penerima

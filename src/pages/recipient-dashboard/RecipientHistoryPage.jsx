@@ -1,6 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
 import { getDonationHistory } from '@/services/api/recipient';
-import { mockHistorySummary } from '@/features/recipient-dashboard/data/mockRecipientDashboardData';
 
 export default function RecipientHistoryPage() {
   const [historyDonations, setHistoryDonations] = useState([]);
@@ -37,8 +36,14 @@ export default function RecipientHistoryPage() {
     [historyDonations]
   );
 
-  // Orang terbantu tetap menggunakan data statis untuk saat ini sesuai permintaan
-  const orangTerbantu = mockHistorySummary.orangTerbantu;
+  const orangTerbantu = useMemo(
+    () =>
+      historyDonations.reduce((sum, item) => {
+        const match = String(item.portion ?? '').match(/\d+/);
+        return sum + (match ? Number(match[0]) : 0);
+      }, 0),
+    [historyDonations],
+  );
 
 
   if (loading) {
@@ -46,24 +51,22 @@ export default function RecipientHistoryPage() {
   }
 
   return (
-    <div className="flex flex-col gap-8 pb-16">
+    <div className="flex flex-col gap-6 px-4 py-6 pb-16 sm:px-6 lg:px-8">
       {/* ════════════ SUMMARY CARDS ════════════ */}
       <div 
-        className="grid gap-5 mx-4 sm:mx-auto lg:max-w-[100%] xl:max-w-[88%]"
-        style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))' }}
+        className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3"
       >
         {/* Card 1: Orang Terbantu */}
         <div
-          className="relative flex items-center gap-5 overflow-hidden rounded-2xl bg-white shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-shadow duration-300 hover:shadow-[0_0px_30px_rgba(37,99,235,0.35)] cursor-default"
+          className="relative flex min-w-0 items-center gap-4 overflow-hidden rounded-2xl bg-white p-5 shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-shadow duration-300 hover:shadow-[0_0px_30px_rgba(37,99,235,0.35)] cursor-default sm:gap-5 sm:p-7"
           style={{
-            padding: '2.5rem 3rem',
             borderLeft: '4px solid #2563eb',
           }}
         >
           <div className="flex shrink-0 items-center justify-center">
             <img src="/recipient_retailer icon/basic-icon/orang terbantu.svg" alt="Orang Terbantu" style={{ width: 48, height: 48 }} />
           </div>
-          <div className="flex flex-col whitespace-nowrap">
+          <div className="flex min-w-0 flex-col">
             <p
               className="font-[Manrope] font-extrabold text-[#2563eb]"
               style={{ fontSize: '28px', lineHeight: 1.2 }}
@@ -81,16 +84,15 @@ export default function RecipientHistoryPage() {
 
         {/* Card 2: Donasi Telah Diterima */}
         <div
-          className="relative flex items-center gap-5 overflow-hidden rounded-2xl bg-white shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-shadow duration-300 hover:shadow-[0_0px_30px_rgba(16,185,129,0.35)] cursor-default"
+          className="relative flex min-w-0 items-center gap-4 overflow-hidden rounded-2xl bg-white p-5 shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-shadow duration-300 hover:shadow-[0_0px_30px_rgba(16,185,129,0.35)] cursor-default sm:gap-5 sm:p-7"
           style={{
-            padding: '2.5rem 3rem',
             borderLeft: '4px solid #10b981',
           }}
         >
           <div className="flex shrink-0 items-center justify-center">
             <img src="/recipient_retailer icon/basic-icon/donasi diterima.svg" alt="Donasi Diterima" style={{ width: 48, height: 48 }} />
           </div>
-          <div className="flex flex-col whitespace-nowrap">
+          <div className="flex min-w-0 flex-col">
             <p
               className="font-[Manrope] font-extrabold text-[#10b981]"
               style={{ fontSize: '28px', lineHeight: 1.2 }}
@@ -108,16 +110,15 @@ export default function RecipientHistoryPage() {
 
         {/* Card 3: Jumlah Toko */}
         <div
-          className="relative flex items-center gap-5 overflow-hidden rounded-2xl bg-white shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-shadow duration-300 hover:shadow-[0_0px_30px_rgba(249,115,22,0.35)] cursor-default"
+          className="relative flex min-w-0 items-center gap-4 overflow-hidden rounded-2xl bg-white p-5 shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-shadow duration-300 hover:shadow-[0_0px_30px_rgba(249,115,22,0.35)] cursor-default sm:gap-5 sm:p-7"
           style={{
-            padding: '2.5rem 3rem',
             borderLeft: '4px solid #f97316',
           }}
         >
           <div className="flex shrink-0 items-center justify-center">
             <img src="/recipient_retailer icon/basic-icon/toko mengirimkan donasi.svg" alt="Jumlah Toko" style={{ width: 48, height: 48 }} />
           </div>
-          <div className="flex flex-col whitespace-nowrap">
+          <div className="flex min-w-0 flex-col">
             <p
               className="font-[Manrope] font-extrabold text-[#f97316]"
               style={{ fontSize: '28px', lineHeight: 1.2 }}
@@ -135,7 +136,7 @@ export default function RecipientHistoryPage() {
       </div>
 
       {/* ════════════ RIWAYAT PENERIMA DONASI ════════════ */}
-      <section className="rounded-lg mx-4 sm:mx-0 px-6 py-1 sm:px-2 bg-slate-50">
+      <section className="rounded-lg bg-slate-50 p-5 sm:p-7 lg:px-8">
         <h2
           className="mb-5 font-[Manrope] font-bold text-text"
           style={{ fontSize: '20px' }}
@@ -147,7 +148,7 @@ export default function RecipientHistoryPage() {
           {historyDonations.map((item, idx) => (
             <div
               key={item.id}
-              className="flex items-center gap-4 rounded-2xl bg-white px-5 py-6 shadow-sm transition-shadow hover:shadow-md"
+              className="flex flex-col gap-4 rounded-2xl bg-white p-5 shadow-sm transition-shadow hover:shadow-md sm:flex-row sm:items-center sm:px-6"
             >
               {/* Numbered badge */}
               <div
@@ -171,7 +172,7 @@ export default function RecipientHistoryPage() {
                   {item.storeName}
                 </p>
                 <p
-                  className="font-[Manrope] text-text-muted"
+                  className="break-words font-[Manrope] text-text-muted"
                   style={{ fontSize: '13px', marginTop: '2px' }}
                 >
                   {item.location}  -  {item.foodName}
@@ -179,7 +180,7 @@ export default function RecipientHistoryPage() {
               </div>
 
               {/* Right info */}
-              <div className="flex shrink-0 flex-col items-center">
+              <div className="flex w-full shrink-0 flex-col items-start sm:w-auto sm:items-center">
                 <p
                   className="font-[Manrope] font-semibold text-text"
                   style={{ fontSize: '18px', lineHeight: 1.2 }}

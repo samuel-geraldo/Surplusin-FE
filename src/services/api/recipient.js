@@ -68,10 +68,14 @@ export async function getDonationSummary() {
     return mockDonationSummary;
   }
 
-  const { data } = await apiClient.get('/donasi/statistik');
+  const [nearbyResponse, activeClaimsResponse] = await Promise.all([
+    apiClient.get('/penerima/nearby'),
+    apiClient.get('/klaim/penerima/aktif'),
+  ]);
+
   return {
-    available: data.total_diklaim ?? 0,
-    claimed: data.total_diterima ?? 0,
+    available: nearbyResponse.data?.total_donasi ?? nearbyResponse.data?.donasi?.length ?? 0,
+    claimed: Array.isArray(activeClaimsResponse.data) ? activeClaimsResponse.data.length : 0,
   };
 }
 
@@ -411,6 +415,7 @@ function mapActiveHandoverToUI(klaim) {
     patokan: klaim.alamat_penyalur || '-',
     lat: klaim.latitude_penyalur ? parseFloat(klaim.latitude_penyalur) : null,
     lng: klaim.longitude_penyalur ? parseFloat(klaim.longitude_penyalur) : null,
+    nomor_whatsapp: klaim.nomor_whatsapp_penyalur || '',
     expiry: klaim.claimed_at ? new Date(klaim.claimed_at).toLocaleString('id-ID') : '-',
     items: [], // BE doesn't return item_detail for active handovers
   };
