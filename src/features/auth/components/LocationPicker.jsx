@@ -1,9 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-<<<<<<< HEAD
-import { Button, GoogleLocationMap, Input } from '@/components/ui';
-=======
 import { Button, Input, GoogleLocationMap as Map } from '@/components/ui';
->>>>>>> 905d1c1709372ee74e7bcd33f8a1d859b45b657f
 import { searchAddresses, shouldSearchAddress } from './locationSearch';
 
 const DEFAULT_CENTER = [106.8456, -6.2088];
