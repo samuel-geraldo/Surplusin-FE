@@ -459,6 +459,7 @@ function mapActiveHandoverToUI(klaim, retailers = [], snapshots = []) {
   const matchedRetailer = findRetailerForClaim(klaim, retailers);
   const snapshot = findClaimSnapshot(klaim, snapshots);
   const claimItems = parseItemDetail(klaim.item_detail);
+  const fallbackItems = klaim.nama_donasi ? [klaim.nama_donasi] : [];
 
   return {
     id: klaim.klaim_id,
@@ -471,7 +472,7 @@ function mapActiveHandoverToUI(klaim, retailers = [], snapshots = []) {
     lng: klaim.longitude_penyalur ? parseFloat(klaim.longitude_penyalur) : null,
     nomor_whatsapp: getRetailerWhatsappFromClaim(klaim) || matchedRetailer?.nomor_whatsapp || '',
     expiry: klaim.claimed_at ? new Date(klaim.claimed_at).toLocaleString('id-ID') : '-',
-    items: claimItems.length > 0 ? claimItems : snapshot?.items || [],
+    items: claimItems.length > 0 ? claimItems : snapshot?.items || fallbackItems,
   };
 }
 
