@@ -35,20 +35,43 @@ export async function deleteRetailerDonation(id) {
 
 export async function getRetailerActiveClaims() {
   const response = await apiClient.get('/klaim/penyalur/aktif');
-  return (Array.isArray(response.data) ? response.data : []).map((claim) => ({
-    id: claim.klaim_id ?? claim.id,
-    status: claim.status,
-    nama_instansi: claim.nama_penerima ?? claim.nama_instansi ?? '-',
-    nama_donasi: claim.nama_donasi ?? '-',
-    jumlah: claim.jumlah ?? 0,
-    satuan: claim.satuan ?? '',
-    claimed_at: claim.claimed_at,
-    alamat: claim.alamat_penerima ?? claim.alamat ?? '',
-    latitude: claim.latitude_penerima,
-    longitude: claim.longitude_penerima,
-    nomor_whatsapp: claim.nomor_whatsapp_penerima ?? '',
-    item_detail: claim.item_detail ?? '',
-  }));
+  const claims = Array.isArray(response.data) ? response.data : [];
+
+  let recipients = [];
+  if (claims.some((claim) => !claim.nomor_whatsapp_penerima)) {
+    try {
+      const recipientsResponse = await apiClient.get('/penerima');
+      recipients = Array.isArray(recipientsResponse.data) ? recipientsResponse.data : [];
+    } catch {
+      recipients = [];
+    }
+  }
+
+  return claims.map((claim) => {
+    const recipientName = claim.nama_penerima ?? claim.nama_instansi ?? '';
+    const recipientAddress = claim.alamat_penerima ?? claim.alamat ?? '';
+    const normalizedName = recipientName.trim().toLowerCase();
+    const normalizedAddress = recipientAddress.trim().toLowerCase();
+    const matchedRecipient = recipients.find((recipient) => (
+      String(recipient.nama_instansi ?? '').trim().toLowerCase() === normalizedName &&
+      (!normalizedAddress || String(recipient.alamat ?? '').trim().toLowerCase() === normalizedAddress)
+    ));
+
+    return {
+      id: claim.klaim_id ?? claim.id,
+      status: claim.status,
+      nama_instansi: recipientName || '-',
+      nama_donasi: claim.nama_donasi ?? '-',
+      jumlah: claim.jumlah ?? 0,
+      satuan: claim.satuan ?? '',
+      claimed_at: claim.claimed_at,
+      alamat: recipientAddress,
+      latitude: claim.latitude_penerima,
+      longitude: claim.longitude_penerima,
+      nomor_whatsapp: claim.nomor_whatsapp_penerima ?? matchedRecipient?.nomor_whatsapp ?? '',
+      item_detail: claim.item_detail ?? '',
+    };
+  });
 }
 
 export async function getRetailerProfile() {

@@ -415,6 +415,7 @@ function mapActiveHandoverToUI(klaim) {
     patokan: klaim.alamat_penyalur || '-',
     lat: klaim.latitude_penyalur ? parseFloat(klaim.latitude_penyalur) : null,
     lng: klaim.longitude_penyalur ? parseFloat(klaim.longitude_penyalur) : null,
+    nomor_whatsapp: klaim.nomor_whatsapp_penyalur || '',
     expiry: klaim.claimed_at ? new Date(klaim.claimed_at).toLocaleString('id-ID') : '-',
     items: [], // BE doesn't return item_detail for active handovers
   };
