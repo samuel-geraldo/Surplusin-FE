@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-
-const MAPS_API_KEY = 'AIzaSyAxvkMdHwDpYBUi62RVVoO4O9SmG_AgPp0';
+import maplibregl from 'maplibre-gl';
+import 'maplibre-gl/dist/maplibre-gl.css';
+import { MAPCN_LIGHT_STYLE } from '@/components/ui/mapConfig';
 
 const mockProfile = {
   name: 'Panti Jenaka Sukarela',
@@ -21,27 +22,6 @@ function toDMS(lat, lng) {
     return `${deg}°${min < 10 ? '0' : ''}${min}'${val >= 0 ? pos : neg}`;
   };
   return `${fmt(lat, 'N', 'S')}, ${fmt(lng, 'E', 'W')}`;
-}
-
-// Load Google Maps JS API script once
-let mapsScriptLoaded = false;
-let mapsScriptLoading = false;
-const mapsReadyCallbacks = [];
-
-function loadMapsScript(apiKey, callback) {
-  if (mapsScriptLoaded) { callback(); return; }
-  mapsReadyCallbacks.push(callback);
-  if (mapsScriptLoading) return;
-  mapsScriptLoading = true;
-  window.__googleMapsReady = () => {
-    mapsScriptLoaded = true;
-    mapsReadyCallbacks.forEach((cb) => cb());
-  };
-  const script = document.createElement('script');
-  script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=__googleMapsReady`;
-  script.async = true;
-  script.defer = true;
-  document.head.appendChild(script);
 }
 
 // ── Reusable field components ──
@@ -112,59 +92,61 @@ export default function RecipientProfilePage() {
 
   // ── Initialize Map ──
   const initMap = useCallback(() => {
-    if (!mapContainerRef.current || !window.google) return;
+    if (!mapContainerRef.current || mapInstanceRef.current) return;
 
-    const mapOptions = {
-      center: { lat, lng },
+    const map = new maplibregl.Map({
+      container: mapContainerRef.current,
+      style: MAPCN_LIGHT_STYLE,
+      center: [lng, lat],
       zoom: 16,
-      disableDefaultUI: false,
-      zoomControl: true,
-      mapTypeControl: false,
-      streetViewControl: false,
-      fullscreenControl: false,
-    };
-
-    const map = new window.google.maps.Map(mapContainerRef.current, mapOptions);
-    mapInstanceRef.current = map;
-
-    const marker = new window.google.maps.Marker({
-      position: { lat, lng },
-      map,
-      draggable: true,
-      animation: window.google.maps.Animation.DROP,
-      title: 'Seret untuk memindahkan lokasi',
+      attributionControl: false,
     });
+
+    mapInstanceRef.current = map;
+    map.addControl(new maplibregl.NavigationControl(), 'top-right');
+
+    const marker = new maplibregl.Marker({
+      draggable: true,
+      color: '#ef4444' // red pin
+    })
+      .setLngLat([lng, lat])
+      .addTo(map);
+      
     markerRef.current = marker;
 
     // Update coords when marker is dragged
-    marker.addListener('dragend', (e) => {
-      const newLat = e.latLng.lat();
-      const newLng = e.latLng.lng();
-      setLat(newLat);
-      setLng(newLng);
+    marker.on('dragend', () => {
+      const newLngLat = marker.getLngLat();
+      setLat(newLngLat.lat);
+      setLng(newLngLat.lng);
     });
 
     // Click on map to move marker
-    map.addListener('click', (e) => {
-      const newLat = e.latLng.lat();
-      const newLng = e.latLng.lng();
-      marker.setPosition({ lat: newLat, lng: newLng });
-      map.panTo({ lat: newLat, lng: newLng });
-      setLat(newLat);
-      setLng(newLng);
+    map.on('click', (e) => {
+      const newLngLat = e.lngLat;
+      marker.setLngLat(newLngLat);
+      map.panTo(newLngLat);
+      setLat(newLngLat.lat);
+      setLng(newLngLat.lng);
     });
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [lat, lng]);
 
-  // Load Maps script on mount
+  // Load Map on mount
   useEffect(() => {
-    loadMapsScript(MAPS_API_KEY, initMap);
+    initMap();
+    return () => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+      }
+    };
   }, [initMap]);
 
   // When lat/lng changes externally (auto-detect / search), update map + marker
   useEffect(() => {
     if (!mapInstanceRef.current || !markerRef.current) return;
-    const pos = { lat, lng };
-    markerRef.current.setPosition(pos);
+    const pos = [lng, lat];
+    markerRef.current.setLngLat(pos);
     mapInstanceRef.current.panTo(pos);
   }, [lat, lng]);
 

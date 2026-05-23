@@ -1,43 +1,17 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
-import { env } from '@/lib/env';
+import maplibregl from 'maplibre-gl';
+import 'maplibre-gl/dist/maplibre-gl.css';
+import { MAPCN_LIGHT_STYLE } from './mapConfig';
 
-const MAPS_API_KEY = env.GOOGLE_MAPS_API_KEY;
 const DEFAULT_CENTER = [106.8456, -6.2088];
 
-let mapsScriptLoaded = false;
-let mapsScriptLoading = false;
-const mapsReadyCallbacks = [];
-
-function loadMapsScript(callback) {
-  if (mapsScriptLoaded) {
-    callback();
-    return;
-  }
-
-  mapsReadyCallbacks.push(callback);
-
-  if (mapsScriptLoading) return;
-
-  mapsScriptLoading = true;
-  window.__googleMapsReady = () => {
-    mapsScriptLoaded = true;
-    mapsReadyCallbacks.splice(0).forEach((item) => item());
-  };
-
-  const script = document.createElement('script');
-  script.src = `https://maps.googleapis.com/maps/api/js?key=${MAPS_API_KEY}&callback=__googleMapsReady`;
-  script.async = true;
-  script.defer = true;
-  document.head.appendChild(script);
-}
-
-function toLatLng(center) {
+function toLngLat(center) {
   const nextCenter = Array.isArray(center) ? center : DEFAULT_CENTER;
-  return {
-    lat: Number(nextCenter[1]) || DEFAULT_CENTER[1],
-    lng: Number(nextCenter[0]) || DEFAULT_CENTER[0],
-  };
+  return [
+    Number(nextCenter[0]) || DEFAULT_CENTER[0],
+    Number(nextCenter[1]) || DEFAULT_CENTER[1],
+  ];
 }
 
 export function GoogleLocationMap({
@@ -60,53 +34,56 @@ export function GoogleLocationMap({
   const applyMapMode = useCallback((map, marker) => {
     const isEditable = editableRef.current;
 
-    map.setOptions({
-      disableDefaultUI: !isEditable,
-      zoomControl: isEditable,
-      mapTypeControl: false,
-      streetViewControl: false,
-      fullscreenControl: false,
-      draggable: isEditable,
-      scrollwheel: isEditable,
-      disableDoubleClickZoom: !isEditable,
-      keyboardShortcuts: isEditable,
-    });
+    if (isEditable) {
+      map.dragPan.enable();
+      map.scrollZoom.enable();
+      map.doubleClickZoom.enable();
+      map.keyboard.enable();
+    } else {
+      map.dragPan.disable();
+      map.scrollZoom.disable();
+      map.doubleClickZoom.disable();
+      map.keyboard.disable();
+    }
 
     marker.setDraggable(isEditable);
   }, []);
 
   const initMap = useCallback(() => {
-    if (!containerRef.current || !window.google || mapRef.current) return;
+    if (!containerRef.current || mapRef.current) return;
 
-    const position = toLatLng(center);
-    const map = new window.google.maps.Map(containerRef.current, {
+    const position = toLngLat(center);
+    const map = new maplibregl.Map({
+      container: containerRef.current,
+      style: MAPCN_LIGHT_STYLE,
       center: position,
       zoom: 16,
-      disableDefaultUI: true,
-      mapTypeControl: false,
-      streetViewControl: false,
-      fullscreenControl: false,
+      attributionControl: false,
     });
 
-    const marker = new window.google.maps.Marker({
-      position,
-      map,
+    if (editableRef.current) {
+      map.addControl(new maplibregl.NavigationControl(), 'top-right');
+    }
+
+    const marker = new maplibregl.Marker({
       draggable: editableRef.current,
-      animation: window.google.maps.Animation.DROP,
-      title: 'Lokasi',
+      color: '#ef4444' // red pin
+    })
+      .setLngLat(position)
+      .addTo(map);
+
+    marker.on('dragend', () => {
+      if (!editableRef.current) return;
+      const lngLat = marker.getLngLat();
+      onPickRef.current?.([lngLat.lng, lngLat.lat]);
     });
 
-    marker.addListener('dragend', (event) => {
+    map.on('click', (event) => {
       if (!editableRef.current) return;
-      onPickRef.current?.([event.latLng.lng(), event.latLng.lat()]);
-    });
-
-    map.addListener('click', (event) => {
-      if (!editableRef.current) return;
-      const nextPosition = { lat: event.latLng.lat(), lng: event.latLng.lng() };
-      marker.setPosition(nextPosition);
-      map.panTo(nextPosition);
-      onPickRef.current?.([nextPosition.lng, nextPosition.lat]);
+      const lngLat = event.lngLat;
+      marker.setLngLat(lngLat);
+      map.panTo(lngLat);
+      onPickRef.current?.([lngLat.lng, lngLat.lat]);
     });
 
     mapRef.current = map;
@@ -115,14 +92,20 @@ export function GoogleLocationMap({
   }, [applyMapMode, center]);
 
   useEffect(() => {
-    loadMapsScript(initMap);
+    initMap();
+    return () => {
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
+    };
   }, [initMap]);
 
   useEffect(() => {
     if (!mapRef.current || !markerRef.current) return;
 
-    const position = toLatLng(center);
-    markerRef.current.setPosition(position);
+    const position = toLngLat(center);
+    markerRef.current.setLngLat(position);
     mapRef.current.panTo(position);
     applyMapMode(mapRef.current, markerRef.current);
   }, [applyMapMode, center, editable]);
