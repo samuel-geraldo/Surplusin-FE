@@ -382,7 +382,7 @@ export default function RecipientHandoverPage() {
 
                 {/* Notification items */}
                 <div className="flex flex-col gap-3">
-                  {notifications.map((notif, index) => {
+                  {notifications.map((notif) => {
                     const isActive = (activeNotifId || notifications[0]?.id) === notif.id;
 
                     return (
