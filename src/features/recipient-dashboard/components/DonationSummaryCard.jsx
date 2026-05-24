@@ -17,7 +17,7 @@ export function DonationSummaryCard({ icon, count, label, accentColor, isLoading
   return (
     <article
       className={cn(
-        'relative flex h-32 items-center gap-4 overflow-hidden rounded-2xl bg-white px-2 py-4',
+        'relative flex min-h-[110px] sm:h-32 items-center gap-3 sm:gap-4 overflow-hidden rounded-2xl bg-white p-4 sm:px-2 sm:py-4',
         'border-l-4',
         isBlue ? 'border-l-[#1F66F4]' : 'border-l-[#FF6600]',
       )}
@@ -36,8 +36,7 @@ export function DonationSummaryCard({ icon, count, label, accentColor, isLoading
         src={icon}
         alt=""
         aria-hidden="true"
-        className="h-12 w-12 shrink-0"
-        style={{ marginLeft: '1rem' }}
+        className="h-10 w-10 sm:h-12 sm:w-12 shrink-0 ml-1 sm:ml-4"
       />
 
       {/* Text */}
@@ -51,15 +50,15 @@ export function DonationSummaryCard({ icon, count, label, accentColor, isLoading
           <>
             <p
               className={cn(
-                'font-[Manrope] text-[26px] font-extrabold leading-tight',
+                'font-[Manrope] text-[22px] sm:text-[26px] font-extrabold leading-tight',
                 isBlue ? 'text-[#1F66F4]' : 'text-[#FF6600]',
               )}
             >
-              {count} Donasi
+              {count} {label === 'Tersedia di sekitarmu' && count !== null && !String(count).includes('Panti') && !String(count).includes('Yayasan') ? (isBlue ? 'Panti' : 'Yayasan') : 'Donasi'}
             </p>
             <p
               className={cn(
-                "font-[Manrope] text-[14px] font-medium",
+                "font-[Manrope] text-[12px] sm:text-[14px] font-medium",
                 isBlue ? "text-[#1F66F4]" : "text-[#FF6600]"
               )}
             >

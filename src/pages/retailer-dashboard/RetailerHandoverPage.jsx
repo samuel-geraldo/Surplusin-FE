@@ -57,7 +57,7 @@ const PICKUP_STATUS = {
   waiting: {
     title: 'Menunggu klaim dari penerima',
     subtitle: '',
-    Icon: Hourglass,
+    Icon: '/recipient_retailer icon/basic-icon/logo waiting.svg',
     textClass: 'text-[#9a9a9a]',
     borderClass: 'border-transparent',
     shadowClass: '',
@@ -65,7 +65,7 @@ const PICKUP_STATUS = {
   on_the_way: {
     title: 'Penerima sedang menuju lokasi',
     subtitlePrefix: 'dari',
-    Icon: Truck,
+    Icon: '/recipient_retailer icon/basic-icon/truck.svg',
     textClass: 'text-[#ff6600]',
     borderClass: 'border-[#ff6600]',
     shadowClass: 'shadow-[0_4px_16px_rgba(255,102,0,0.32)]',
@@ -73,7 +73,7 @@ const PICKUP_STATUS = {
   arrived: {
     title: 'Penerima tiba di lokasi',
     subtitlePrefix: 'dari',
-    Icon: Radio,
+    Icon: '/recipient_retailer icon/basic-icon/logo penerima tiba di lokasi.svg',
     textClass: 'text-[#059669]',
     borderClass: 'border-[#059669]',
     shadowClass: 'shadow-[0_4px_16px_rgba(5,150,105,0.28)]',
@@ -189,7 +189,7 @@ export default function RetailerHandoverPage() {
       ) : null}
 
       <section className={`flex min-h-20 items-center gap-4 rounded-3xl border bg-white px-5 py-4 shadow-[0_8px_30px_rgba(0,0,0,0.06)] sm:px-7 ${pickupStatus.borderClass} ${pickupStatus.shadowClass}`}>
-        <PickupIcon className={`size-10 shrink-0 sm:size-12 ${pickupStatus.textClass}`} strokeWidth={2.2} />
+        <img src={PickupIcon} alt="" className="size-10 shrink-0 sm:size-12" />
         <div className="min-w-0">
           <h2 className={`text-[20px] font-extrabold leading-tight sm:text-[26px] ${pickupStatus.textClass}`}>
             {pickupStatus.title}
@@ -209,8 +209,8 @@ export default function RetailerHandoverPage() {
             style={{ padding: '2rem', boxShadow: '0 8px 30px rgba(0,0,0,0.06)', border: '1px solid #f1f5f9' }}
           >
             <div className="flex items-center gap-3">
-              <PackageCheck className="size-[18px] text-[#0f172a]" />
-              <h2 className="font-[Manrope] text-[15px] font-bold text-[#0f172a]">
+              <img src="/recipient_retailer icon/basic-icon/logo daftar persiapan item.svg" alt="" className="size-5 shrink-0" />
+              <h2 className="font-[Manrope] text-[16px] font-bold text-[#0f172a]">
                 Daftar Persiapan Item
               </h2>
             </div>
@@ -245,9 +245,12 @@ export default function RetailerHandoverPage() {
               </p>
             )}
 
-            <p className="mt-5 rounded-2xl bg-blue-50 px-4 py-3 font-[Manrope] text-[13px] text-[#0f172a]">
-              Pastikan semua item sudah dikemas sesuai standar kebersihan sebelum kurir/penerima tiba.
-            </p>
+            <div className="mt-5 flex items-start sm:items-center gap-3 rounded-2xl bg-[#eff6ff] px-4 py-3">
+              <img src="/recipient_retailer icon/basic-icon/alert.svg" alt="" className="size-5 shrink-0" />
+              <p className="font-[Manrope] text-[13px] text-[#0f172a]">
+                Pastikan semua item sudah dikemas sesuai standar kebersihan sebelum kurir/penerima tiba.
+              </p>
+            </div>
           </section>
 
           <section

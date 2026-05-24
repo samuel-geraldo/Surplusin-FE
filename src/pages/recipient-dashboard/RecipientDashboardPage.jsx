@@ -103,7 +103,7 @@ export default function RecipientDashboardPage() {
               />
             ))
           ) : (
-            <p className="col-span-full py-10 text-center font-[Manrope] text-text-muted">
+            <p className="col-span-full py-10 text-center font-[Manrope] font-medium text-text-muted text-[13px] sm:text-[15px]">
               Tidak ada donasi yang cocok dengan pencarian.
             </p>
           )}

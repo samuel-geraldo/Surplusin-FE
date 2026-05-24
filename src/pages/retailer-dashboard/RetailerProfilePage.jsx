@@ -53,7 +53,7 @@ function getProfileCenter(profile) {
 }
 
 function HomeProfileIcon() {
-  return <img src="/recipient_retailer icon/basic-icon/icon rumah.svg" alt="" aria-hidden="true" style={{ width: 22, height: 22 }} />;
+  return <img src="/recipient_retailer icon/basic-icon/logo profile retailer.svg" alt="" aria-hidden="true" style={{ width: 22, height: 22 }} />;
 }
 
 function EditProfileIcon() {
@@ -435,7 +435,7 @@ export default function RetailerProfilePage() {
   };
 
   return (
-    <div className="flex flex-col md:flex-row gap-4 sm:gap-6 px-4 py-4 sm:py-6 font-[Manrope] sm:px-6 lg:px-8 md:py-8" style={{ marginTop: '1rem' }}>
+    <div className="flex flex-col md:flex-row gap-4 sm:gap-6 px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 font-[Manrope]" style={{ marginTop: '0.5rem' }}>
       {isLoading && (
         <div className="fixed inset-x-0 top-20 z-40 mx-auto w-fit rounded-full bg-white px-5 py-2 text-sm font-semibold text-[#64748b] shadow">
           Memuat profil...

@@ -51,24 +51,22 @@ export default function RecipientHistoryPage() {
       >
         {/* Card 1: Orang Terbantu */}
         <div
-          className="relative flex min-w-0 items-center gap-4 overflow-hidden rounded-2xl bg-white p-5 shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-shadow duration-300 hover:shadow-[0_0px_30px_rgba(37,99,235,0.35)] cursor-default sm:gap-5 sm:p-7"
+          className="relative flex min-w-0 items-center gap-3 sm:gap-5 overflow-hidden rounded-2xl bg-white p-4 sm:p-5 lg:p-7 shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-shadow duration-300 hover:shadow-[0_0px_30px_rgba(37,99,235,0.35)] cursor-default"
           style={{
             borderLeft: '4px solid #2563eb',
           }}
         >
           <div className="flex shrink-0 items-center justify-center">
-            <img src="/recipient_retailer icon/basic-icon/orang terbantu.svg" alt="Orang Terbantu" style={{ width: 48, height: 48 }} />
+            <img src="/recipient_retailer icon/basic-icon/orang terbantu.svg" alt="Orang Terbantu" className="w-10 h-10 sm:w-12 sm:h-12 object-contain shrink-0" />
           </div>
           <div className="flex min-w-0 flex-col">
             <p
-              className="font-[Manrope] font-extrabold text-[#2563eb]"
-              style={{ fontSize: '28px', lineHeight: 1.2 }}
+              className="font-[Manrope] font-extrabold text-[#2563eb] text-[22px] sm:text-[28px] leading-tight"
             >
               {orangTerbantu} Orang
             </p>
             <p
-              className="font-[Manrope] font-medium text-[#60a5fa]"
-              style={{ fontSize: '15px' }}
+              className="font-[Manrope] font-medium text-[#60a5fa] text-[13px] sm:text-[15px]"
             >
               Terbantu
             </p>
@@ -77,24 +75,22 @@ export default function RecipientHistoryPage() {
 
         {/* Card 2: Donasi Telah Diterima */}
         <div
-          className="relative flex min-w-0 items-center gap-4 overflow-hidden rounded-2xl bg-white p-5 shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-shadow duration-300 hover:shadow-[0_0px_30px_rgba(16,185,129,0.35)] cursor-default sm:gap-5 sm:p-7"
+          className="relative flex min-w-0 items-center gap-3 sm:gap-5 overflow-hidden rounded-2xl bg-white p-4 sm:p-5 lg:p-7 shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-shadow duration-300 hover:shadow-[0_0px_30px_rgba(16,185,129,0.35)] cursor-default"
           style={{
             borderLeft: '4px solid #10b981',
           }}
         >
           <div className="flex shrink-0 items-center justify-center">
-            <img src="/recipient_retailer icon/basic-icon/donasi diterima.svg" alt="Donasi Diterima" style={{ width: 48, height: 48 }} />
+            <img src="/recipient_retailer icon/basic-icon/donasi diterima.svg" alt="Donasi Diterima" className="w-10 h-10 sm:w-12 sm:h-12 object-contain shrink-0" />
           </div>
           <div className="flex min-w-0 flex-col">
             <p
-              className="font-[Manrope] font-extrabold text-[#10b981]"
-              style={{ fontSize: '28px', lineHeight: 1.2 }}
+              className="font-[Manrope] font-extrabold text-[#10b981] text-[22px] sm:text-[28px] leading-tight"
             >
               {donasiDiterima} Donasi
             </p>
             <p
-              className="font-[Manrope] font-medium text-[#4ade80]"
-              style={{ fontSize: '15px' }}
+              className="font-[Manrope] font-medium text-[#34d399] text-[13px] sm:text-[15px]"
             >
               Telah diterima
             </p>
@@ -103,24 +99,22 @@ export default function RecipientHistoryPage() {
 
         {/* Card 3: Jumlah Toko */}
         <div
-          className="relative flex min-w-0 items-center gap-4 overflow-hidden rounded-2xl bg-white p-5 shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-shadow duration-300 hover:shadow-[0_0px_30px_rgba(249,115,22,0.35)] cursor-default sm:gap-5 sm:p-7"
+          className="relative flex min-w-0 items-center gap-3 sm:gap-5 overflow-hidden rounded-2xl bg-white p-4 sm:p-5 lg:p-7 shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-shadow duration-300 hover:shadow-[0_0px_30px_rgba(249,115,22,0.35)] cursor-default w-full md:col-span-2 xl:col-span-1 md:w-[calc(50%-10px)] md:justify-self-center xl:w-full xl:justify-self-auto"
           style={{
-            borderLeft: '4px solid #f97316',
+            borderLeft: '4px solid #ea580c',
           }}
         >
           <div className="flex shrink-0 items-center justify-center">
-            <img src="/recipient_retailer icon/basic-icon/toko mengirimkan donasi.svg" alt="Jumlah Toko" style={{ width: 48, height: 48 }} />
+            <img src="/recipient_retailer icon/basic-icon/toko mengirimkan donasi.svg" alt="Toko Terlibat" className="w-10 h-10 sm:w-12 sm:h-12 object-contain shrink-0" />
           </div>
           <div className="flex min-w-0 flex-col">
             <p
-              className="font-[Manrope] font-extrabold text-[#f97316]"
-              style={{ fontSize: '28px', lineHeight: 1.2 }}
+              className="font-[Manrope] font-extrabold text-[#ea580c] text-[22px] sm:text-[28px] leading-tight"
             >
               {jumlahToko} Toko
             </p>
             <p
-              className="font-[Manrope] font-medium text-[#fb923c]"
-              style={{ fontSize: '15px' }}
+              className="font-[Manrope] font-medium text-[#fb923c] text-[13px] sm:text-[15px]"
             >
               Mengirimkan Donasi
             </p>
@@ -194,10 +188,10 @@ export default function RecipientHistoryPage() {
             <div
               className="flex flex-col items-center justify-center py-12"
             >
-              <p className="font-[Manrope] font-semibold text-[#94a3b8]" style={{ fontSize: '16px' }}>
+              <p className="text-center font-[Manrope] font-semibold text-[#94a3b8]" style={{ fontSize: '16px' }}>
                 Belum ada riwayat donasi
               </p>
-              <p className="font-[Manrope] text-[#94a3b8]" style={{ fontSize: '13px', marginTop: '4px' }}>
+              <p className="text-center font-[Manrope] text-[#94a3b8] px-4" style={{ fontSize: '13px', marginTop: '4px' }}>
                 Riwayat akan muncul setelah Anda menyelesaikan penjemputan donasi.
               </p>
             </div>

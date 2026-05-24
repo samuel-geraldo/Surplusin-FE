@@ -10,21 +10,21 @@ function formatDate(value) {
   }).format(new Date(value));
 }
 
-function SummaryCard({ card }) {
+function SummaryCard({ card, isThirdCard }) {
   return (
     <article
-      className="relative flex min-w-0 items-center gap-4 overflow-hidden rounded-2xl bg-white p-5 sm:gap-5 sm:p-7"
+      className={`relative flex min-w-0 items-center gap-3 sm:gap-5 overflow-hidden rounded-2xl bg-white p-4 sm:p-5 lg:p-7 ${isThirdCard ? 'w-full md:col-span-2 xl:col-span-1 md:w-[calc(50%-10px)] md:justify-self-center xl:w-full xl:justify-self-auto' : ''}`}
       style={{
         borderLeft: `4px solid ${card.accent}`,
         boxShadow: '0 8px 30px rgba(0,0,0,0.06)',
       }}
     >
-      <img src={card.icon} alt="" aria-hidden="true" style={{ width: 48, height: 48 }} />
+      <img src={card.icon} alt="" aria-hidden="true" className="w-10 h-10 sm:w-12 sm:h-12 object-contain shrink-0" />
       <div className="flex min-w-0 flex-col">
-        <p className="font-[Manrope] font-extrabold leading-tight" style={{ color: card.accent, fontSize: '28px' }}>
+        <p className="font-[Manrope] font-extrabold leading-tight text-[22px] sm:text-[28px]" style={{ color: card.accent }}>
           {card.value}
         </p>
-        <p className="font-[Manrope] font-medium" style={{ color: card.accent, fontSize: '15px' }}>
+        <p className="font-[Manrope] font-medium text-[13px] sm:text-[15px]" style={{ color: card.accent }}>
           {card.label}
         </p>
       </div>
@@ -127,10 +127,10 @@ export default function RetailerHistoryPage() {
   ];
 
   return (
-    <div className="flex flex-col gap-6 px-4 py-6 font-[Manrope] sm:px-6 lg:px-8" style={{ marginTop: '1rem' }}>
+    <div className="flex flex-col gap-6 px-4 py-6 font-[Manrope] sm:px-6 lg:px-8">
       <section className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
-        {summaryCards.map((card) => (
-          <SummaryCard key={card.label} card={card} />
+        {summaryCards.map((card, index) => (
+          <SummaryCard key={card.label} card={card} isThirdCard={index === 2} />
         ))}
       </section>
 
