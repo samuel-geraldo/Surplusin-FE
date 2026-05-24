@@ -61,7 +61,7 @@ function EditProfileIcon() {
 }
 
 function FieldBox({ field, value, draftValue, error, isEditing, onChange }) {
-  const inputClass = `w-full rounded-xl font-[Manrope] text-[#374151] outline-none px-3 py-2 text-[13px] sm:px-[14px] sm:py-[10px] sm:text-[14px] bg-white ${error ? 'border-[1.5px] border-[#ff4542]' : 'border-[1.5px] border-[#e2e8f0]'}`;
+  const inputClass = `w-full rounded-xl font-[Manrope] text-[#374151] outline-none px-3 py-2 text-[13px] sm:px-[14px] lg:py-[10px] sm:text-[14px] bg-white ${error ? 'border-[1.5px] border-[#ff4542]' : 'border-[1.5px] border-[#e2e8f0]'}`;
 
   return (
     <label className={`flex flex-col min-w-0 ${field.id === 'category' || field.id === 'whatsapp' ? '' : 'sm:col-span-2 md:col-span-1 lg:col-span-2'}`}>
@@ -102,7 +102,7 @@ function FieldBox({ field, value, draftValue, error, isEditing, onChange }) {
         )
       ) : (
         <span
-          className="flex w-full min-h-[36px] sm:min-h-[42px] items-center break-words rounded-xl font-[Manrope] text-[#374151] px-3 py-2 text-[13px] sm:px-[14px] sm:py-[10px] sm:text-[14px] bg-[#f0fdf4] border border-[#d1fae5]"
+          className="flex w-full min-h-[36px] lg:min-h-[42px] items-center break-words rounded-xl font-[Manrope] text-[#374151] px-3 py-2 text-[13px] sm:px-[14px] lg:py-[10px] sm:text-[14px] bg-[#f0fdf4] border border-[#d1fae5]"
         >
           {value || '-'}
         </span>
@@ -448,10 +448,10 @@ export default function RetailerProfilePage() {
       )}
       <div className="flex flex-1 flex-col gap-6" style={{ minWidth: 0 }}>
         <section
-          className="flex flex-col h-full rounded-3xl bg-white p-5 sm:p-7 lg:px-8"
+          className="flex flex-col h-full rounded-3xl bg-white p-5 lg:p-7 lg:px-8"
           style={{ boxShadow: '0 8px 30px rgba(0,0,0,0.06)', border: '1px solid #f1f5f9' }}
         >
-          <div className="mb-5 flex items-center justify-between gap-4">
+          <div className="mb-4 lg:mb-5 flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <HomeProfileIcon />
               <h2 className="font-[Manrope] text-[16px] sm:text-[18px] font-extrabold leading-6 text-[#0f172a]">
@@ -470,7 +470,7 @@ export default function RetailerProfilePage() {
             ) : null}
           </div>
 
-          <div className="grid grid-cols-1 gap-3 sm:gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2">
+          <div className="grid grid-cols-1 gap-3 lg:gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2">
             <FieldBox
               field={profileFields[0]}
               value={profile.storeName}
@@ -543,7 +543,7 @@ export default function RetailerProfilePage() {
 
       <aside className="flex w-full shrink-0 flex-col gap-0 md:w-[320px] lg:w-[380px]">
         <section
-          className="flex flex-col h-full rounded-3xl bg-white p-5 sm:p-7"
+          className="flex flex-col h-full rounded-3xl bg-white p-5 lg:p-7"
           style={{ boxShadow: '0 8px 30px rgba(0,0,0,0.06)', border: '1px solid #f1f5f9' }}
         >
           <div className="flex flex-1 min-w-0 flex-col">
