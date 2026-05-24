@@ -110,19 +110,19 @@ export default function RetailerHistoryPage() {
       value: `${totalKg} kg`,
       label: 'Makanan tidak ke TPA',
       accent: '#1f66f4',
-      icon: '/recipient_retailer icon/basic-icon/orang terbantu.svg',
+      icon: '/recipient_retailer icon/basic-icon/makanan tidak ke tpa.svg',
     },
     {
       value: `${totalPorsi} Porsi`,
       label: 'Makanan dikirimkan',
       accent: '#ff6600',
-      icon: '/recipient_retailer icon/basic-icon/toko mengirimkan donasi.svg',
+      icon: '/recipient_retailer icon/basic-icon/logo makanan dikirimkan.svg',
     },
     {
       value: `${totalPengiriman * 2} kg`,
       label: 'Emisi terselamatkan',
       accent: '#50c878',
-      icon: '/recipient_retailer icon/basic-icon/donasi diterima.svg',
+      icon: '/recipient_retailer icon/basic-icon/logo emisi terselamatkan.svg',
     },
   ];
 

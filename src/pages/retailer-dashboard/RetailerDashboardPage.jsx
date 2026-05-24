@@ -15,8 +15,8 @@ const ICONS = {
   cake: '/recipient_retailer icon/basic-icon/kue.svg',
   box: '/recipient_retailer icon/basic-icon/box.svg',
   // Untuk summary cards — dipilih sesuai warna icon natural-nya
-  nearbyPanti: '/recipient_retailer icon/basic-icon/orang terbantu.svg',   // biru #1F66F4
-  nearbyYayasan: '/recipient_retailer icon/basic-icon/toko mengirimkan donasi.svg', // orange #FF6600
+  nearbyPanti: '/recipient_retailer icon/basic-icon/logo panti.svg',   // biru #1F66F4
+  nearbyYayasan: '/recipient_retailer icon/basic-icon/logo yayasan.svg', // orange #FF6600
 };
 
 const CATEGORY_OPTIONS = [

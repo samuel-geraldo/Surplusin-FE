@@ -76,17 +76,11 @@ function EditIcon() {
 }
 
 function FieldBox({ field, value, draftValue, error, isEditing, onChange }) {
-  const inputClass = 'w-full rounded-xl font-[Manrope] text-[#374151] outline-none';
-  const inputStyle = {
-    padding: '10px 14px',
-    fontSize: '14px',
-    border: error ? '1.5px solid #ff4542' : '1.5px solid #e2e8f0',
-    backgroundColor: '#fff',
-  };
+  const inputClass = `w-full rounded-xl font-[Manrope] text-[#374151] outline-none px-3 py-2 text-[13px] sm:px-[14px] sm:py-[10px] sm:text-[14px] bg-white ${error ? 'border-[1.5px] border-[#ff4542]' : 'border-[1.5px] border-[#e2e8f0]'}`;
 
   return (
-    <label className={`flex flex-col min-w-0 ${field.id === 'category' || field.id === 'whatsapp' ? '' : 'sm:col-span-2'}`}>
-      <span className="mb-1 block font-[Manrope] font-medium text-[#374151]" style={{ fontSize: '14px' }}>
+    <label className={`flex flex-col min-w-0 ${field.id === 'category' || field.id === 'whatsapp' ? '' : 'sm:col-span-2 md:col-span-1 lg:col-span-2'}`}>
+      <span className="mb-1 block font-[Manrope] font-medium text-[#374151] text-[13px] sm:text-[14px]">
         {field.label}
       </span>
       {isEditing ? (
@@ -97,7 +91,6 @@ function FieldBox({ field, value, draftValue, error, isEditing, onChange }) {
             required
             aria-invalid={Boolean(error)}
             className={inputClass}
-            style={inputStyle}
           >
             <option value="">Pilih kategori</option>
             {categoryOptions.map((option) => (
@@ -111,7 +104,6 @@ function FieldBox({ field, value, draftValue, error, isEditing, onChange }) {
             required
             aria-invalid={Boolean(error)}
             className={`${inputClass} resize-none`}
-            style={{ ...inputStyle, resize: 'none' }}
             rows={3}
           />
         ) : (
@@ -121,19 +113,11 @@ function FieldBox({ field, value, draftValue, error, isEditing, onChange }) {
             required
             aria-invalid={Boolean(error)}
             className={inputClass}
-            style={inputStyle}
           />
         )
       ) : (
         <span
-          className="w-full break-words rounded-xl font-[Manrope] text-[#374151]"
-          style={{
-            padding: '10px 14px',
-            fontSize: '14px',
-            backgroundColor: '#f0fdf4',
-            border: '1px solid #d1fae5',
-            minHeight: field.multiline ? 92 : 42,
-          }}
+          className="flex w-full min-h-[36px] sm:min-h-[42px] items-center break-words rounded-xl font-[Manrope] text-[#374151] px-3 py-2 text-[13px] sm:px-[14px] sm:py-[10px] sm:text-[14px] bg-[#f0fdf4] border border-[#d1fae5]"
         >
           {value || '-'}
         </span>
@@ -308,7 +292,7 @@ function RecipientLocationMap({ editable, profile, draft, onLocationChange }) {
         ) : null}
       </div>
 
-      <div className="relative flex-1 min-h-[260px] w-full overflow-hidden rounded-2xl border border-[#e2e8f0] bg-[#edf2f7]">
+      <div className="relative flex-1 min-h-[200px] sm:min-h-[260px] w-full overflow-hidden rounded-2xl border border-[#e2e8f0] bg-[#edf2f7]">
         <GoogleLocationMap
           center={center}
           onPick={handlePick}
@@ -445,7 +429,7 @@ export default function RecipientProfilePage() {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row gap-6 px-4 sm:px-6 lg:px-8 py-6 sm:py-8 font-[Manrope]" style={{ marginTop: '0.5rem' }}>
+    <div className="flex flex-col md:flex-row gap-4 sm:gap-6 px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 font-[Manrope]" style={{ marginTop: '0.5rem' }}>
       {isLoading && (
         <div className="fixed inset-x-0 top-20 z-40 mx-auto w-fit rounded-full bg-white px-5 py-2 text-sm font-semibold text-[#64748b] shadow">
           Memuat profil...
@@ -464,7 +448,7 @@ export default function RecipientProfilePage() {
           <div className="mb-5 flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <HomeIcon />
-              <h2 className="font-[Manrope] text-[18px] font-extrabold leading-6 text-[#0f172a]">
+              <h2 className="font-[Manrope] text-[16px] sm:text-[18px] font-extrabold leading-6 text-[#0f172a]">
                 Informasi Dasar
               </h2>
             </div>
@@ -480,7 +464,7 @@ export default function RecipientProfilePage() {
             ) : null}
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
             {fields.map((field) => (
               <FieldBox
                 key={field.id}
@@ -523,7 +507,7 @@ export default function RecipientProfilePage() {
         </section>
       </div>
 
-      <aside className="flex shrink-0 flex-col gap-0 w-full lg:w-[380px]" >
+      <aside className="flex shrink-0 flex-col gap-0 w-full md:w-[320px] lg:w-[380px]">
         <section
           className="flex flex-col h-full rounded-3xl bg-white p-5 sm:p-7"
           style={{ boxShadow: '0 8px 30px rgba(0,0,0,0.06)', border: '1px solid #f1f5f9' }}
@@ -536,7 +520,7 @@ export default function RecipientProfilePage() {
                 aria-hidden="true"
                 style={{ width: 18, height: 23 }}
               />
-              <h2 className="font-[Manrope] text-[18px] font-extrabold leading-6 text-black">
+              <h2 className="font-[Manrope] text-[16px] sm:text-[18px] font-extrabold leading-6 text-black">
                 Pinpoint Lokasi
               </h2>
             </div>
