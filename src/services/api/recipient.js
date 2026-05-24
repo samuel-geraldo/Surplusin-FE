@@ -25,6 +25,14 @@ import apiClient from './client';
 import { env } from '@/lib/env';
 
 const USE_MOCK = env.USE_MOCK_API;
+const MOCK_CATEGORIES = [
+  { value: 'semua', label: 'Semua' },
+  { value: 'makanan-siap-saji', label: 'Makanan Siap Saji' },
+  { value: 'roti-pastry', label: 'Roti & Pastry' },
+  { value: 'jajanan-kue', label: 'Jajanan & Kue' },
+];
+const mockDonationSummary = { available: 0, claimed: 0 };
+const mockDonations = [];
 
 // ────────────────────────────────────────────
 // Helpers

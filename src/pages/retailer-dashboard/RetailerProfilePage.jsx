@@ -46,6 +46,12 @@ const profileFields = [
   },
 ];
 
+const categoryOptions = [
+  'Makanan Siap Saji',
+  'Roti & Pastry',
+  'Jajanan & Kue',
+];
+
 function getProfileCenter(profile) {
   return profile.longitude && profile.latitude
     ? [Number(profile.longitude), Number(profile.latitude)]

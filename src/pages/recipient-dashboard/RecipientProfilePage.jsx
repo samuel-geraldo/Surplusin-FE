@@ -538,7 +538,7 @@ export default function RecipientProfilePage() {
           </div>
         </section>
       </aside>
-      
+
       <CancelEditPopup
         isOpen={showCancelPopup}
         onConfirm={handleCancelConfirm}

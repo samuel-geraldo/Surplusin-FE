@@ -13,11 +13,11 @@ export function ProtectedRoute({ allowedRoles = [] }) {
   }
 
   if (!accessToken) {
-   // return <Navigate to={ROUTES.AUTH} replace state={{ from: location }} />;
+    return <Navigate to={ROUTES.AUTH} replace state={{ from: location }} />;
   }
 
   if (allowedRoles.length > 0 && !allowedRoles.includes(user?.role)) {
-   // return <Navigate to={ROUTES.AUTH} replace />;
+    return <Navigate to={ROUTES.AUTH} replace />;
   }
 
   return <Outlet />;
