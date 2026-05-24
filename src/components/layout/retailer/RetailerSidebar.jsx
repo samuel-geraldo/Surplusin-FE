@@ -20,17 +20,19 @@ export function RetailerSidebar() {
   return (
     <>
       <aside
-        onMouseEnter={() => setIsExpanded(true)}
+        onMouseEnter={() => {
+          if (window.innerWidth >= 768) setIsExpanded(true);
+        }}
         onMouseLeave={() => setIsExpanded(false)}
         className={cn(
           'sticky top-0 z-40 flex h-screen shrink-0 flex-col border-r border-border bg-surface font-[Manrope] shadow-[8px_0_24px_rgba(15,23,42,0.04)] transition-[width] duration-700 ease-in-out',
-          isExpanded ? 'w-[190px]' : 'w-[60px] sm:w-[60px]',
+          isExpanded ? 'w-[190px]' : 'w-[52px] sm:w-[60px]',
         )}
       >
-        <div className="flex h-[57px] w-full shrink-0 items-center justify-center overflow-hidden border-b border-border/80 transition-all duration-500">
+        <div className="flex h-12 sm:h-[72px] md:h-14 w-full shrink-0 items-center justify-center overflow-hidden border-b border-border/80 transition-all duration-500">
           <div className="flex shrink-0 items-center justify-center">
-            <div className="flex size-10 shrink-0 cursor-pointer items-center justify-center text-primary transition-transform duration-200 active:scale-95">
-              <img src="/MainLogo.svg" alt="SurplusIn Logo" className="size-7" />
+            <div className="flex size-8 sm:size-10 shrink-0 cursor-pointer items-center justify-center text-primary transition-transform duration-200 active:scale-95">
+              <img src="/MainLogo.svg" alt="SurplusIn Logo" className="size-6 sm:size-7" />
             </div>
             <span
               className={cn(
@@ -63,13 +65,13 @@ export function RetailerSidebar() {
                 aria-label={item.label}
                 title={!isExpanded ? item.shortLabel : undefined}
               >
-                <div className="flex w-7 shrink-0 items-center justify-center">
+                <div className="flex w-6 sm:w-7 shrink-0 items-center justify-center">
                   <img
                     src={item.icon}
                     alt=""
                     aria-hidden="true"
                     className={cn(
-                      'h-[26px] w-[26px] shrink-0 transition-all duration-200',
+                      'h-[22px] w-[22px] sm:h-[26px] sm:w-[26px] shrink-0 transition-all duration-200',
                       '[filter:brightness(0)_invert(55%)]',
                       'group-[.is-active]:[filter:invert(48%)_sepia(62%)_saturate(450%)_hue-rotate(95deg)_brightness(90%)]',
                     )}
@@ -102,8 +104,8 @@ export function RetailerSidebar() {
             aria-label="Keluar"
             title={!isExpanded ? 'Keluar' : undefined}
           >
-            <div className="flex w-7 shrink-0 items-center justify-center">
-              <img src="/recipient_retailer icon/basic-icon/logout logo.svg" alt="Logout" className="size-[24px] shrink-0 sm:size-[26px]" />
+            <div className="flex w-6 sm:w-7 shrink-0 items-center justify-center">
+              <img src="/recipient_retailer icon/basic-icon/logout logo.svg" alt="Logout" className="size-[20px] shrink-0 sm:size-[26px]" />
             </div>
             <span
               className={cn(
