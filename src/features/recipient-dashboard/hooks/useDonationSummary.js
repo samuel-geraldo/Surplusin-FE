@@ -7,7 +7,7 @@ import { getDonationSummary } from '@/services/api/recipient';
  * Mengembalikan { data, isLoading, error } — pola yang sama
  * yang akan digunakan setelah migrasi ke API nyata.
  *
- * @returns {{ data: import('@/features/recipient-dashboard/data/mockRecipientDashboardData').DonationSummary | null, isLoading: boolean, error: string | null }}
+ * @returns {{ data: Object | null, isLoading: boolean, error: string | null }}
  */
 export function useDonationSummary() {
   const [data, setData] = useState(null);

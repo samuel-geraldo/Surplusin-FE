@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { LocateFixed, Search } from 'lucide-react';
-import { GoogleLocationMap } from '@/components/ui';
+import { GoogleLocationMap, CancelEditPopup, FailedUpdatePopup, SuccessUpdatePopup } from '@/components/ui';
 import {
   searchAddresses,
   shouldSearchAddress,
@@ -46,6 +46,12 @@ const profileFields = [
   },
 ];
 
+const categoryOptions = [
+  'Makanan Siap Saji',
+  'Roti & Pastry',
+  'Jajanan & Kue',
+];
+
 function getProfileCenter(profile) {
   return profile.longitude && profile.latitude
     ? [Number(profile.longitude), Number(profile.latitude)]
@@ -53,72 +59,56 @@ function getProfileCenter(profile) {
 }
 
 function HomeProfileIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#0f172a" style={{ width: 22, height: 22 }} aria-hidden="true">
-      <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
-    </svg>
-  );
+  return <img src="/recipient_retailer icon/basic-icon/logo profile retailer.svg" alt="" aria-hidden="true" style={{ width: 22, height: 22 }} />;
 }
 
 function EditProfileIcon() {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 32 32" style={{ width: 18, height: 18 }}>
-      <path
-        fill="black"
-        d="M4 22.9V28h5.1L24.15 12.95l-5.1-5.1L4 22.9Zm24.05-13.9a1.36 1.36 0 0 0 0-1.92l-3.13-3.13a1.36 1.36 0 0 0-1.92 0l-2.45 2.45 5.1 5.1 2.4-2.5Z"
-      />
-    </svg>
-  );
+  return <img src="/recipient_retailer icon/basic-icon/edit logo.svg" alt="" aria-hidden="true" style={{ width: 18, height: 18 }} />;
 }
 
 function FieldBox({ field, value, draftValue, error, isEditing, onChange }) {
-  const inputBaseStyle = {
-    padding: '10px 14px',
-    fontSize: '14px',
-    border: error ? '1.5px solid #ff4542' : '1.5px solid #e2e8f0',
-    backgroundColor: '#fff',
-  };
-
-  const sharedInputClass = 'w-full rounded-xl font-[Manrope] text-[#374151] outline-none';
+  const inputClass = `w-full rounded-xl font-[Manrope] text-[#374151] outline-none px-3 py-2 text-[13px] sm:px-[14px] lg:py-[10px] sm:text-[14px] bg-white ${error ? 'border-[1.5px] border-[#ff4542]' : 'border-[1.5px] border-[#e2e8f0]'}`;
 
   return (
-    <label className={`flex min-w-0 flex-col ${field.id === 'category' || field.id === 'whatsapp' ? '' : 'sm:col-span-2'}`}>
-      <span className="mb-1 block font-[Manrope] font-medium text-[#374151]" style={{ fontSize: '14px' }}>
+    <label className={`flex flex-col min-w-0 ${field.id === 'category' || field.id === 'whatsapp' ? '' : 'sm:col-span-2 md:col-span-1 lg:col-span-2'}`}>
+      <span className="mb-1 block font-[Manrope] font-medium text-[#374151] text-[13px] sm:text-[14px]">
         {field.label}
       </span>
       {isEditing ? (
-        field.multiline ? (
+        field.id === 'category' ? (
+          <select
+            value={draftValue}
+            onChange={(event) => onChange(field.id, event.target.value)}
+            required
+            aria-invalid={Boolean(error)}
+            className={inputClass}
+          >
+            <option value="">Pilih kategori</option>
+            {categoryOptions.map((option) => (
+              <option key={option} value={option}>{option}</option>
+            ))}
+          </select>
+        ) : field.multiline ? (
           <textarea
             value={draftValue}
             onChange={(event) => onChange(field.id, event.target.value)}
-            onInput={(event) => onChange(field.id, event.currentTarget.value)}
             required
             aria-invalid={Boolean(error)}
-            className={`${sharedInputClass} resize-none`}
-            style={{ ...inputBaseStyle, resize: 'none' }}
+            className={`${inputClass} resize-none`}
             rows={3}
           />
         ) : (
           <input
             value={draftValue}
             onChange={(event) => onChange(field.id, event.target.value)}
-            onInput={(event) => onChange(field.id, event.currentTarget.value)}
             required
             aria-invalid={Boolean(error)}
-            className={sharedInputClass}
-            style={inputBaseStyle}
+            className={inputClass}
           />
         )
       ) : (
         <span
-          className="w-full break-words rounded-xl font-[Manrope] text-[#374151]"
-          style={{
-            padding: '10px 14px',
-            fontSize: '14px',
-            backgroundColor: '#f0fdf4',
-            border: '1px solid #d1fae5',
-            minHeight: field.multiline ? 92 : 42,
-          }}
+          className="flex w-full min-h-[36px] lg:min-h-[42px] items-center break-words rounded-xl font-[Manrope] text-[#374151] px-3 py-2 text-[13px] sm:px-[14px] lg:py-[10px] sm:text-[14px] bg-[#f0fdf4] border border-[#d1fae5]"
         >
           {value || '-'}
         </span>
@@ -257,7 +247,7 @@ function RetailerLocationMap({ editable, profile, draft, onLocationChange }) {
   }
 
   return (
-    <div className="mt-4 flex flex-col gap-3">
+    <div className="mt-4 flex flex-1 flex-col gap-3">
       <div className="relative">
         <div className="flex h-11 w-full items-center rounded-[8px] border border-[#94a3b8] bg-white px-3">
           <Search className="size-5 text-[#64748b]" strokeWidth={2.2} />
@@ -311,7 +301,7 @@ function RetailerLocationMap({ editable, profile, draft, onLocationChange }) {
         ) : null}
       </div>
 
-      <div className="relative h-[260px] w-full overflow-hidden rounded-2xl border border-[#e2e8f0] bg-[#edf2f7]">
+      <div className="relative flex-1 min-h-[200px] sm:min-h-[260px] w-full overflow-hidden rounded-2xl border border-[#e2e8f0] bg-[#edf2f7]">
         <GoogleLocationMap
           center={center}
           onPick={handlePick}
@@ -331,6 +321,9 @@ export default function RetailerProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [showCancelPopup, setShowCancelPopup] = useState(false);
+  const [showFailedPopup, setShowFailedPopup] = useState(false);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -390,10 +383,17 @@ export default function RetailerProfilePage() {
     });
   }, []);
 
-  const handleCancel = () => {
+  const handleCancelClick = () => {
+    setShowCancelPopup(true);
+  };
+
+  const handleCancelConfirm = () => {
     setDraft(profile);
     setErrors({});
     setIsEditing(false);
+    setShowCancelPopup(false);
+    setShowFailedPopup(true);
+    setTimeout(() => setShowFailedPopup(false), 2000);
   };
 
   const handleSave = async () => {
@@ -427,6 +427,8 @@ export default function RetailerProfilePage() {
       setProfile(nextProfile);
       setDraft(nextProfile);
       setIsEditing(false);
+      setShowSuccessPopup(true);
+      setTimeout(() => setShowSuccessPopup(false), 2000);
     } catch (error) {
       setErrorMessage(
         error?.response?.data?.message ||
@@ -439,7 +441,7 @@ export default function RetailerProfilePage() {
   };
 
   return (
-    <div className="flex flex-col gap-6 px-4 py-6 font-[Manrope] sm:px-6 lg:px-8 xl:flex-row xl:py-8" style={{ marginTop: '1rem' }}>
+    <div className="flex flex-col md:flex-row gap-4 sm:gap-6 px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 font-[Manrope]" style={{ marginTop: '0.5rem' }}>
       {isLoading && (
         <div className="fixed inset-x-0 top-20 z-40 mx-auto w-fit rounded-full bg-white px-5 py-2 text-sm font-semibold text-[#64748b] shadow">
           Memuat profil...
@@ -452,13 +454,13 @@ export default function RetailerProfilePage() {
       )}
       <div className="flex flex-1 flex-col gap-6" style={{ minWidth: 0 }}>
         <section
-          className="rounded-3xl bg-white p-5 sm:p-7 lg:px-8"
+          className="flex flex-col h-full rounded-3xl bg-white p-5 lg:p-7 lg:px-8"
           style={{ boxShadow: '0 8px 30px rgba(0,0,0,0.06)', border: '1px solid #f1f5f9' }}
         >
-          <div className="mb-5 flex items-center justify-between gap-4">
+          <div className="mb-4 lg:mb-5 flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <HomeProfileIcon />
-              <h2 className="font-[Manrope] text-[18px] font-extrabold leading-6 text-[#0f172a]">
+              <h2 className="font-[Manrope] text-[16px] sm:text-[18px] font-extrabold leading-6 text-[#0f172a]">
                 Informasi Dasar
               </h2>
             </div>
@@ -474,7 +476,7 @@ export default function RetailerProfilePage() {
             ) : null}
           </div>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-3 lg:gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2">
             <FieldBox
               field={profileFields[0]}
               value={profile.storeName}
@@ -520,7 +522,7 @@ export default function RetailerProfilePage() {
             <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-end">
               <button
                 type="button"
-                onClick={handleCancel}
+                onClick={handleCancelClick}
                 className="w-full rounded-xl font-[Manrope] font-semibold text-[#374151] transition-colors hover:bg-[#e2e8f0] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#64748b] sm:w-auto"
                 style={{ padding: '10px 28px', fontSize: '14px', backgroundColor: '#f1f5f9' }}
               >
@@ -545,12 +547,12 @@ export default function RetailerProfilePage() {
         </section>
       </div>
 
-      <aside className="flex w-full shrink-0 flex-col gap-0 xl:w-[380px]">
+      <aside className="flex w-full shrink-0 flex-col gap-0 md:w-[320px] lg:w-[380px]">
         <section
-          className="flex flex-col rounded-3xl bg-white p-5 sm:p-7"
+          className="flex flex-col h-full rounded-3xl bg-white p-5 lg:p-7"
           style={{ boxShadow: '0 8px 30px rgba(0,0,0,0.06)', border: '1px solid #f1f5f9' }}
         >
-          <div className="flex min-w-0 flex-col">
+          <div className="flex flex-1 min-w-0 flex-col">
             <div className="flex items-center gap-2">
               <img
                 src="/recipient_retailer icon/basic-icon/location black.svg"
@@ -558,7 +560,7 @@ export default function RetailerProfilePage() {
                 aria-hidden="true"
                 style={{ width: 18, height: 23 }}
               />
-              <h2 className="font-[Manrope] text-[18px] font-extrabold leading-6 text-black">
+              <h2 className="font-[Manrope] text-[16px] sm:text-[18px] font-extrabold leading-6 text-black">
                 Pinpoint Lokasi
               </h2>
             </div>
@@ -576,6 +578,14 @@ export default function RetailerProfilePage() {
           </div>
         </section>
       </aside>
+
+      <CancelEditPopup
+        isOpen={showCancelPopup}
+        onConfirm={handleCancelConfirm}
+        onCancel={() => setShowCancelPopup(false)}
+      />
+      <FailedUpdatePopup isOpen={showFailedPopup} />
+      <SuccessUpdatePopup isOpen={showSuccessPopup} />
     </div>
   );
 }

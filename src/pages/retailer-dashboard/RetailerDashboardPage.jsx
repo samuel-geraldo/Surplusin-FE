@@ -15,8 +15,8 @@ const ICONS = {
   cake: '/recipient_retailer icon/basic-icon/kue.svg',
   box: '/recipient_retailer icon/basic-icon/box.svg',
   // Untuk summary cards — dipilih sesuai warna icon natural-nya
-  nearbyPanti: '/recipient_retailer icon/basic-icon/orang terbantu.svg',   // biru #1F66F4
-  nearbyYayasan: '/recipient_retailer icon/basic-icon/toko mengirimkan donasi.svg', // orange #FF6600
+  nearbyPanti: '/recipient_retailer icon/basic-icon/logo panti.svg',   // biru #1F66F4
+  nearbyYayasan: '/recipient_retailer icon/basic-icon/logo yayasan.svg', // orange #FF6600
 };
 
 const CATEGORY_OPTIONS = [
@@ -148,7 +148,7 @@ function NearbySummaryCard({ icon, count, label, accentColor, isLoading }) {
 
   return (
     <article
-      className="relative flex h-36 items-center gap-4 overflow-hidden rounded-2xl bg-white px-6 py-4"
+      className="relative flex min-h-[110px] sm:h-36 items-center gap-3 sm:gap-4 overflow-hidden rounded-2xl bg-white p-4 sm:px-6 sm:py-4"
       style={{
         borderLeft: `4px solid ${color}`,
         boxShadow: '0 12px 30px rgba(0,0,0,0.08)',
@@ -165,8 +165,7 @@ function NearbySummaryCard({ icon, count, label, accentColor, isLoading }) {
         src={icon}
         alt=""
         aria-hidden="true"
-        className="h-12 w-12 shrink-0"
-        style={{ marginLeft: '1rem' }}
+        className="h-10 w-10 sm:h-12 sm:w-12 shrink-0 ml-1 sm:ml-4"
       />
 
       {/* Text */}
@@ -179,12 +178,12 @@ function NearbySummaryCard({ icon, count, label, accentColor, isLoading }) {
         ) : (
           <>
             <p
-              className="font-[Manrope] text-[30px] font-extrabold leading-tight"
+              className="font-[Manrope] text-[22px] sm:text-[30px] font-extrabold leading-tight"
               style={{ color }}
             >
               {count}
             </p>
-            <p className="font-[Manrope] text-[16px] font-medium" style={{ color }}>
+            <p className="font-[Manrope] text-[12px] sm:text-[16px] font-medium" style={{ color }}>
               {label}
             </p>
           </>
@@ -493,7 +492,7 @@ export default function RetailerDashboardPage() {
   }
 
   return (
-    <div className="mt-6 flex w-full flex-col gap-6 px-6 pt-4 sm:mt-8 sm:px-8 sm:pt-6 lg:mt-10 lg:px-12 lg:pt-8">
+    <div className="flex w-full flex-col gap-6 px-6 pb-10 sm:px-8 lg:px-12">
       {error ? (
         <p className="rounded-xl border border-red-200 bg-red-50 px-5 py-4 text-sm font-semibold text-red-600">
           {error}
@@ -534,7 +533,7 @@ export default function RetailerDashboardPage() {
 
         <div className="flex flex-col gap-3">
           {isLoading ? (
-            <p className="rounded-2xl bg-white px-5 py-8 text-center text-[#64748b]">
+            <p className="rounded-2xl bg-white px-5 py-8 text-center font-[Manrope] font-medium text-[#64748b] text-[13px] sm:text-[15px]">
               Memuat donasi...
             </p>
           ) : donations.length > 0 ? (
@@ -542,7 +541,7 @@ export default function RetailerDashboardPage() {
               <DonationRow key={item.id} item={item} onDelete={handleDelete} />
             ))
           ) : (
-            <p className="rounded-2xl bg-white px-5 py-8 text-center text-[#64748b]">
+            <p className="rounded-2xl bg-white px-5 py-8 text-center font-[Manrope] font-medium text-[#64748b] text-[13px] sm:text-[15px]">
               Belum ada surplus aktif.
             </p>
           )}

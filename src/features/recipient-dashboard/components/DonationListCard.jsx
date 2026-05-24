@@ -1,11 +1,17 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@/lib/constants';
-import { MOCK_CATEGORIES } from '@/features/recipient-dashboard/data/mockRecipientDashboardData';
 import { claimDonation } from '@/services/api/recipient';
 import { env } from '@/lib/env';
 import { ClaimDonationModal } from './ClaimDonationModal';
 import { ClaimSuccessPopup } from './ClaimSuccessPopup';
+
+// Mapping slug kategori → label tampilan
+const CATEGORY_LABELS = {
+  'makanan-siap-saji': 'Makanan Siap Saji',
+  'roti-pastry': 'Roti & Pastry',
+  'jajanan-kue': 'Jajanan & Kue',
+};
 
 export function DonationListCard({ data, onClaimed }) {
   const {
@@ -17,8 +23,8 @@ export function DonationListCard({ data, onClaimed }) {
     foodType
   } = data;
 
-  // Integrasi label kategori dengan data yang dipakai di dropdown
-  const categoryLabel = data.categoryLabel || MOCK_CATEGORIES.find(c => c.value === foodType)?.label || foodType;
+  // Integrasi label kategori
+  const categoryLabel = data.categoryLabel || CATEGORY_LABELS[foodType] || foodType;
 
   const navigate = useNavigate();
 
@@ -27,7 +33,7 @@ export function DonationListCard({ data, onClaimed }) {
   const [showSuccess, setShowSuccess] = useState(false);
   const [claiming, setClaiming] = useState(false);
 
-  // Klaim donasi via API, lalu simpan ke localStorage untuk mock fallback
+  // Klaim donasi via API
   const handleClaim = async () => {
     try {
       setClaiming(true);

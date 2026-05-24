@@ -96,34 +96,11 @@ export default function RecipientHandoverPage() {
   const handleConfirmPickup = async (id) => {
     try {
       await updateClaimStatus(id, 'completed');
-      
+
       // Update state (remove from list)
       const updated = claimedDonations.filter((d) => d.id !== id);
       setClaimedDonations(updated);
-      
-      // Untuk mock localStorage update (simulasi)
-      if (import.meta.env.VITE_USE_MOCK_API === 'true') {
-        const donation = claimedDonations.find((d) => d.id === id);
-        if (donation) {
-          const stored = localStorage.getItem('surplusin_history_donations');
-          const history = stored ? JSON.parse(stored) : [];
-          const now = new Date();
-          const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-          const dateStr = `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
-          history.push({
-            id: donation.id,
-            storeName: donation.storeName,
-            location: donation.patokan || '-',
-            foodName: donation.foodName,
-            portion: donation.portion || '-',
-            date: dateStr,
-            donationCount: (donation.items || []).length || 1,
-          });
-          localStorage.setItem('surplusin_history_donations', JSON.stringify(history));
-        }
-        localStorage.setItem('surplusin_claimed_donations', JSON.stringify(updated));
-      }
-      
+
     } catch (error) {
       console.error('Gagal mengkonfirmasi penjemputan:', error);
       alert('Terjadi kesalahan saat konfirmasi penjemputan.');

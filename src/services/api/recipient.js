@@ -23,13 +23,16 @@
 
 import apiClient from './client';
 import { env } from '@/lib/env';
-import {
-  mockDonationSummary,
-  mockDonations,
-  MOCK_CATEGORIES,
-} from '@/features/recipient-dashboard/data/mockRecipientDashboardData';
 
 const USE_MOCK = env.USE_MOCK_API;
+const MOCK_CATEGORIES = [
+  { value: 'semua', label: 'Semua' },
+  { value: 'makanan-siap-saji', label: 'Makanan Siap Saji' },
+  { value: 'roti-pastry', label: 'Roti & Pastry' },
+  { value: 'jajanan-kue', label: 'Jajanan & Kue' },
+];
+const mockDonationSummary = { available: 0, claimed: 0 };
+const mockDonations = [];
 
 // ────────────────────────────────────────────
 // Helpers
@@ -314,11 +317,7 @@ export async function updateRecipientProfile(payload) {
 export async function getDonationHistory() {
   if (USE_MOCK) {
     await mockDelay(400);
-    // Re-use mock data yang sudah ada
-    const { mockHistoryDonations } = await import(
-      '@/features/recipient-dashboard/data/mockRecipientDashboardData'
-    );
-    return mockHistoryDonations;
+    return [];
   }
 
   const { data } = await apiClient.get('/donasi/riwayat-penerima');
