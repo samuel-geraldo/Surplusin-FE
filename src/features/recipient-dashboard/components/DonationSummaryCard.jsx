@@ -54,7 +54,7 @@ export function DonationSummaryCard({ icon, count, label, accentColor, isLoading
                 isBlue ? 'text-[#1F66F4]' : 'text-[#FF6600]',
               )}
             >
-              {count} {label === 'Tersedia di sekitarmu' && count !== null && !String(count).includes('Panti') && !String(count).includes('Yayasan') ? (isBlue ? 'Panti' : 'Yayasan') : 'Donasi'}
+              {count} Donasi
             </p>
             <p
               className={cn(
