@@ -68,22 +68,11 @@ function getCenter(profile) {
 }
 
 function HomeIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#0f172a" style={{ width: 22, height: 22 }} aria-hidden="true">
-      <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
-    </svg>
-  );
+  return <img src="/recipient_retailer icon/basic-icon/icon rumah.svg" alt="" aria-hidden="true" style={{ width: 22, height: 22 }} />;
 }
 
 function EditIcon() {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 32 32" style={{ width: 18, height: 18 }}>
-      <path
-        fill="black"
-        d="M4 22.9V28h5.1L24.15 12.95l-5.1-5.1L4 22.9Zm24.05-13.9a1.36 1.36 0 0 0 0-1.92l-3.13-3.13a1.36 1.36 0 0 0-1.92 0l-2.45 2.45 5.1 5.1 2.4-2.5Z"
-      />
-    </svg>
-  );
+  return <img src="/recipient_retailer icon/basic-icon/edit logo.svg" alt="" aria-hidden="true" style={{ width: 18, height: 18 }} />;
 }
 
 function FieldBox({ field, value, draftValue, error, isEditing, onChange }) {
@@ -96,7 +85,7 @@ function FieldBox({ field, value, draftValue, error, isEditing, onChange }) {
   };
 
   return (
-    <label className={`flex flex-col ${field.id === 'category' || field.id === 'whatsapp' ? '' : 'col-span-2'}`}>
+    <label className={`flex flex-col min-w-0 ${field.id === 'category' || field.id === 'whatsapp' ? '' : 'sm:col-span-2'}`}>
       <span className="mb-1 block font-[Manrope] font-medium text-[#374151]" style={{ fontSize: '14px' }}>
         {field.label}
       </span>
@@ -137,7 +126,7 @@ function FieldBox({ field, value, draftValue, error, isEditing, onChange }) {
         )
       ) : (
         <span
-          className="w-full rounded-xl font-[Manrope] text-[#374151]"
+          className="w-full break-words rounded-xl font-[Manrope] text-[#374151]"
           style={{
             padding: '10px 14px',
             fontSize: '14px',
@@ -265,7 +254,7 @@ function RecipientLocationMap({ editable, profile, draft, onLocationChange }) {
   }
 
   return (
-    <div className="mt-4 flex flex-col gap-3">
+    <div className="mt-4 flex flex-1 flex-col gap-3">
       <div className="relative">
         <div className="flex h-11 w-full items-center rounded-[8px] border border-[#94a3b8] bg-white px-3">
           <Search className="size-5 text-[#64748b]" strokeWidth={2.2} />
@@ -304,7 +293,7 @@ function RecipientLocationMap({ editable, profile, draft, onLocationChange }) {
               <button
                 key={result.id}
                 type="button"
-                className="block w-full px-4 py-3 text-left font-[Manrope] text-[14px] leading-5 text-[#0f172a] hover:bg-[#dcfce9] focus-visible:bg-[#dcfce9] focus-visible:outline-none"
+                className="block w-full px-4 py-3 text-left font-[Manrope] text-[14px] leading-5 text-text hover:bg-[#dcfce9] focus-visible:bg-[#dcfce9] focus-visible:outline-none"
                 onClick={() => handleAddressSelect(result)}
               >
                 {result.label}
@@ -319,7 +308,7 @@ function RecipientLocationMap({ editable, profile, draft, onLocationChange }) {
         ) : null}
       </div>
 
-      <div className="relative h-[260px] w-full overflow-hidden rounded-2xl border border-[#e2e8f0] bg-[#edf2f7]">
+      <div className="relative flex-1 min-h-[260px] w-full overflow-hidden rounded-2xl border border-[#e2e8f0] bg-[#edf2f7]">
         <GoogleLocationMap
           center={center}
           onPick={handlePick}
@@ -456,7 +445,7 @@ export default function RecipientProfilePage() {
   };
 
   return (
-    <div className="flex gap-6 px-8 py-8 font-[Manrope]" style={{ marginTop: '1rem' }}>
+    <div className="flex flex-col lg:flex-row gap-6 px-4 sm:px-6 lg:px-8 py-6 sm:py-8 font-[Manrope]" style={{ marginTop: '0.5rem' }}>
       {isLoading && (
         <div className="fixed inset-x-0 top-20 z-40 mx-auto w-fit rounded-full bg-white px-5 py-2 text-sm font-semibold text-[#64748b] shadow">
           Memuat profil...
@@ -467,11 +456,10 @@ export default function RecipientProfilePage() {
           {errorMessage}
         </div>
       )}
-
       <div className="flex flex-1 flex-col gap-6" style={{ minWidth: 0 }}>
         <section
-          className="rounded-3xl bg-white"
-          style={{ padding: '1.75rem 2rem', boxShadow: '0 8px 30px rgba(0,0,0,0.06)', border: '1px solid #f1f5f9' }}
+          className="flex flex-col h-full rounded-3xl bg-white p-5 sm:p-7 lg:px-8"
+          style={{ boxShadow: '0 8px 30px rgba(0,0,0,0.06)', border: '1px solid #f1f5f9' }}
         >
           <div className="mb-5 flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
@@ -492,7 +480,7 @@ export default function RecipientProfilePage() {
             ) : null}
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {fields.map((field) => (
               <FieldBox
                 key={field.id}
@@ -535,12 +523,12 @@ export default function RecipientProfilePage() {
         </section>
       </div>
 
-      <aside className="hidden shrink-0 flex-col gap-0 xl:flex" style={{ width: 380 }}>
+      <aside className="flex shrink-0 flex-col gap-0 w-full lg:w-[380px]" >
         <section
-          className="flex flex-col rounded-3xl bg-white"
-          style={{ padding: '1.75rem', boxShadow: '0 8px 30px rgba(0,0,0,0.06)', border: '1px solid #f1f5f9' }}
+          className="flex flex-col h-full rounded-3xl bg-white p-5 sm:p-7"
+          style={{ boxShadow: '0 8px 30px rgba(0,0,0,0.06)', border: '1px solid #f1f5f9' }}
         >
-          <div className="flex min-w-0 flex-col">
+          <div className="flex flex-1 min-w-0 flex-col">
             <div className="flex items-center gap-2">
               <img
                 src="/recipient_retailer icon/basic-icon/location black.svg"
@@ -575,5 +563,5 @@ export default function RecipientProfilePage() {
       <FailedUpdatePopup isOpen={showFailedPopup} />
       <SuccessUpdatePopup isOpen={showSuccessPopup} />
     </div>
-  );
+  )
 }

@@ -53,22 +53,11 @@ function getProfileCenter(profile) {
 }
 
 function HomeProfileIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#0f172a" style={{ width: 22, height: 22 }} aria-hidden="true">
-      <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
-    </svg>
-  );
+  return <img src="/recipient_retailer icon/basic-icon/icon rumah.svg" alt="" aria-hidden="true" style={{ width: 22, height: 22 }} />;
 }
 
 function EditProfileIcon() {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 32 32" style={{ width: 18, height: 18 }}>
-      <path
-        fill="black"
-        d="M4 22.9V28h5.1L24.15 12.95l-5.1-5.1L4 22.9Zm24.05-13.9a1.36 1.36 0 0 0 0-1.92l-3.13-3.13a1.36 1.36 0 0 0-1.92 0l-2.45 2.45 5.1 5.1 2.4-2.5Z"
-      />
-    </svg>
-  );
+  return <img src="/recipient_retailer icon/basic-icon/edit logo.svg" alt="" aria-hidden="true" style={{ width: 18, height: 18 }} />;
 }
 
 function FieldBox({ field, value, draftValue, error, isEditing, onChange }) {
@@ -257,7 +246,7 @@ function RetailerLocationMap({ editable, profile, draft, onLocationChange }) {
   }
 
   return (
-    <div className="mt-4 flex flex-col gap-3">
+    <div className="mt-4 flex flex-1 flex-col gap-3">
       <div className="relative">
         <div className="flex h-11 w-full items-center rounded-[8px] border border-[#94a3b8] bg-white px-3">
           <Search className="size-5 text-[#64748b]" strokeWidth={2.2} />
@@ -311,7 +300,7 @@ function RetailerLocationMap({ editable, profile, draft, onLocationChange }) {
         ) : null}
       </div>
 
-      <div className="relative h-[260px] w-full overflow-hidden rounded-2xl border border-[#e2e8f0] bg-[#edf2f7]">
+      <div className="relative flex-1 min-h-[260px] w-full overflow-hidden rounded-2xl border border-[#e2e8f0] bg-[#edf2f7]">
         <GoogleLocationMap
           center={center}
           onPick={handlePick}
@@ -464,7 +453,7 @@ export default function RetailerProfilePage() {
       )}
       <div className="flex flex-1 flex-col gap-6" style={{ minWidth: 0 }}>
         <section
-          className="rounded-3xl bg-white p-5 sm:p-7 lg:px-8"
+          className="flex flex-col h-full rounded-3xl bg-white p-5 sm:p-7 lg:px-8"
           style={{ boxShadow: '0 8px 30px rgba(0,0,0,0.06)', border: '1px solid #f1f5f9' }}
         >
           <div className="mb-5 flex items-center justify-between gap-4">
@@ -559,10 +548,10 @@ export default function RetailerProfilePage() {
 
       <aside className="flex w-full shrink-0 flex-col gap-0 xl:w-[380px]">
         <section
-          className="flex flex-col rounded-3xl bg-white p-5 sm:p-7"
+          className="flex flex-col h-full rounded-3xl bg-white p-5 sm:p-7"
           style={{ boxShadow: '0 8px 30px rgba(0,0,0,0.06)', border: '1px solid #f1f5f9' }}
         >
-          <div className="flex min-w-0 flex-col">
+          <div className="flex flex-1 min-w-0 flex-col">
             <div className="flex items-center gap-2">
               <img
                 src="/recipient_retailer icon/basic-icon/location black.svg"
